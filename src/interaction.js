@@ -1,8 +1,9 @@
 import { selectCell, typeLetter, backspace } from "./model.js";
+import { getShareUrl } from "./share.js";
 
 const HEBREW_LETTER = /[א-ת]/;
 
-export function wireInteractions(state, { gridEl, hiddenInput, onChange }) {
+export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChange }) {
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;
@@ -36,6 +37,23 @@ export function wireInteractions(state, { gridEl, hiddenInput, onChange }) {
       onChange();
       hiddenInput.focus({ preventScroll: true });
     }
+  });
+
+  shareBtn.addEventListener("click", async () => {
+    const url = getShareUrl(state);
+    const originalText = shareBtn.textContent;
+    try {
+      await navigator.clipboard.writeText(url);
+      shareBtn.textContent = "הקישור הועתק!";
+    } catch (err) {
+      // clipboard API can be unavailable (older browsers, non-HTTPS, permissions) --
+      // fall back to just showing the link so the user can copy it manually
+      console.warn("Clipboard write failed, showing link instead:", err);
+      window.prompt("העתיקו את הקישור:", url);
+    }
+    setTimeout(() => {
+      shareBtn.textContent = originalText;
+    }, 2000);
   });
 }
 

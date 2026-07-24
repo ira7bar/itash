@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v4";
+const CACHE_NAME = "tashbetz-shell-v5";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -9,6 +9,7 @@ const SHELL_FILES = [
   "src/render.js",
   "src/interaction.js",
   "src/storage.js",
+  "src/share.js",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "fonts/assistant-hebrew.woff2",

@@ -15,6 +15,7 @@
   --letter-fg: #0d3b4d;
   --banner-bg: #1c6e8c;
   --banner-fg: #ffffff;
+  --share-accent: #1c6e8c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -106,6 +107,26 @@ body {
   font-weight: 700;
   color: var(--letter-fg);
   line-height: 1;
+}
+
+footer {
+  position: sticky;
+  bottom: 0;
+  padding: 0.5rem;
+  background: var(--bg);
+  border-top: 1px solid rgba(128, 128, 128, 0.4);
+  text-align: center;
+}
+
+#share-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--share-accent);
+  background: transparent;
+  color: var(--share-accent);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 #hidden-input {

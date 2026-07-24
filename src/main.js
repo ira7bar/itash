@@ -2,18 +2,27 @@ import { createState } from "./model.js";
 import { setupImage, renderGridShell, updateGrid, updateClueBanner } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
+import { loadFromUrlIfPresent } from "./share.js";
 
 async function main() {
   const imageEl = document.getElementById("puzzle-image");
   const overlayEl = document.getElementById("overlay-layer");
   const bannerEl = document.getElementById("clue-banner");
   const hiddenInput = document.getElementById("hidden-input");
+  const shareBtn = document.getElementById("share-btn");
 
   const res = await fetch("puzzle.json", { cache: "no-cache" });
   const puzzle = await res.json();
 
   const state = createState(puzzle);
   loadProgress(state);
+  // A shared link (opened from another device, or from a family member) is an
+  // explicit "load this snapshot" action, so it overrides whatever local
+  // progress this device already had -- then gets saved locally right away so
+  // it carries on from here as normal on this device too.
+  if (loadFromUrlIfPresent(state)) {
+    saveProgress(state);
+  }
 
   setupImage(state, imageEl);
   renderGridShell(state, overlayEl);
@@ -27,7 +36,7 @@ async function main() {
     saveProgress(state);
   };
 
-  wireInteractions(state, { gridEl: overlayEl, hiddenInput, onChange });
+  wireInteractions(state, { gridEl: overlayEl, hiddenInput, shareBtn, onChange });
   onChange();
 }
 
