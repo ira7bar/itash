@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Assistant";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/assistant-hebrew.woff2") format("woff2");
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+
 :root {
   --bg: #ffffff;
   --fg: #1a1a1a;
@@ -35,7 +44,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--fg);
-  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-family: "Assistant", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
 
 body {
@@ -79,7 +88,6 @@ body {
 
 .cell {
   position: relative;
-  aspect-ratio: 1 / 1;
   background: var(--blank-bg);
   display: flex;
   align-items: center;
@@ -117,7 +125,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(4px, 1.6cqw, 9px);
+  font-size: var(--clue-font-size, 8px);
   line-height: 1.1;
   text-align: center;
   padding: 1px;
@@ -130,11 +138,9 @@ body {
 }
 
 .letter {
-  font-size: clamp(10px, 4.5cqw, 22px);
+  font-size: var(--letter-font-size, 18px);
   font-weight: 600;
 }
-
-#grid { container-type: inline-size; }
 
 footer {
   position: sticky;

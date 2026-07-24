@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v2";
+const CACHE_NAME = "tashbetz-shell-v3";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -11,6 +11,7 @@ const SHELL_FILES = [
   "src/storage.js",
   "icons/icon-192.png",
   "icons/icon-512.png",
+  "fonts/assistant-hebrew.woff2",
 ];
 
 self.addEventListener("install", (event) => {

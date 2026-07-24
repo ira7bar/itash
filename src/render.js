@@ -1,23 +1,39 @@
 import { isBlocked, getCellEntry, getActiveWord } from "./model.js";
 
-// #grid has no intrinsic height of its own; without a definite height, CSS Grid's
-// `1fr` row tracks have no free space to divide and instead grow to fit each row's
-// tallest content (the classic "1fr degrades to auto in an auto-sized container"
-// behavior), which breaks the uniform square-cell layout once any cell's clue text
-// wants more vertical room than the row would otherwise get. Setting an explicit
-// pixel height (computed from the grid's own rendered width) forces every row to
-// the same size, so `overflow: hidden` on `.cell` can then reliably clip long text
-// instead of the whole grid deforming around it.
+// `1fr` grid tracks are still a content-aware sizing algorithm (they must first
+// satisfy each track's "automatic minimum size" before distributing free space),
+// and that has shown real cross-environment inconsistency for this layout. Fixed
+// pixel tracks have no such ambiguity -- a `22px` track cannot grow from content
+// in any spec-compliant browser. So instead of `repeat(n, 1fr)` plus a computed
+// container height, every track (and every cell) gets an explicit pixel size
+// computed from the grid's own rendered width.
+function clamp(min, value, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 export function sizeGridToSquareCells(state, gridEl) {
   const width = gridEl.clientWidth;
   const cellSize = width / state.index.cols;
+  gridEl.style.gridTemplateColumns = `repeat(${state.index.cols}, ${cellSize}px)`;
+  gridEl.style.gridTemplateRows = `repeat(${state.index.rows}, ${cellSize}px)`;
   gridEl.style.height = `${cellSize * state.index.rows}px`;
+
+  // Font sizes are computed here (plain px, no cqw/container-query) for the same
+  // reason cell sizing moved off `1fr`: fewer content-aware/engine-dependent CSS
+  // sizing mechanisms in the chain, less room for cross-browser divergence.
+  const clueFontSize = clamp(4, cellSize * 0.22, 8);
+  const letterFontSize = clamp(10, cellSize * 0.72, 22);
+  gridEl.style.setProperty("--clue-font-size", `${clueFontSize}px`);
+  gridEl.style.setProperty("--letter-font-size", `${letterFontSize}px`);
+
+  for (const cellEl of gridEl.children) {
+    cellEl.style.width = `${cellSize}px`;
+    cellEl.style.height = `${cellSize}px`;
+  }
 }
 
 export function renderGridShell(state, gridEl) {
   gridEl.innerHTML = "";
-  gridEl.style.gridTemplateColumns = `repeat(${state.index.cols}, 1fr)`;
-  gridEl.style.gridTemplateRows = `repeat(${state.index.rows}, 1fr)`;
 
   for (let r = 0; r < state.index.rows; r++) {
     for (let c = 0; c < state.index.cols; c++) {
