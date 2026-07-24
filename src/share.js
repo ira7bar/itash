@@ -3,37 +3,48 @@
 // into a compact string in the URL's hash fragment; opening that link on any
 // device (or handing it to family) loads that exact snapshot. Not live sync --
 // each share is a snapshot at the moment you generate it.
+//
+// Encoding: only FILLED cells are encoded (most of a 21x16 grid is empty most
+// of the time, so encoding all 336 positions wastes space on "empty" markers).
+// Each filled cell becomes exactly 3 plain-ASCII base-36 characters: 2 for its
+// flat grid position (0-335 fits easily) and 1 for the letter -- Hebrew's
+// Unicode block is a contiguous 27-code-point range (including the final
+// forms ך/ם/ן/ף/ץ interspersed within it), so "which letter" is just
+// (charCode - HEBREW_BASE), a number 0-26 that fits in a single base-36
+// digit. The result is already URL-safe ASCII, no base64 step needed.
 
-const EMPTY_MARK = "_"; // safe: typed answers are always Hebrew letters (see interaction.js)
+const HEBREW_BASE = 0x05d0; // א -- start of the Hebrew Unicode block
+const RADIX = 36;
+const POS_WIDTH = 2; // base-36 digits; 36^2 = 1296, comfortably covers 0-335
 
 export function encodeAnswers(state) {
   const { rows, cols } = state.index;
-  let flat = "";
+  let out = "";
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      flat += state.answers[r][c] || EMPTY_MARK;
+      const letter = state.answers[r][c];
+      if (!letter) continue;
+      const letterIndex = letter.charCodeAt(0) - HEBREW_BASE;
+      if (letterIndex < 0 || letterIndex > 26) continue; // not a plain Hebrew letter; skip
+      const flatIndex = r * cols + c;
+      out += flatIndex.toString(RADIX).padStart(POS_WIDTH, "0");
+      out += letterIndex.toString(RADIX);
     }
   }
-  const bytes = new TextEncoder().encode(flat);
-  let binary = "";
-  for (const b of bytes) binary += String.fromCharCode(b);
-  // URL-safe base64: '+' and '/' aren't valid in a URL fragment without encoding
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return out;
 }
 
 export function decodeAnswers(encoded, rows, cols) {
-  const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
-  const binary = atob(base64);
-  const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
-  const flat = new TextDecoder().decode(bytes);
-
   const answers = Array.from({ length: rows }, () => Array(cols).fill(""));
-  let i = 0;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const ch = flat[i++];
-      answers[r][c] = ch && ch !== EMPTY_MARK ? ch : "";
-    }
+  const entryWidth = POS_WIDTH + 1;
+  for (let i = 0; i + entryWidth <= encoded.length; i += entryWidth) {
+    const flatIndex = parseInt(encoded.slice(i, i + POS_WIDTH), RADIX);
+    const letterIndex = parseInt(encoded.slice(i + POS_WIDTH, i + entryWidth), RADIX);
+    if (Number.isNaN(flatIndex) || Number.isNaN(letterIndex)) continue;
+    const r = Math.floor(flatIndex / cols);
+    const c = flatIndex % cols;
+    if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
+    answers[r][c] = String.fromCharCode(HEBREW_BASE + letterIndex);
   }
   return answers;
 }
@@ -49,7 +60,7 @@ export function getShareUrl(state) {
 // Clears the hash afterward so reloading the (now-bookmarked) page doesn't
 // keep re-applying an old snapshot over newer local progress.
 export function loadFromUrlIfPresent(state) {
-  const match = location.hash.match(/^#s=(.+)$/);
+  const match = location.hash.match(/^#s=([0-9a-z]*)$/);
   if (!match) return false;
   try {
     state.answers = decodeAnswers(match[1], state.index.rows, state.index.cols);
