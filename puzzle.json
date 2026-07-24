@@ -12,7 +12,10 @@
         "clue": "נו באמת, נראה לָך?"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -27,14 +30,20 @@
         "clue": "שם תואר לחלבון, בהקשר התזונתי"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
         "clue": "בחורף סגרירי – ובקיץ?"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -49,7 +58,10 @@
         "clue": "פתיחה לשאלה שהתשובה לה שלילית"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -60,7 +72,10 @@
         "clue": "פרח ְצהוב או ורוד שגדל בחופי ארְצנו"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -81,19 +96,31 @@
     ],
     [
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -107,7 +134,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -116,22 +152,31 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -151,7 +196,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -163,7 +211,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -183,7 +234,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -211,7 +265,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -231,10 +288,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -251,7 +314,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -275,10 +341,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -298,13 +370,19 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -316,10 +394,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -342,7 +426,11 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -365,7 +453,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -383,7 +474,11 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -406,7 +501,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -418,7 +516,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -447,10 +548,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -482,10 +589,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -510,7 +623,11 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -523,7 +640,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -540,7 +660,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -552,7 +675,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -564,10 +696,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -587,7 +719,11 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -621,7 +757,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -638,7 +777,11 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
       },
       {
         "type": "blocked",
@@ -658,21 +801,33 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -684,10 +839,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -701,10 +862,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -724,7 +891,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -743,7 +913,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -756,20 +929,29 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
         "clue": "כלי קיבול שְצבא גרמניה פיתח"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -784,7 +966,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -795,7 +980,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -818,7 +1006,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -838,7 +1029,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -864,10 +1058,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -887,10 +1087,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -907,10 +1113,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -932,10 +1144,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -955,7 +1173,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -964,7 +1185,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -980,13 +1204,22 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1003,13 +1236,19 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1032,7 +1271,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -1049,10 +1291,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1072,10 +1320,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1105,7 +1359,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1118,10 +1375,16 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1137,16 +1400,25 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ],
     [
@@ -1157,7 +1429,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1173,7 +1448,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1195,7 +1473,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1238,7 +1519,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       },
       {
         "type": "blocked",
@@ -1254,7 +1538,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
       }
     ]
   ],

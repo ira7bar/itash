@@ -1,5 +1,1 @@
-test_*.py
-test_*_report.json
-shot_*.png
-__pycache__/
-fresh_check.json
+dev/

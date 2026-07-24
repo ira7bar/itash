@@ -5,6 +5,7 @@ import { saveProgress, loadProgress } from "./storage.js";
 
 async function main() {
   const gridEl = document.getElementById("grid");
+  const gridWrapEl = document.getElementById("grid-wrap");
   const bannerEl = document.getElementById("clue-banner");
   const hiddenInput = document.getElementById("hidden-input");
   const editToggleBtn = document.getElementById("edit-toggle");
@@ -17,8 +18,8 @@ async function main() {
   syncIndexWithOverrides(state);
 
   renderGridShell(state, gridEl);
-  sizeGridToSquareCells(state, gridEl);
-  window.addEventListener("resize", () => sizeGridToSquareCells(state, gridEl));
+  sizeGridToSquareCells(state, gridEl, gridWrapEl);
+  window.addEventListener("resize", () => sizeGridToSquareCells(state, gridEl, gridWrapEl));
 
   const onChange = () => {
     updateGrid(state, gridEl);
