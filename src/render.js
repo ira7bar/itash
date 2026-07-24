@@ -66,16 +66,3 @@ export function updateGrid(state, overlayEl) {
     cellEl.classList.toggle("in-word", !blocked && activeWordCellSet.has(`${r},${c}`));
   }
 }
-
-export function updateClueBanner(state, bannerEl) {
-  const word = getActiveWord(state);
-  if (!word) {
-    bannerEl.textContent = state.activeCell ? "" : "הקש על תא כדי להתחיל";
-    bannerEl.classList.toggle("empty", true);
-    return;
-  }
-  const dirLabel = word.direction === "horizontal" ? "מאוזן" : "מאונך";
-  bannerEl.textContent = word.clue ? `${word.clue} (${dirLabel})` : `(אין רמז מזוהה — ${dirLabel})`;
-  bannerEl.classList.toggle("empty", false);
-  bannerEl.classList.toggle("missing-clue", !word.clue);
-}

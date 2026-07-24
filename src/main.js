@@ -1,5 +1,5 @@
 import { createState } from "./model.js";
-import { setupImage, renderGridShell, updateGrid, updateClueBanner } from "./render.js";
+import { setupImage, renderGridShell, updateGrid } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { loadFromUrlIfPresent } from "./share.js";
@@ -7,7 +7,6 @@ import { loadFromUrlIfPresent } from "./share.js";
 async function main() {
   const imageEl = document.getElementById("puzzle-image");
   const overlayEl = document.getElementById("overlay-layer");
-  const bannerEl = document.getElementById("clue-banner");
   const hiddenInput = document.getElementById("hidden-input");
   const shareBtn = document.getElementById("share-btn");
 
@@ -32,7 +31,6 @@ async function main() {
 
   const onChange = () => {
     updateGrid(state, overlayEl);
-    updateClueBanner(state, bannerEl);
     saveProgress(state);
   };
 

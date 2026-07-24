@@ -12,9 +12,7 @@
   --fg: #1a1a1a;
   --active-bg: rgba(255, 213, 74, 0.55);
   --in-word-bg: rgba(255, 213, 74, 0.28);
-  --letter-fg: #0d3b4d;
-  --banner-bg: #1c6e8c;
-  --banner-fg: #ffffff;
+  --letter-fg: #000000;
   --share-accent: #1c6e8c;
 }
 
@@ -22,9 +20,7 @@
   :root {
     --bg: #121212;
     --fg: #eaeaea;
-    --letter-fg: #cfe6f2;
-    --banner-bg: #0d3b4d;
-    --banner-fg: #f2f2f2;
+    --letter-fg: #f2f2f2;
   }
 }
 
@@ -43,22 +39,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-#clue-banner {
-  direction: rtl;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--banner-bg);
-  color: var(--banner-fg);
-  padding: 0.75rem 1rem;
-  font-size: 1.05rem;
-  line-height: 1.4;
-  min-height: 1.4em;
-  text-align: center;
-}
-#clue-banner.empty { opacity: 0.7; font-style: italic; }
-#clue-banner.missing-clue { opacity: 0.85; }
 
 #grid-wrap {
   flex: 1;
