@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+  <meta name="theme-color" content="#1c6e8c" />
+  <title>תשחץ הארץ</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="clue-banner" class="empty">הקש על תא כדי להתחיל</header>
+
+  <main id="grid-wrap">
+    <div id="grid"></div>
+  </main>
+
+  <footer>
+    <button id="edit-toggle" type="button">מצב עריכה</button>
+  </footer>
+
+  <input id="hidden-input" type="text" inputmode="text" lang="he" autocomplete="off"
+         autocapitalize="off" autocorrect="off" spellcheck="false" />
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --blocked-bg: #cfe6f2;
+  --blocked-fg: #0d3b4d;
+  --blank-bg: #ffffff;
+  --blank-border: #888888;
+  --active-bg: #ffd54a;
+  --in-word-bg: #fff2c2;
+  --banner-bg: #1c6e8c;
+  --banner-fg: #ffffff;
+  --edit-accent: #d1495b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --fg: #eaeaea;
+    --blocked-bg: #17414f;
+    --blocked-fg: #cfe6f2;
+    --blank-bg: #1e1e1e;
+    --blank-border: #666666;
+    --active-bg: #b98d00;
+    --in-word-bg: #3a3220;
+    --banner-bg: #0d3b4d;
+    --banner-fg: #f2f2f2;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#clue-banner {
+  direction: rtl;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--banner-bg);
+  color: var(--banner-fg);
+  padding: 0.75rem 1rem;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  min-height: 1.4em;
+  text-align: center;
+}
+#clue-banner.empty { opacity: 0.7; font-style: italic; }
+#clue-banner.missing-clue { opacity: 0.85; }
+
+#grid-wrap {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pinch-zoom pan-x pan-y;
+  padding: 0.5rem;
+}
+
+#grid {
+  direction: ltr; /* column order must match the source PDF's left-to-right layout, not follow RTL flow */
+  display: grid;
+  gap: 1px;
+  background: var(--blank-border);
+  border: 2px solid var(--blank-border);
+  width: min(100%, 700px);
+  margin: 0 auto;
+}
+
+.cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--blank-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cell.blocked {
+  background: var(--blocked-bg);
+  color: var(--blocked-fg);
+  cursor: default;
+}
+
+.cell.blank.active { background: var(--active-bg); }
+.cell.blank.in-word:not(.active) { background: var(--in-word-bg); }
+
+.cell.edit-mode { cursor: pointer; }
+.cell.edit-mode.blocked { outline: 1px dashed var(--edit-accent); }
+.cell.edit-mode.blank { outline: 1px dashed var(--edit-accent); }
+
+.clue-text {
+  direction: rtl;
+  font-size: clamp(4px, 1.6cqw, 9px);
+  line-height: 1.1;
+  text-align: center;
+  padding: 1px;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.letter {
+  font-size: clamp(10px, 4.5cqw, 22px);
+  font-weight: 600;
+}
+
+#grid { container-type: inline-size; }
+
+footer {
+  position: sticky;
+  bottom: 0;
+  padding: 0.5rem;
+  background: var(--bg);
+  border-top: 1px solid var(--blank-border);
+  text-align: center;
+}
+
+#edit-toggle {
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--edit-accent);
+  background: transparent;
+  color: var(--edit-accent);
+  cursor: pointer;
+}
+#edit-toggle.active {
+  background: var(--edit-accent);
+  color: white;
+}
+
+#hidden-input {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  font-size: 16px; /* prevents iOS Safari from auto-zooming on focus */
+  pointer-events: none;
+}

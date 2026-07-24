@@ -1,0 +1,5 @@
+test_drive*.py
+test_advance*.py
+test_*_report.json
+shot_*.png
+__pycache__/
