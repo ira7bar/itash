@@ -1,5 +1,5 @@
 import { createState, syncIndexWithOverrides } from "./model.js";
-import { renderGridShell, updateGrid, updateClueBanner } from "./render.js";
+import { renderGridShell, sizeGridToSquareCells, updateGrid, updateClueBanner } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 
@@ -17,6 +17,8 @@ async function main() {
   syncIndexWithOverrides(state);
 
   renderGridShell(state, gridEl);
+  sizeGridToSquareCells(state, gridEl);
+  window.addEventListener("resize", () => sizeGridToSquareCells(state, gridEl));
 
   const onChange = () => {
     updateGrid(state, gridEl);
