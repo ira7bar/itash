@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v3";
+const CACHE_NAME = "tashbetz-shell-v4";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -31,8 +31,9 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname.endsWith("puzzle.json")) {
-    // network-first: always try to get this week's latest puzzle, fall back to cache if offline
+  if (url.pathname.endsWith("puzzle.json") || url.pathname.endsWith("puzzle.png")) {
+    // network-first: always try to get this week's latest puzzle (data + rendered
+    // page image), fall back to cache if offline
     event.respondWith(
       fetch(event.request)
         .then((response) => {

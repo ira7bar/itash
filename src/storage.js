@@ -6,10 +6,7 @@ function keyFor(puzzle) {
 
 export function saveProgress(state) {
   const key = keyFor(state.puzzle);
-  const payload = {
-    answers: state.answers,
-    blockedOverrides: state.blockedOverrides,
-  };
+  const payload = { answers: state.answers };
   try {
     localStorage.setItem(key, JSON.stringify(payload));
   } catch (err) {
@@ -24,7 +21,6 @@ export function loadProgress(state) {
     if (!raw) return;
     const payload = JSON.parse(raw);
     if (payload.answers) state.answers = payload.answers;
-    if (payload.blockedOverrides) state.blockedOverrides = payload.blockedOverrides;
   } catch (err) {
     console.warn("Could not load saved progress:", err);
   }

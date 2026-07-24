@@ -35,95 +35,17 @@ function pickDirection(index, row, col, preferredDirection) {
 export function createState(puzzle) {
   const index = buildIndex(puzzle);
   const answers = Array.from({ length: index.rows }, () => Array(index.cols).fill(""));
-  const blockedOverrides = Array.from({ length: index.rows }, () => Array(index.cols).fill(null));
   return {
     puzzle,
     index,
     answers,
-    blockedOverrides, // null = use puzzle's original type; true/false = manual tweak override
     activeCell: null,
     activeDirection: null,
-    editMode: false,
   };
 }
 
 export function isBlocked(state, row, col) {
-  const override = state.blockedOverrides[row][col];
-  if (override !== null) return override;
   return state.puzzle.grid[row][col].type === "blocked";
-}
-
-export function toggleBlocked(state, row, col) {
-  const current = isBlocked(state, row, col);
-  state.blockedOverrides[row][col] = !current;
-  syncIndexWithOverrides(state);
-  if (state.activeCell && isBlocked(state, state.activeCell.row, state.activeCell.col)) {
-    state.activeCell = null;
-    state.activeDirection = null;
-  }
-}
-
-// Recomputes the word-run index against the current blocked matrix (original + overrides).
-// Call this after restoring saved overrides from storage, as well as after each manual toggle.
-export function syncIndexWithOverrides(state) {
-  state.index = rebuildIndexWithOverrides(state);
-  return state.index;
-}
-
-function rebuildIndexWithOverrides(state) {
-  const { rows, cols } = state.index;
-  const blocked = Array.from({ length: rows }, (_, r) =>
-    Array.from({ length: cols }, (_, c) => isBlocked(state, r, c))
-  );
-
-  const words = [];
-  for (let r = 0; r < rows; r++) {
-    let c = 0;
-    while (c < cols) {
-      if (blocked[r][c]) { c++; continue; }
-      const start = c;
-      while (c < cols && !blocked[r][c]) c++;
-      const end = c - 1;
-      if (end - start + 1 >= 2) {
-        const cells = [];
-        for (let cc = end; cc >= start; cc--) cells.push([r, cc]);
-        words.push({ id: `h-${r}-${start}`, direction: "horizontal", cells, clue: null, clueCell: null });
-      }
-    }
-  }
-  for (let c = 0; c < cols; c++) {
-    let r = 0;
-    while (r < rows) {
-      if (blocked[r][c]) { r++; continue; }
-      const start = r;
-      while (r < rows && !blocked[r][c]) r++;
-      const end = r - 1;
-      if (end - start + 1 >= 2) {
-        const cells = [];
-        for (let rr = start; rr <= end; rr++) cells.push([rr, c]);
-        words.push({ id: `v-${start}-${c}`, direction: "vertical", cells, clue: null, clueCell: null });
-      }
-    }
-  }
-
-  // preserve original clue text where a run is unchanged from the source puzzle
-  const originalIndex = buildIndex(state.puzzle);
-  for (const word of words) {
-    const orig = originalIndex.wordsById.get(word.id);
-    if (orig) {
-      word.clue = orig.clue;
-      word.clueCell = orig.clueCell;
-    }
-  }
-
-  const wordsById = new Map(words.map((w) => [w.id, w]));
-  const cellIndex = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => ({ horizontal: null, vertical: null }))
-  );
-  for (const word of words) {
-    for (const [r, c] of word.cells) cellIndex[r][c][word.direction] = word.id;
-  }
-  return { wordsById, cellIndex, rows, cols };
 }
 
 export function selectCell(state, row, col) {

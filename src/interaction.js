@@ -1,19 +1,13 @@
-import { selectCell, typeLetter, backspace, toggleBlocked } from "./model.js";
+import { selectCell, typeLetter, backspace } from "./model.js";
 
 const HEBREW_LETTER = /[א-ת]/;
 
-export function wireInteractions(state, { gridEl, hiddenInput, editToggleBtn, onChange }) {
+export function wireInteractions(state, { gridEl, hiddenInput, onChange }) {
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;
     const row = Number(cellEl.dataset.row);
     const col = Number(cellEl.dataset.col);
-
-    if (state.editMode) {
-      toggleBlocked(state, row, col);
-      onChange();
-      return;
-    }
 
     selectCell(state, row, col);
     onChange();
@@ -42,13 +36,6 @@ export function wireInteractions(state, { gridEl, hiddenInput, editToggleBtn, on
       onChange();
       hiddenInput.focus({ preventScroll: true });
     }
-  });
-
-  editToggleBtn.addEventListener("click", () => {
-    state.editMode = !state.editMode;
-    editToggleBtn.classList.toggle("active", state.editMode);
-    editToggleBtn.textContent = state.editMode ? "סיום עריכה" : "מצב עריכה";
-    onChange();
   });
 }
 

@@ -10,27 +10,18 @@
 :root {
   --bg: #ffffff;
   --fg: #1a1a1a;
-  --blocked-bg: #cfe6f2;
-  --blocked-fg: #0d3b4d;
-  --blank-bg: #ffffff;
-  --blank-border: #888888;
-  --active-bg: #ffd54a;
-  --in-word-bg: #fff2c2;
+  --active-bg: rgba(255, 213, 74, 0.55);
+  --in-word-bg: rgba(255, 213, 74, 0.28);
+  --letter-fg: #0d3b4d;
   --banner-bg: #1c6e8c;
   --banner-fg: #ffffff;
-  --edit-accent: #d1495b;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #121212;
     --fg: #eaeaea;
-    --blocked-bg: #17414f;
-    --blocked-fg: #cfe6f2;
-    --blank-bg: #1e1e1e;
-    --blank-border: #666666;
-    --active-bg: #b98d00;
-    --in-word-bg: #3a3220;
+    --letter-fg: #cfe6f2;
     --banner-bg: #0d3b4d;
     --banner-fg: #f2f2f2;
   }
@@ -74,115 +65,47 @@ body {
   -webkit-overflow-scrolling: touch;
   touch-action: pinch-zoom pan-x pan-y;
   padding: 0.5rem;
+  background: var(--bg);
 }
 
 #grid {
-  direction: ltr; /* column order must match the source PDF's left-to-right layout, not follow RTL flow */
-  display: grid;
-  gap: 1px;
-  background: var(--blank-border);
-  border: 2px solid var(--blank-border);
-  width: min(100%, 700px);
+  position: relative;
+  width: min(100%, 900px);
   margin: 0 auto;
+  line-height: 0; /* avoid the image's own inline-baseline gap adding stray space below it */
+}
+
+#puzzle-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#overlay-layer {
+  position: absolute;
+  inset: 0;
 }
 
 .cell {
-  position: relative;
-  background: var(--blank-bg);
+  position: absolute;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  cursor: pointer;
-  user-select: none;
 }
 
-.cell.blocked {
-  background: var(--blocked-bg);
-  color: var(--blocked-fg);
-  cursor: default;
-}
+.cell.blocked { cursor: default; }
 
 .cell.blank.active { background: var(--active-bg); }
 .cell.blank.in-word:not(.active) { background: var(--in-word-bg); }
 
-.cell.edit-mode { cursor: pointer; }
-.cell.edit-mode.blocked { outline: 1px dashed var(--edit-accent); }
-.cell.edit-mode.blank { outline: 1px dashed var(--edit-accent); }
-
-.clue-text {
-  direction: rtl;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.clue-part {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--clue-font-size, 8px);
-  line-height: 1.1;
-  text-align: center;
-  padding: 1px;
-  overflow: hidden;
-  word-break: break-word;
-}
-
-.clue-part + .clue-part {
-  border-top: 1px solid var(--blocked-fg);
-}
-
 .letter {
-  font-size: var(--letter-font-size, 18px);
-  font-weight: 600;
-}
-
-.direction-hints {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hint {
-  position: absolute;
-  color: var(--blank-border);
-  opacity: 0.65;
-  font-size: max(8px, calc(var(--letter-font-size, 18px) * 0.45));
+  font-size: clamp(10px, 3.6vw, 30px);
   font-weight: 700;
+  color: var(--letter-fg);
   line-height: 1;
-}
-
-/* word runs rightward-to-leftward (RTL): arrow sits at the cell's right edge, pointing left */
-.hint-h { top: 1px; right: 1px; }
-/* word runs downward: arrow sits at the cell's top edge */
-.hint-v { top: 1px; left: 1px; }
-
-footer {
-  position: sticky;
-  bottom: 0;
-  padding: 0.5rem;
-  background: var(--bg);
-  border-top: 1px solid var(--blank-border);
-  text-align: center;
-}
-
-#edit-toggle {
-  padding: 0.5rem 1.25rem;
-  font-size: 1rem;
-  border-radius: 999px;
-  border: 1px solid var(--edit-accent);
-  background: transparent;
-  color: var(--edit-accent);
-  cursor: pointer;
-}
-#edit-toggle.active {
-  background: var(--edit-accent);
-  color: white;
 }
 
 #hidden-input {

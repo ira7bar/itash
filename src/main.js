@@ -1,33 +1,33 @@
-import { createState, syncIndexWithOverrides } from "./model.js";
-import { renderGridShell, sizeGridToSquareCells, updateGrid, updateClueBanner } from "./render.js";
+import { createState } from "./model.js";
+import { setupImage, renderGridShell, updateGrid, updateClueBanner } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 
 async function main() {
-  const gridEl = document.getElementById("grid");
-  const gridWrapEl = document.getElementById("grid-wrap");
+  const imageEl = document.getElementById("puzzle-image");
+  const overlayEl = document.getElementById("overlay-layer");
   const bannerEl = document.getElementById("clue-banner");
   const hiddenInput = document.getElementById("hidden-input");
-  const editToggleBtn = document.getElementById("edit-toggle");
 
   const res = await fetch("puzzle.json", { cache: "no-cache" });
   const puzzle = await res.json();
 
   const state = createState(puzzle);
   loadProgress(state);
-  syncIndexWithOverrides(state);
 
-  renderGridShell(state, gridEl);
-  sizeGridToSquareCells(state, gridEl, gridWrapEl);
-  window.addEventListener("resize", () => sizeGridToSquareCells(state, gridEl, gridWrapEl));
+  setupImage(state, imageEl);
+  renderGridShell(state, overlayEl);
+  // No resize handling needed: cell positions are percentages of the image's own
+  // box, so they stay aligned automatically as the image scales with the viewport
+  // or native pinch-zoom -- there's no pixel math to redo on resize.
 
   const onChange = () => {
-    updateGrid(state, gridEl);
+    updateGrid(state, overlayEl);
     updateClueBanner(state, bannerEl);
     saveProgress(state);
   };
 
-  wireInteractions(state, { gridEl, hiddenInput, editToggleBtn, onChange });
+  wireInteractions(state, { gridEl: overlayEl, hiddenInput, onChange });
   onChange();
 }
 
