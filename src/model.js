@@ -23,13 +23,32 @@ export function getCellEntry(index, row, col) {
   return index.cellIndex[row]?.[col] ?? null;
 }
 
-function pickDirection(index, row, col, preferredDirection) {
-  const entry = getCellEntry(index, row, col);
-  if (!entry) return null;
-  if (preferredDirection && entry[preferredDirection]) return preferredDirection;
-  if (entry.horizontal) return "horizontal";
-  if (entry.vertical) return "vertical";
-  return null;
+function isStartCell(word, row, col) {
+  const [r0, c0] = word.cells[0];
+  return r0 === row && c0 === col;
+}
+
+function isWordFull(state, word) {
+  return word.cells.every(([r, c]) => Boolean(state.answers[r][c]));
+}
+
+// A tap only enters "whole word" (auto-advance) mode for a direction whose word
+// STARTS at this exact cell and still has blanks left to fill -- that's the
+// convention every crossword solver already knows from paper (you begin typing
+// at the numbered cell). Any other cell -- a mid-word cell, or a start cell
+// whose word is already full -- is unambiguous: there's nothing to auto-advance
+// into, so a tap there just edits that one letter.
+function wholeWordCandidates(state, entry, row, col) {
+  const candidates = [];
+  for (const direction of ["horizontal", "vertical"]) {
+    const wordId = entry[direction];
+    if (!wordId) continue;
+    const word = state.index.wordsById.get(wordId);
+    if (isStartCell(word, row, col) && !isWordFull(state, word)) {
+      candidates.push(direction);
+    }
+  }
+  return candidates;
 }
 
 export function createState(puzzle) {
@@ -61,20 +80,28 @@ export function selectCell(state, row, col) {
     return;
   }
 
-  if (isSameCell && entry.horizontal && entry.vertical) {
-    state.activeDirection = state.activeDirection === "horizontal" ? "vertical" : "horizontal";
+  const candidates = wholeWordCandidates(state, entry, row, col);
+
+  if (candidates.length === 0) {
+    // Not a fillable start cell for either direction: edit just this letter.
+    state.activeCell = { row, col };
+    state.activeDirection = null;
     return;
   }
 
-  const currentWordId =
-    state.activeDirection && state.activeCell
-      ? getCellEntry(index, state.activeCell.row, state.activeCell.col)?.[state.activeDirection]
-      : null;
+  if (candidates.length === 1) {
+    state.activeCell = { row, col };
+    state.activeDirection = candidates[0];
+    return;
+  }
 
-  if (currentWordId && (entry.horizontal === currentWordId || entry.vertical === currentWordId)) {
-    state.activeDirection = entry.horizontal === currentWordId ? "horizontal" : "vertical";
-  } else {
-    state.activeDirection = pickDirection(index, row, col, state.activeDirection);
+  // Rare: this cell starts both an across and a down word (still un-full).
+  // Tapping it again flips between them; otherwise keep the previous
+  // direction if it still applies, defaulting to horizontal.
+  if (isSameCell && candidates.includes(state.activeDirection)) {
+    state.activeDirection = state.activeDirection === "horizontal" ? "vertical" : "horizontal";
+  } else if (!candidates.includes(state.activeDirection)) {
+    state.activeDirection = candidates[0];
   }
   state.activeCell = { row, col };
 }
