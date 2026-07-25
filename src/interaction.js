@@ -1,7 +1,9 @@
 import { selectCell, typeLetter, backspace, toggleUnsure } from "./model.js";
 import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
 
-const HEBREW_OR_LATIN_LETTER = /[א-תa-zA-Z]/;
+// Includes the punctuation keys that map to ת/ץ/ף on the standard Hebrew
+// keyboard layout (, . ; and their shifted forms < > :) -- see hebrew.js.
+const HEBREW_OR_LATIN_LETTER = /[א-תa-zA-Z,.;<>:]/;
 const LONG_PRESS_MS = 450;
 const MOVE_TOLERANCE_PX = 10;
 

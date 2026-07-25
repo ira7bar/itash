@@ -16,6 +16,14 @@ const ENGLISH_KEYBOARD_TO_HEBREW = {
   q: "/", w: "'", e: "ק", r: "ר", t: "א", y: "ט", u: "ו", i: "ן", o: "ם", p: "פ",
   a: "ש", s: "ד", d: "ג", f: "כ", g: "ע", h: "י", j: "ח", k: "ל", l: "ך",
   z: "ז", x: "ס", c: "ב", v: "ה", b: "נ", n: "מ", m: "צ",
+  // Three Hebrew letters live on PUNCTUATION keys on the standard layout, not
+  // letter keys: comma -> ת, period -> ץ, semicolon -> ף. Easy to miss (as
+  // this file did, at first) since every other entry is a letter-to-letter
+  // mapping. Shifted variants (< > :) map the same way, since they're the
+  // same physical key.
+  ",": "ת", "<": "ת",
+  ".": "ץ", ">": "ץ",
+  ";": "ף", ":": "ף",
 };
 
 const FINAL_TO_REGULAR = {

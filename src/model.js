@@ -222,14 +222,34 @@ function resolveWordForToggle(state, row, col) {
     return activeWord;
   }
 
-  // No currently-highlighted word covers this cell (e.g. long-pressing a
-  // fresh intersection cold, without having tapped either word first). If
-  // only one direction crosses here, that's unambiguous; if both do, this is
-  // an honest limitation -- default to horizontal. Tapping the word you mean
-  // first (so it's highlighted), then long-pressing anywhere within it,
-  // always resolves correctly regardless of direction.
-  const wordId = entry.horizontal || entry.vertical;
-  return wordId ? state.index.wordsById.get(wordId) : null;
+  const hWordId = entry.horizontal;
+  const vWordId = entry.vertical;
+  if (hWordId && !vWordId) return state.index.wordsById.get(hWordId);
+  if (vWordId && !hWordId) return state.index.wordsById.get(vWordId);
+  if (!hWordId && !vWordId) return null;
+
+  // Both directions cross here, and neither is currently highlighted (e.g.
+  // long-pressing cold, or long-pressing a now-FULL word's start cell --
+  // fullness takes it out of "whole word" typing mode entirely, so it's not
+  // highlighted either, even though marking a just-finished word unsure is
+  // completely normal). A word's START (the numbered cell you deliberately
+  // tap to begin solving it) is a much more deliberate signal than its END
+  // (which is very often just wherever a crossing word happens to stop) --
+  // so START always outranks END when the two conflict, not just "being an
+  // edge at all." Only when neither direction is a start does END become
+  // the tiebreaker; a true middle-of-both cell, never engaged via either
+  // word's start or end, falls back to a plain horizontal default.
+  const hWord = state.index.wordsById.get(hWordId);
+  const vWord = state.index.wordsById.get(vWordId);
+  const hStart = isStartCell(hWord, row, col);
+  const vStart = isStartCell(vWord, row, col);
+  if (hStart && !vStart) return hWord;
+  if (vStart && !hStart) return vWord;
+  const hEnd = isEndCell(hWord, row, col);
+  const vEnd = isEndCell(vWord, row, col);
+  if (hEnd && !vEnd) return hWord;
+  if (vEnd && !hEnd) return vWord;
+  return hWord;
 }
 
 // Returns { wordId, isUnsure } for the word that was toggled, or null if the
