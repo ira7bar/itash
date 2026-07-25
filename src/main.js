@@ -33,6 +33,7 @@ async function main() {
   const joinCodeInput = document.getElementById("join-code-input");
   const joinBtn = document.getElementById("join-btn");
   const celebrationEl = document.getElementById("celebration-overlay");
+  const celebrationTextEl = document.getElementById("celebration-text");
 
   const res = await fetch("puzzle.json", { cache: "no-cache" });
   const puzzle = await res.json();
@@ -54,9 +55,11 @@ async function main() {
   const checkCelebration = () => {
     const complete = isPuzzleComplete(state);
     if (complete && !wasComplete) {
-      celebrationEl.classList.remove("celebrate");
-      void celebrationEl.offsetWidth; // restart the animation if it fires again later
-      celebrationEl.classList.add("celebrate");
+      for (const el of [celebrationEl, celebrationTextEl]) {
+        el.classList.remove("celebrate");
+        void el.offsetWidth; // restart the animation if it fires again later
+        el.classList.add("celebrate");
+      }
     }
     wasComplete = complete;
   };

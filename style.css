@@ -91,8 +91,8 @@ body {
 
 #celebration-overlay.celebrate {
   animation:
-    celebrate-spin 3s linear,
-    celebrate-fade 3s ease-in-out;
+    celebrate-spin 30s linear,
+    celebrate-fade 30s ease-in-out;
 }
 
 @keyframes celebrate-spin {
@@ -102,9 +102,39 @@ body {
 
 @keyframes celebrate-fade {
   0% { opacity: 0; }
-  15% { opacity: 0.6; }
-  85% { opacity: 0.6; }
+  5% { opacity: 0.85; }
+  90% { opacity: 0.85; }
   100% { opacity: 0; }
+}
+
+#celebration-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  font-size: clamp(2rem, 12vw, 5rem);
+  font-weight: 800;
+  color: #fff;
+  text-shadow:
+    0 0 14px rgba(0, 0, 0, 0.6),
+    0 0 28px rgba(0, 0, 0, 0.4),
+    2px 2px 0 #000,
+    -2px -2px 0 #000;
+}
+
+#celebration-text.celebrate {
+  animation: celebrate-text 30s ease-in-out;
+}
+
+@keyframes celebrate-text {
+  0% { opacity: 0; transform: scale(0.6); }
+  5% { opacity: 1; transform: scale(1.15); }
+  10% { opacity: 1; transform: scale(1); }
+  85% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
 }
 
 .cell {
