@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v9";
+const CACHE_NAME = "tashbetz-shell-v10";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -10,6 +10,8 @@ const SHELL_FILES = [
   "src/interaction.js",
   "src/storage.js",
   "src/share.js",
+  "src/sync.js",
+  "src/firebase-config.js",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "fonts/assistant-hebrew.woff2",

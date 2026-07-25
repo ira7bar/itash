@@ -60,7 +60,40 @@ export function createState(puzzle) {
     answers,
     activeCell: null,
     activeDirection: null,
+    roomId: null,
   };
+}
+
+// Sparse map of only the filled cells, for pushing to a live room -- no point
+// syncing a few hundred empty-string entries over the network every keystroke.
+export function flattenAnswers(state) {
+  const map = {};
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (state.answers[r][c]) map[`${r}_${c}`] = state.answers[r][c];
+    }
+  }
+  return map;
+}
+
+// Rebuilds state.answers from a room's full snapshot map. Always a full
+// replace, never a merge -- a room update reflects everyone's current state
+// including deletions, so a cell missing from the map means it's actually
+// blank now, not "unchanged."
+export function applyRemoteAnswers(state, answersMap) {
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      state.answers[r][c] = "";
+    }
+  }
+  for (const key of Object.keys(answersMap || {})) {
+    const [r, c] = key.split("_").map(Number);
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      state.answers[r][c] = answersMap[key];
+    }
+  }
 }
 
 export function isBlocked(state, row, col) {

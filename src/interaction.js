@@ -1,9 +1,9 @@
 import { selectCell, typeLetter, backspace } from "./model.js";
-import { getShareUrl } from "./share.js";
+import { shareRoomUrl } from "./share.js";
 
 const HEBREW_LETTER = /[א-ת]/;
 
-export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChange }) {
+export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChange, onAnswerChange, ensureRoomAndGetShareUrl }) {
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;
@@ -22,7 +22,7 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
     hiddenInput.value = "";
     if (lastChar) {
       typeLetter(state, lastChar);
-      onChange();
+      onAnswerChange();
     }
   });
 
@@ -30,7 +30,7 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
     if (e.key === "Backspace") {
       e.preventDefault();
       backspace(state);
-      onChange();
+      onAnswerChange();
     } else if (e.key.startsWith("Arrow")) {
       e.preventDefault();
       moveByArrowKey(state, e.key);
@@ -40,20 +40,26 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
   });
 
   shareBtn.addEventListener("click", async () => {
-    const url = getShareUrl(state);
     const originalText = shareBtn.textContent;
+    shareBtn.disabled = true;
     try {
-      await navigator.clipboard.writeText(url);
-      shareBtn.textContent = "הקישור הועתק!";
+      const url = await ensureRoomAndGetShareUrl();
+      const result = await shareRoomUrl(url);
+      if (result === "copied") {
+        shareBtn.textContent = "הקישור הועתק!";
+        setTimeout(() => {
+          shareBtn.textContent = originalText;
+        }, 2000);
+      }
     } catch (err) {
-      // clipboard API can be unavailable (older browsers, non-HTTPS, permissions) --
-      // fall back to just showing the link so the user can copy it manually
-      console.warn("Clipboard write failed, showing link instead:", err);
-      window.prompt("העתיקו את הקישור:", url);
+      console.warn("Failed to start/share a live room:", err);
+      shareBtn.textContent = "שגיאה בשיתוף";
+      setTimeout(() => {
+        shareBtn.textContent = originalText;
+      }, 2000);
+    } finally {
+      shareBtn.disabled = false;
     }
-    setTimeout(() => {
-      shareBtn.textContent = originalText;
-    }, 2000);
   });
 }
 
