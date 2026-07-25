@@ -1,4 +1,4 @@
-import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure } from "./model.js";
+import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, isPuzzleComplete } from "./model.js";
 import { setupImage, renderGridShell, updateGrid } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
@@ -32,6 +32,7 @@ async function main() {
   const joinForm = document.getElementById("join-form");
   const joinCodeInput = document.getElementById("join-code-input");
   const joinBtn = document.getElementById("join-btn");
+  const celebrationEl = document.getElementById("celebration-overlay");
 
   const res = await fetch("puzzle.json", { cache: "no-cache" });
   const puzzle = await res.json();
@@ -45,9 +46,25 @@ async function main() {
   // box, so they stay aligned automatically as the image scales with the viewport
   // or native pinch-zoom -- there's no pixel math to redo on resize.
 
+  // Only fire the rainbow celebration on the actual moment the puzzle
+  // BECOMES complete -- initializing from the puzzle's already-loaded state
+  // means reopening an already-finished puzzle doesn't replay it every time.
+  let wasComplete = isPuzzleComplete(state);
+
+  const checkCelebration = () => {
+    const complete = isPuzzleComplete(state);
+    if (complete && !wasComplete) {
+      celebrationEl.classList.remove("celebrate");
+      void celebrationEl.offsetWidth; // restart the animation if it fires again later
+      celebrationEl.classList.add("celebrate");
+    }
+    wasComplete = complete;
+  };
+
   const onChange = () => {
     updateGrid(state, overlayEl);
     saveProgress(state);
+    checkCelebration();
   };
 
   // A typed letter or backspace syncs just that ONE cell to a live room --
@@ -93,8 +110,7 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteUnsure(state, roomState.unsure || []);
-      updateGrid(state, overlayEl);
-      saveProgress(state);
+      onChange();
     });
     if (unsubscribeRoom) unsubscribeRoom();
     unsubscribeRoom = unsubscribe;

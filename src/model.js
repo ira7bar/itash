@@ -135,6 +135,16 @@ export function isBlocked(state, row, col) {
   return state.puzzle.grid[row][col].type === "blocked";
 }
 
+export function isPuzzleComplete(state) {
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (!isBlocked(state, r, c) && !state.answers[r][c]) return false;
+    }
+  }
+  return true;
+}
+
 export function selectCell(state, row, col) {
   if (isBlocked(state, row, col)) return;
   const { index } = state;

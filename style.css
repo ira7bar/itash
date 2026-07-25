@@ -76,6 +76,37 @@ body {
   inset: 0;
 }
 
+#celebration-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  /* "color" blend mode tints the hue of whatever's underneath (the puzzle
+     image and the answer letters) while keeping their lightness -- a
+     rainbow wash rather than an opaque cover, so the finished grid stays
+     fully readable through it. */
+  mix-blend-mode: color;
+  background: conic-gradient(from 0deg, red, orange, yellow, green, blue, indigo, violet, red);
+}
+
+#celebration-overlay.celebrate {
+  animation:
+    celebrate-spin 3s linear,
+    celebrate-fade 3s ease-in-out;
+}
+
+@keyframes celebrate-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes celebrate-fade {
+  0% { opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
 .cell {
   position: absolute;
   cursor: pointer;
