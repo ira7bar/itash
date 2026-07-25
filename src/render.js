@@ -64,5 +64,13 @@ export function updateGrid(state, overlayEl) {
     const isActive = state.activeCell && state.activeCell.row === r && state.activeCell.col === c;
     cellEl.classList.toggle("active", Boolean(isActive));
     cellEl.classList.toggle("in-word", !blocked && activeWordCellSet.has(`${r},${c}`));
+
+    const entry = getCellEntry(state.index, r, c);
+    const isUnsure =
+      !blocked &&
+      entry &&
+      ((entry.horizontal && state.unsureWords.has(entry.horizontal)) ||
+        (entry.vertical && state.unsureWords.has(entry.vertical)));
+    cellEl.classList.toggle("unsure", Boolean(isUnsure));
   }
 }

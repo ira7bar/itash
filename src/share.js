@@ -25,6 +25,10 @@ export function getRoomIdFromUrl() {
   return match ? match[1] : null;
 }
 
+export function shareButtonRestingLabel(roomId) {
+  return roomId ? "שתף קישור" : "משחק קבוצתי";
+}
+
 // Tries the native OS share sheet first (WhatsApp, Messages, email, etc. show
 // up there directly on mobile); falls back to clipboard, then to a manual
 // prompt if even that fails (older browsers, clipboard permission denied).

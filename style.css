@@ -20,7 +20,9 @@
   :root {
     --bg: #121212;
     --fg: #eaeaea;
-    --letter-fg: #f2f2f2;
+    /* --letter-fg deliberately NOT overridden here: the grid's visual
+       background is always the light/white puzzle scan image, regardless of
+       OS theme, so the answer letters must stay dark to stay readable on it. */
   }
 }
 
@@ -44,7 +46,12 @@ body {
   flex: 1;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  touch-action: pinch-zoom pan-x pan-y;
+  /* touch-action deliberately left at its default (auto): the previous
+     explicit "pinch-zoom pan-x pan-y" is a less-common combination that may
+     be triggering an Android-specific gesture-handling edge case (reported:
+     pinch-zoom jumps the view to the left edge). auto already permits both
+     panning and pinch-zoom with no special-casing, so there's no known
+     upside to overriding it here. */
   padding: 0.5rem;
   background: var(--bg);
 }
@@ -89,6 +96,13 @@ body {
   line-height: 1;
 }
 
+.cell.unsure .letter {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: #d9534f;
+  text-underline-offset: 2px;
+}
+
 footer {
   position: sticky;
   bottom: 0;
@@ -109,12 +123,55 @@ footer {
   font-family: inherit;
 }
 
+#leave-room-btn {
+  margin-inline-start: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  background: transparent;
+  color: var(--fg);
+  opacity: 0.8;
+  cursor: pointer;
+  font-family: inherit;
+}
+
 #room-code {
   margin-top: 0.4rem;
   font-size: 0.85rem;
   color: var(--fg);
   opacity: 0.7;
   letter-spacing: 0.05em;
+}
+
+#join-form {
+  margin-top: 0.6rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+#join-code-input {
+  width: 7rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  text-align: center;
+}
+
+#join-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--share-accent);
+  background: transparent;
+  color: var(--share-accent);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 #hidden-input {

@@ -18,8 +18,14 @@
   </main>
 
   <footer>
-    <button id="share-btn" type="button">שתף התקדמות</button>
+    <button id="share-btn" type="button">משחק קבוצתי</button>
+    <button id="leave-room-btn" type="button" hidden>משחק אישי</button>
     <div id="room-code" hidden></div>
+    <form id="join-form">
+      <input id="join-code-input" type="text" inputmode="text" placeholder="קוד חדר" maxlength="8"
+             autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <button id="join-btn" type="submit">הצטרף</button>
+    </form>
   </footer>
 
   <input id="hidden-input" type="text" inputmode="text" lang="he" autocomplete="off"

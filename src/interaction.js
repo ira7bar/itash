@@ -1,9 +1,28 @@
-import { selectCell, typeLetter, backspace } from "./model.js";
-import { shareRoomUrl } from "./share.js";
+import { selectCell, typeLetter, backspace, toggleUnsure } from "./model.js";
+import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
 
-const HEBREW_LETTER = /[א-ת]/;
+const HEBREW_OR_LATIN_LETTER = /[א-תa-zA-Z]/;
+const LONG_PRESS_MS = 450;
+const MOVE_TOLERANCE_PX = 10;
 
-export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChange, onAnswerChange, ensureRoomAndGetShareUrl }) {
+export function wireInteractions(
+  state,
+  {
+    gridEl,
+    hiddenInput,
+    shareBtn,
+    leaveRoomBtn,
+    joinForm,
+    joinCodeInput,
+    joinBtn,
+    onChange,
+    onAnswerCellChange,
+    onUnsureFlagChange,
+    ensureRoomAndGetShareUrl,
+    joinRoomByCode,
+    leaveRoom,
+  }
+) {
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;
@@ -16,21 +35,61 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
     hiddenInput.focus({ preventScroll: true });
   });
 
+  // Long-press (hold, don't drag) a cell to flag its word as "unsure" --
+  // independent of the click handler above, which still fires normally
+  // afterward and selects the cell as usual.
+  let pressTimer = null;
+  let pressStart = null;
+
+  const cancelPress = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+    pressStart = null;
+  };
+
+  gridEl.addEventListener("pointerdown", (e) => {
+    const cellEl = e.target.closest(".cell");
+    if (!cellEl) return;
+    const row = Number(cellEl.dataset.row);
+    const col = Number(cellEl.dataset.col);
+    pressStart = { x: e.clientX, y: e.clientY };
+    pressTimer = setTimeout(() => {
+      const result = toggleUnsure(state, row, col);
+      if (result) onUnsureFlagChange(result.wordId, result.isUnsure);
+      pressTimer = null;
+    }, LONG_PRESS_MS);
+  });
+
+  gridEl.addEventListener("pointermove", (e) => {
+    if (!pressStart) return;
+    const dx = e.clientX - pressStart.x;
+    const dy = e.clientY - pressStart.y;
+    if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) cancelPress();
+  });
+
+  gridEl.addEventListener("pointerup", cancelPress);
+  gridEl.addEventListener("pointercancel", cancelPress);
+  gridEl.addEventListener("pointerleave", cancelPress);
+
   hiddenInput.addEventListener("input", () => {
     const value = hiddenInput.value;
-    const lastChar = [...value].reverse().find((ch) => HEBREW_LETTER.test(ch));
+    const candidate = [...value].reverse().find((ch) => HEBREW_OR_LATIN_LETTER.test(ch));
     hiddenInput.value = "";
-    if (lastChar) {
-      typeLetter(state, lastChar);
-      onAnswerChange();
+    const result = candidate ? typeLetter(state, candidate) : null;
+    if (result) {
+      onAnswerCellChange(result.row, result.col, result.letter);
     }
   });
 
   hiddenInput.addEventListener("keydown", (e) => {
     if (e.key === "Backspace") {
       e.preventDefault();
-      backspace(state);
-      onAnswerChange();
+      const result = backspace(state);
+      if (result) {
+        onAnswerCellChange(result.row, result.col, "");
+      }
     } else if (e.key.startsWith("Arrow")) {
       e.preventDefault();
       moveByArrowKey(state, e.key);
@@ -40,7 +99,6 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
   });
 
   shareBtn.addEventListener("click", async () => {
-    const originalText = shareBtn.textContent;
     shareBtn.disabled = true;
     try {
       const url = await ensureRoomAndGetShareUrl();
@@ -48,17 +106,47 @@ export function wireInteractions(state, { gridEl, hiddenInput, shareBtn, onChang
       if (result === "copied") {
         shareBtn.textContent = "הקישור הועתק!";
         setTimeout(() => {
-          shareBtn.textContent = originalText;
+          shareBtn.textContent = shareButtonRestingLabel(state.roomId);
         }, 2000);
+      } else {
+        shareBtn.textContent = shareButtonRestingLabel(state.roomId);
       }
     } catch (err) {
       console.warn("Failed to start/share a live room:", err);
       shareBtn.textContent = "שגיאה בשיתוף";
       setTimeout(() => {
-        shareBtn.textContent = originalText;
+        shareBtn.textContent = shareButtonRestingLabel(state.roomId);
       }, 2000);
     } finally {
       shareBtn.disabled = false;
+    }
+  });
+
+  leaveRoomBtn.addEventListener("click", () => {
+    leaveRoom();
+    onChange();
+  });
+
+  joinForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = joinCodeInput.value;
+    if (!code.trim()) return;
+    joinBtn.disabled = true;
+    const originalJoinText = joinBtn.textContent;
+    try {
+      const joined = await joinRoomByCode(code);
+      if (joined) {
+        joinCodeInput.value = "";
+        onChange();
+      }
+    } catch (err) {
+      console.warn("Failed to join room by code:", err);
+      joinBtn.textContent = "קוד לא תקין";
+      setTimeout(() => {
+        joinBtn.textContent = originalJoinText;
+      }, 2000);
+    } finally {
+      joinBtn.disabled = false;
     }
   });
 }

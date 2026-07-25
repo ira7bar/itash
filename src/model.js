@@ -1,6 +1,10 @@
 // Pure grid/word-run logic. No DOM access here -- this is the part that
 // would survive a future move to a different rendering layer unchanged.
 
+import { normalizeLetter } from "./hebrew.js";
+
+const HEBREW_LETTER_RE = /^[א-ת]$/;
+
 export function buildIndex(puzzle) {
   const rows = puzzle.meta.rows;
   const cols = puzzle.meta.cols;
@@ -61,6 +65,7 @@ export function createState(puzzle) {
     activeCell: null,
     activeDirection: null,
     roomId: null,
+    unsureWords: new Set(),
   };
 }
 
@@ -91,9 +96,25 @@ export function applyRemoteAnswers(state, answersMap) {
   for (const key of Object.keys(answersMap || {})) {
     const [r, c] = key.split("_").map(Number);
     if (r >= 0 && r < rows && c >= 0 && c < cols) {
-      state.answers[r][c] = answersMap[key];
+      // Normalize here too, not just on typing: a peer on an older cached
+      // version of the app (before this normalization existed) could still
+      // push an un-normalized final-form letter into a shared room.
+      state.answers[r][c] = normalizeLetter(answersMap[key]);
     }
   }
+}
+
+// Sparse map ({wordId: true}, same shape as flattenAnswers) of word ids
+// currently flagged "unsure", for pushing to a live room -- a map, not an
+// array, so a single flag can be added/removed as its own child path.
+export function flattenUnsure(state) {
+  const map = {};
+  for (const id of state.unsureWords) map[id] = true;
+  return map;
+}
+
+export function applyRemoteUnsure(state, unsureMap) {
+  state.unsureWords = new Set(Object.keys(unsureMap || {}));
 }
 
 export function isBlocked(state, row, col) {
@@ -146,33 +167,77 @@ export function getActiveWord(state) {
   return wordId ? state.index.wordsById.get(wordId) : null;
 }
 
-export function typeLetter(state, letter) {
-  if (!state.activeCell || isBlocked(state, state.activeCell.row, state.activeCell.col)) return;
+// Returns { row, col, letter } for the cell that was actually written, or
+// null if nothing was committed (e.g. stray punctuation from a mismapped
+// key) -- callers use this both to skip a wasted render/save when nothing
+// changed, and to know exactly which single cell to sync to a live room
+// (never the whole grid -- see pushAnswerCell in sync.js for why).
+export function typeLetter(state, rawLetter) {
+  if (!state.activeCell || isBlocked(state, state.activeCell.row, state.activeCell.col)) return null;
+  const letter = normalizeLetter(rawLetter);
+  if (!HEBREW_LETTER_RE.test(letter)) return null;
   const { row, col } = state.activeCell;
   state.answers[row][col] = letter;
 
   const word = getActiveWord(state);
-  if (!word) return;
-  const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-  if (idx >= 0 && idx < word.cells.length - 1) {
-    const [nr, nc] = word.cells[idx + 1];
-    state.activeCell = { row: nr, col: nc };
+  if (word) {
+    const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
+    if (idx >= 0 && idx < word.cells.length - 1) {
+      const [nr, nc] = word.cells[idx + 1];
+      state.activeCell = { row: nr, col: nc };
+    }
   }
+  return { row, col, letter };
 }
 
+// Which word a long-press at (row, col) should flag as unsure: if that cell
+// is already the active one, use whichever direction is currently active
+// (matches "flag the word I'm looking at right now"); otherwise fall back to
+// the same horizontal-then-vertical preference used elsewhere.
+function resolveWordForToggle(state, row, col) {
+  const entry = getCellEntry(state.index, row, col);
+  if (!entry) return null;
+  const isCurrentlyActive = state.activeCell && state.activeCell.row === row && state.activeCell.col === col;
+  if (isCurrentlyActive && state.activeDirection && entry[state.activeDirection]) {
+    return state.index.wordsById.get(entry[state.activeDirection]);
+  }
+  const wordId = entry.horizontal || entry.vertical;
+  return wordId ? state.index.wordsById.get(wordId) : null;
+}
+
+// Returns { wordId, isUnsure } for the word that was toggled, or null if the
+// cell isn't part of any word.
+export function toggleUnsure(state, row, col) {
+  const word = resolveWordForToggle(state, row, col);
+  if (!word) return null;
+  let isUnsure;
+  if (state.unsureWords.has(word.id)) {
+    state.unsureWords.delete(word.id);
+    isUnsure = false;
+  } else {
+    state.unsureWords.add(word.id);
+    isUnsure = true;
+  }
+  return { wordId: word.id, isUnsure };
+}
+
+// Returns { row, col } for the cell that was actually cleared, or null if
+// nothing changed -- same reasoning as typeLetter's return value.
 export function backspace(state) {
-  if (!state.activeCell) return;
+  if (!state.activeCell) return null;
   const { row, col } = state.activeCell;
   if (state.answers[row][col]) {
     state.answers[row][col] = "";
-    return;
+    return { row, col };
   }
   const word = getActiveWord(state);
-  if (!word) return;
+  if (!word) return null;
   const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
   if (idx > 0) {
     const [pr, pc] = word.cells[idx - 1];
     state.activeCell = { row: pr, col: pc };
     state.answers[pr][pc] = "";
+    return { row: pr, col: pc };
   }
+  return null;
 }
