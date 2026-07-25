@@ -32,6 +32,7 @@ export function wireInteractions(
     selectCell(state, row, col);
     onChange();
     hiddenInput.value = "";
+    positionHiddenInputAtCell(hiddenInput, cellEl);
     hiddenInput.focus({ preventScroll: true });
   });
 
@@ -94,6 +95,11 @@ export function wireInteractions(
       e.preventDefault();
       moveByArrowKey(state, e.key);
       onChange();
+      if (state.activeCell) {
+        const { row, col } = state.activeCell;
+        const cellEl = gridEl.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        if (cellEl) positionHiddenInputAtCell(hiddenInput, cellEl);
+      }
       hiddenInput.focus({ preventScroll: true });
     }
   });
@@ -149,6 +155,21 @@ export function wireInteractions(
       joinBtn.disabled = false;
     }
   });
+}
+
+// #hidden-input is a real DOM input purely to summon the OS keyboard and
+// capture its output -- it must never be visible, and was originally pinned
+// at a fixed (0,0). But focusing an input opens the on-screen keyboard, and
+// mobile browsers try to keep the focused element in view when that
+// happens; if the page was scrolled/zoomed anywhere other than the exact
+// top-left corner, that "keep it in view" scroll snaps the whole page back
+// to (0,0) on every single tap-to-type -- reported as "jump to the left."
+// Moving the input to sit exactly on top of whichever cell is active means
+// it's already in view, so there's nothing to scroll.
+function positionHiddenInputAtCell(hiddenInput, cellEl) {
+  const rect = cellEl.getBoundingClientRect();
+  hiddenInput.style.left = `${rect.left}px`;
+  hiddenInput.style.top = `${rect.top}px`;
 }
 
 function moveByArrowKey(state, key) {
