@@ -32,23 +32,37 @@ function isStartCell(word, row, col) {
   return r0 === row && c0 === col;
 }
 
+function isEndCell(word, row, col) {
+  const [rl, cl] = word.cells[word.cells.length - 1];
+  return rl === row && cl === col;
+}
+
 function isWordFull(state, word) {
   return word.cells.every(([r, c]) => Boolean(state.answers[r][c]));
 }
 
-// A tap only enters "whole word" (auto-advance) mode for a direction whose word
-// STARTS at this exact cell and still has blanks left to fill -- that's the
-// convention every crossword solver already knows from paper (you begin typing
-// at the numbered cell). Any other cell -- a mid-word cell, or a start cell
-// whose word is already full -- is unambiguous: there's nothing to auto-advance
-// into, so a tap there just edits that one letter.
+function isWordEmpty(state, word) {
+  return word.cells.every(([r, c]) => !state.answers[r][c]);
+}
+
+// A tap enters "whole word" (auto-advance) mode for a direction whose word
+// either STARTS at this exact cell and still has blanks left to fill (typing
+// forward -- the convention every crossword solver knows from paper: you
+// begin at the numbered cell), or ENDS at this exact cell and still has
+// something to delete (backspacing backward -- the mirror image, for
+// reviewing/correcting a word from its last letter). Any other cell -- a
+// mid-word cell, a start cell whose word is already full, or an end cell
+// whose word is already empty -- is unambiguous: there's nothing to
+// auto-advance into either direction, so a tap there just edits that one letter.
 function wholeWordCandidates(state, entry, row, col) {
   const candidates = [];
   for (const direction of ["horizontal", "vertical"]) {
     const wordId = entry[direction];
     if (!wordId) continue;
     const word = state.index.wordsById.get(wordId);
-    if (isStartCell(word, row, col) && !isWordFull(state, word)) {
+    const forTyping = isStartCell(word, row, col) && !isWordFull(state, word);
+    const forDeleting = isEndCell(word, row, col) && !isWordEmpty(state, word);
+    if (forTyping || forDeleting) {
       candidates.push(direction);
     }
   }
@@ -190,17 +204,30 @@ export function typeLetter(state, rawLetter) {
   return { row, col, letter };
 }
 
-// Which word a long-press at (row, col) should flag as unsure: if that cell
-// is already the active one, use whichever direction is currently active
-// (matches "flag the word I'm looking at right now"); otherwise fall back to
-// the same horizontal-then-vertical preference used elsewhere.
+// Which word a long-press at (row, col) should flag as unsure. This is
+// called from a timer that starts on pointerDOWN, before the eventual click
+// event's selectCell call runs for THIS press -- so state.activeCell/
+// activeDirection still reflect whatever was active from the interaction
+// BEFORE this press began. That's actually the right signal to use: if
+// you've been typing/reviewing a word (it's the one currently highlighted)
+// and long-press one of its cells -- including a crossing cell that's also
+// part of some other word -- you clearly mean the word you were just
+// looking at, not whichever direction happens to be geometrically first.
 function resolveWordForToggle(state, row, col) {
   const entry = getCellEntry(state.index, row, col);
   if (!entry) return null;
-  const isCurrentlyActive = state.activeCell && state.activeCell.row === row && state.activeCell.col === col;
-  if (isCurrentlyActive && state.activeDirection && entry[state.activeDirection]) {
-    return state.index.wordsById.get(entry[state.activeDirection]);
+
+  const activeWord = getActiveWord(state);
+  if (activeWord && activeWord.cells.some(([r, c]) => r === row && c === col)) {
+    return activeWord;
   }
+
+  // No currently-highlighted word covers this cell (e.g. long-pressing a
+  // fresh intersection cold, without having tapped either word first). If
+  // only one direction crosses here, that's unambiguous; if both do, this is
+  // an honest limitation -- default to horizontal. Tapping the word you mean
+  // first (so it's highlighted), then long-pressing anywhere within it,
+  // always resolves correctly regardless of direction.
   const wordId = entry.horizontal || entry.vertical;
   return wordId ? state.index.wordsById.get(wordId) : null;
 }

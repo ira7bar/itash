@@ -5,6 +5,23 @@ import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
 import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag } from "./sync.js";
 
+const RETRY_DELAY_MS = 1500;
+
+// A transient mobile-network blip can silently drop a single write, and
+// since the local screen already shows the typed letter (it's in local
+// state regardless of whether the network call succeeds), there'd be no
+// visible sign that it never reached the room at all. One quiet retry
+// covers the common "blip," without building a whole offline queue for
+// what should be a rare case once resyncOnVisible (below) also exists.
+function pushWithRetry(pushFn, ...args) {
+  pushFn(...args).catch((err) => {
+    console.warn("Sync failed, retrying once:", err);
+    setTimeout(() => {
+      pushFn(...args).catch((err2) => console.warn("Retry also failed:", err2));
+    }, RETRY_DELAY_MS);
+  });
+}
+
 async function main() {
   const imageEl = document.getElementById("puzzle-image");
   const overlayEl = document.getElementById("overlay-layer");
@@ -39,18 +56,14 @@ async function main() {
   const onAnswerCellChange = (row, col, letter) => {
     onChange();
     if (state.roomId) {
-      pushAnswerCell(state.roomId, row, col, letter).catch((err) => {
-        console.warn("Failed to sync answer to room:", err);
-      });
+      pushWithRetry(pushAnswerCell, state.roomId, row, col, letter);
     }
   };
 
   const onUnsureFlagChange = (wordId, isUnsure) => {
     onChange();
     if (state.roomId) {
-      pushUnsureFlag(state.roomId, wordId, isUnsure).catch((err) => {
-        console.warn("Failed to sync unsure flag to room:", err);
-      });
+      pushWithRetry(pushUnsureFlag, state.roomId, wordId, isUnsure);
     }
   };
 
@@ -165,6 +178,22 @@ async function main() {
     leaveRoom,
   });
   onChange();
+
+  // Re-subscribe whenever the tab comes back to the foreground. Covers two
+  // real things that happen constantly on mobile: a WebSocket connection
+  // that silently died while backgrounded (very common -- e.g. switching
+  // away to actually send the share link via WhatsApp, or the phone just
+  // locking), and simply guarantees a fresh, authoritative snapshot instead
+  // of trusting a possibly-stale one after any length of time away. joinRoom
+  // is safe to re-run on the same room id -- it just tears down the old
+  // listener and opens a new one.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && state.roomId) {
+      joinRoom(state.roomId).catch((err) => {
+        console.warn("Failed to resync room on becoming visible:", err);
+      });
+    }
+  });
 }
 
 main();
