@@ -11,6 +11,7 @@ export function wireInteractions(
   state,
   {
     gridEl,
+    imageEl,
     hiddenInput,
     shareBtn,
     leaveRoomBtn,
@@ -75,6 +76,16 @@ export function wireInteractions(
   gridEl.addEventListener("pointerup", cancelPress);
   gridEl.addEventListener("pointercancel", cancelPress);
   gridEl.addEventListener("pointerleave", cancelPress);
+
+  // Android fires its own native "image options" menu (copy/share image) on a
+  // long-press of the puzzle <img>, competing with the long-press-to-toggle-
+  // unsure gesture above. Suppress it on both the image and the overlay --
+  // the overlay's cells sit on top and normally take the touch, but Android's
+  // image-menu detection isn't reliable DOM hit-testing, so it can still fire
+  // as if the image itself were touched.
+  const suppressContextMenu = (e) => e.preventDefault();
+  gridEl.addEventListener("contextmenu", suppressContextMenu);
+  imageEl.addEventListener("contextmenu", suppressContextMenu);
 
   hiddenInput.addEventListener("input", () => {
     const value = hiddenInput.value;

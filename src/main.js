@@ -183,6 +183,7 @@ async function main() {
 
   wireInteractions(state, {
     gridEl: overlayEl,
+    imageEl,
     hiddenInput,
     shareBtn,
     leaveRoomBtn,
