@@ -1,1 +1,3 @@
 dev/
+debug/
+.claude/settings.local.json
