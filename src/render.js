@@ -1,4 +1,4 @@
-import { isBlocked, getCellEntry, getActiveWord } from "./model.js";
+import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell } from "./model.js";
 
 // The grid is a rendered image of the actual PDF page -- clue text, dividers,
 // borders, and the source's own direction arrows all come through pixel-perfect,
@@ -38,6 +38,12 @@ export function renderGridShell(state, overlayEl) {
       const letterEl = document.createElement("div");
       letterEl.className = "letter";
       cellEl.appendChild(letterEl);
+
+      // Static per puzzle (independent of answers/active state), so it's set
+      // once here rather than recomputed every updateGrid call.
+      if (getWordsForClueCell(state, r, c).length > 0) {
+        cellEl.classList.add("clue-tappable");
+      }
 
       overlayEl.appendChild(cellEl);
     }

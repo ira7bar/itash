@@ -1,4 +1,4 @@
-import { selectCell, typeLetter, backspace, toggleUnsure } from "./model.js";
+import { selectCell, typeLetter, backspace, toggleUnsure, isBlocked, getWordsForClueCell } from "./model.js";
 import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
 
 // Includes the punctuation keys that map to ת/ץ/ף on the standard Hebrew
@@ -32,11 +32,29 @@ export function wireInteractions(
     const row = Number(cellEl.dataset.row);
     const col = Number(cellEl.dataset.col);
 
-    selectCell(state, row, col);
+    // Tapping a clue cell jumps straight into solving the word it belongs
+    // to -- same as tapping that word's own start cell, just from its printed
+    // definition instead. A plain (non-clue) blocked cell has no word to jump
+    // to and stays inert, as before.
+    let targetCellEl = cellEl;
+    let targetRow = row;
+    let targetCol = col;
+    if (isBlocked(state, row, col)) {
+      const word = resolveClueTapWord(state, row, col, e.clientY, cellEl);
+      if (!word) return;
+      [targetRow, targetCol] = word.cells[0];
+      targetCellEl = gridEl.querySelector(`.cell[data-row="${targetRow}"][data-col="${targetCol}"]`);
+      if (!targetCellEl) return;
+    }
+
+    selectCell(state, targetRow, targetCol);
     onChange();
     hiddenInput.value = "";
-    positionHiddenInputAtCell(hiddenInput, cellEl);
+    positionHiddenInputAtCell(hiddenInput, targetCellEl);
     hiddenInput.focus({ preventScroll: true });
+    // Only a clue-cell jump needs to bring the target into view -- an
+    // ordinary tap is already on a cell the user can see.
+    if (targetCellEl !== cellEl) scrollCellIntoView(targetCellEl, "center");
   });
 
   // Long-press (hold, don't drag) a cell to flag its word as "unsure" --
@@ -87,6 +105,16 @@ export function wireInteractions(
   gridEl.addEventListener("contextmenu", suppressContextMenu);
   imageEl.addEventListener("contextmenu", suppressContextMenu);
 
+  // Keeps whatever's currently the active cell from drifting off-screen as
+  // it moves (typing through a word, backspacing back through it). A no-op
+  // whenever the cell in question is already visible.
+  const scrollActiveCellIntoView = (mode) => {
+    if (!state.activeCell) return;
+    const { row, col } = state.activeCell;
+    const cellEl = gridEl.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+    if (cellEl) scrollCellIntoView(cellEl, mode);
+  };
+
   hiddenInput.addEventListener("input", () => {
     const value = hiddenInput.value;
     const candidate = [...value].reverse().find((ch) => HEBREW_OR_LATIN_LETTER.test(ch));
@@ -94,6 +122,11 @@ export function wireInteractions(
     const result = candidate ? typeLetter(state, candidate) : null;
     if (result) {
       onAnswerCellChange(result.row, result.col, result.letter);
+      // Advancing through a word can walk the active cell off the edge of
+      // the screen (long words, or a pinch-zoomed-in view) -- nudge it back
+      // into view, but only the minimum needed: no scroll at all while it's
+      // already visible, so ordinary typing doesn't jitter the page.
+      scrollActiveCellIntoView("nearest");
     }
   });
 
@@ -103,6 +136,7 @@ export function wireInteractions(
       const result = backspace(state);
       if (result) {
         onAnswerCellChange(result.row, result.col, "");
+        scrollActiveCellIntoView("nearest");
       }
     } else if (e.key.startsWith("Arrow")) {
       e.preventDefault();
@@ -111,7 +145,10 @@ export function wireInteractions(
       if (state.activeCell) {
         const { row, col } = state.activeCell;
         const cellEl = gridEl.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-        if (cellEl) positionHiddenInputAtCell(hiddenInput, cellEl);
+        if (cellEl) {
+          positionHiddenInputAtCell(hiddenInput, cellEl);
+          scrollCellIntoView(cellEl, "nearest");
+        }
       }
       hiddenInput.focus({ preventScroll: true });
     }
@@ -183,6 +220,33 @@ function positionHiddenInputAtCell(hiddenInput, cellEl) {
   const rect = cellEl.getBoundingClientRect();
   hiddenInput.style.left = `${rect.left}px`;
   hiddenInput.style.top = `${rect.top}px`;
+}
+
+// Which word a tap on a clue cell means. Usually unambiguous (one word per
+// clue cell); a clue cell shared between an across and a down word holds two
+// stacked clue boxes, so the tap's Y position within the cell picks between
+// them -- top half is always the horizontal clue, bottom half always
+// vertical (see getWordsForClueCell in model.js for why that's reliable).
+function resolveClueTapWord(state, row, col, clientY, cellEl) {
+  const words = getWordsForClueCell(state, row, col);
+  if (words.length <= 1) return words[0] ?? null;
+  const rect = cellEl.getBoundingClientRect();
+  const isTopHalf = clientY - rect.top < rect.height / 2;
+  const wantDirection = isTopHalf ? "horizontal" : "vertical";
+  return words.find((w) => w.direction === wantDirection) ?? words[0];
+}
+
+// "center": a deliberate jump to a word tapped via its clue, so it lands
+// somewhere comfortable to read and type into, not just barely on-screen.
+// "nearest": the passive, minimal-motion case for staying with the active
+// cell while typing/backspacing -- does nothing at all if already visible,
+// so ordinary fast typing doesn't jitter the page every keystroke.
+function scrollCellIntoView(cellEl, mode) {
+  if (mode === "center") {
+    cellEl.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+  } else {
+    cellEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+  }
 }
 
 function moveByArrowKey(state, key) {

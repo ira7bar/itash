@@ -12,19 +12,41 @@ export function buildIndex(puzzle) {
   const cellIndex = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => ({ horizontal: null, vertical: null }))
   );
+  // Reverse of word.clueCell: which word(s) a tap on a given (blocked) clue
+  // cell should resolve to. Almost always one word, but a clue cell can be
+  // shared by an across and a down word at once (two clue boxes stacked in
+  // the same cell) -- see getWordsForClueCell.
+  const clueCellIndex = new Map();
 
   for (const word of puzzle.words) {
     wordsById.set(word.id, word);
     for (const [r, c] of word.cells) {
       cellIndex[r][c][word.direction] = word.id;
     }
+    if (word.clueCell) {
+      const key = `${word.clueCell[0]}_${word.clueCell[1]}`;
+      if (!clueCellIndex.has(key)) clueCellIndex.set(key, []);
+      clueCellIndex.get(key).push(word.id);
+    }
   }
 
-  return { wordsById, cellIndex, rows, cols };
+  return { wordsById, cellIndex, clueCellIndex, rows, cols };
 }
 
 export function getCellEntry(index, row, col) {
   return index.cellIndex[row]?.[col] ?? null;
+}
+
+// Word(s) whose printed clue is physically in this cell: empty for a plain
+// (non-clue) blocked cell, one word for almost every clue cell, or two for a
+// clue cell shared between an across and a down word. When there are two,
+// the source PDF always stacks the horizontal clue on top and the vertical
+// clue below it (validated in parse_puzzle.py's _split_dual_direction_clues)
+// -- callers with a tap position use that to pick between them.
+export function getWordsForClueCell(state, row, col) {
+  const ids = state.index.clueCellIndex.get(`${row}_${col}`);
+  if (!ids) return [];
+  return ids.map((id) => state.index.wordsById.get(id));
 }
 
 function isStartCell(word, row, col) {

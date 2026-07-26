@@ -146,6 +146,7 @@ body {
 }
 
 .cell.blocked { cursor: default; }
+.cell.blocked.clue-tappable { cursor: pointer; }
 
 .cell.blank.active { background: var(--active-bg); }
 .cell.blank.in-word:not(.active) { background: var(--in-word-bg); }
