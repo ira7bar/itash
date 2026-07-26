@@ -12,6 +12,7 @@ export function wireInteractions(
   {
     gridEl,
     imageEl,
+    gridWrapEl,
     hiddenInput,
     shareBtn,
     leaveRoomBtn,
@@ -104,6 +105,28 @@ export function wireInteractions(
   const suppressContextMenu = (e) => e.preventDefault();
   gridEl.addEventListener("contextmenu", suppressContextMenu);
   imageEl.addEventListener("contextmenu", suppressContextMenu);
+
+  // "center": a deliberate jump to a word tapped via its clue, so it lands
+  // somewhere comfortable to read and type into, not just barely on-screen.
+  // "nearest": the passive, minimal-motion case for staying with the active
+  // cell while typing/backspacing -- does nothing at all if already visible,
+  // so ordinary fast typing doesn't jitter the page every keystroke.
+  //
+  // Either way, horizontal scroll-padding gives the landing spot a full
+  // cell's width of breathing room past the target, so the next letter --
+  // or, backspacing, the previous one -- lands fully visible rather than
+  // just peeking in at the edge. Recomputed from the cell's own current
+  // rendered width each time. Horizontal only, per direct feedback that
+  // vertical panning didn't need the same adjustment.
+  const scrollCellIntoView = (cellEl, mode) => {
+    const cellWidthPx = cellEl.getBoundingClientRect().width;
+    gridWrapEl.style.scrollPaddingInline = `${cellWidthPx}px`;
+    if (mode === "center") {
+      cellEl.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+    } else {
+      cellEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+    }
+  };
 
   // Keeps whatever's currently the active cell from drifting off-screen as
   // it moves (typing through a word, backspacing back through it). A no-op
@@ -234,19 +257,6 @@ function resolveClueTapWord(state, row, col, clientY, cellEl) {
   const isTopHalf = clientY - rect.top < rect.height / 2;
   const wantDirection = isTopHalf ? "horizontal" : "vertical";
   return words.find((w) => w.direction === wantDirection) ?? words[0];
-}
-
-// "center": a deliberate jump to a word tapped via its clue, so it lands
-// somewhere comfortable to read and type into, not just barely on-screen.
-// "nearest": the passive, minimal-motion case for staying with the active
-// cell while typing/backspacing -- does nothing at all if already visible,
-// so ordinary fast typing doesn't jitter the page every keystroke.
-function scrollCellIntoView(cellEl, mode) {
-  if (mode === "center") {
-    cellEl.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
-  } else {
-    cellEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
-  }
 }
 
 function moveByArrowKey(state, key) {

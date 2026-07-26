@@ -25,6 +25,7 @@ function pushWithRetry(pushFn, ...args) {
 async function main() {
   const imageEl = document.getElementById("puzzle-image");
   const overlayEl = document.getElementById("overlay-layer");
+  const gridWrapEl = document.getElementById("grid-wrap");
   const hiddenInput = document.getElementById("hidden-input");
   const shareBtn = document.getElementById("share-btn");
   const leaveRoomBtn = document.getElementById("leave-room-btn");
@@ -184,6 +185,7 @@ async function main() {
   wireInteractions(state, {
     gridEl: overlayEl,
     imageEl,
+    gridWrapEl,
     hiddenInput,
     shareBtn,
     leaveRoomBtn,
