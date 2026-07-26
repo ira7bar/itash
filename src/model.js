@@ -59,36 +59,49 @@ function isEndCell(word, row, col) {
   return rl === row && cl === col;
 }
 
-function isWordFull(state, word) {
-  return word.cells.every(([r, c]) => Boolean(state.answers[r][c]));
-}
-
 function isWordEmpty(state, word) {
   return word.cells.every(([r, c]) => !state.answers[r][c]);
 }
 
 // A tap enters "whole word" (auto-advance) mode for a direction whose word
-// either STARTS at this exact cell and still has blanks left to fill (typing
-// forward -- the convention every crossword solver knows from paper: you
-// begin at the numbered cell), or ENDS at this exact cell and still has
-// something to delete (backspacing backward -- the mirror image, for
-// reviewing/correcting a word from its last letter). Any other cell -- a
-// mid-word cell, a start cell whose word is already full, or an end cell
-// whose word is already empty -- is unambiguous: there's nothing to
-// auto-advance into either direction, so a tap there just edits that one letter.
+// either STARTS at this exact cell (typing forward -- the convention every
+// crossword solver knows from paper: you begin at the numbered cell -- and
+// lands exactly there, however full or empty the word already is; see
+// nextTypeIndex for how already-filled cells get skipped as typing
+// advances, never on the initial tap itself), or ENDS at this exact cell and
+// still has something to delete (backspacing backward -- the mirror image,
+// for reviewing/correcting a word from its last letter). Any other cell --
+// a mid-word cell, or an end cell whose word is already empty -- is
+// unambiguous: there's nothing to auto-advance into either direction, so a
+// tap there just edits that one letter.
 function wholeWordCandidates(state, entry, row, col) {
   const candidates = [];
   for (const direction of ["horizontal", "vertical"]) {
     const wordId = entry[direction];
     if (!wordId) continue;
     const word = state.index.wordsById.get(wordId);
-    const forTyping = isStartCell(word, row, col) && !isWordFull(state, word);
+    const forTyping = isStartCell(word, row, col);
     const forDeleting = isEndCell(word, row, col) && !isWordEmpty(state, word);
     if (forTyping || forDeleting) {
       candidates.push(direction);
     }
   }
   return candidates;
+}
+
+// Where typing forward should land after filling word.cells[idx]: the next
+// still-blank cell ahead, if any -- skipping past cells already filled in,
+// almost always correctly, via a crossing word -- otherwise the plain next
+// cell in sequence, so a full rewrite of an already-full word (see
+// wholeWordCandidates: tapping a FULL word's start is almost always "this
+// was wrong, redo it") still advances normally; otherwise -1, at the word's
+// actual last cell with nowhere left to go.
+function nextTypeIndex(state, word, idx) {
+  for (let i = idx + 1; i < word.cells.length; i++) {
+    const [r, c] = word.cells[i];
+    if (!state.answers[r][c]) return i;
+  }
+  return idx < word.cells.length - 1 ? idx + 1 : -1;
 }
 
 export function createState(puzzle) {
@@ -195,8 +208,8 @@ export function selectCell(state, row, col) {
     return;
   }
 
-  // Rare: this cell starts both an across and a down word (still un-full).
-  // Tapping it again flips between them; otherwise keep the previous
+  // Rare: this cell starts both an across and a down word. Tapping it
+  // again flips between them; otherwise keep the previous
   // direction if it still applies, defaulting to horizontal.
   if (isSameCell && candidates.includes(state.activeDirection)) {
     state.activeDirection = state.activeDirection === "horizontal" ? "vertical" : "horizontal";
@@ -228,8 +241,9 @@ export function typeLetter(state, rawLetter) {
   const word = getActiveWord(state);
   if (word) {
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    if (idx >= 0 && idx < word.cells.length - 1) {
-      const [nr, nc] = word.cells[idx + 1];
+    const nextIdx = idx >= 0 ? nextTypeIndex(state, word, idx) : -1;
+    if (nextIdx >= 0) {
+      const [nr, nc] = word.cells[nextIdx];
       state.activeCell = { row: nr, col: nc };
     }
   }
@@ -261,10 +275,8 @@ function resolveWordForToggle(state, row, col) {
   if (!hWordId && !vWordId) return null;
 
   // Both directions cross here, and neither is currently highlighted (e.g.
-  // long-pressing cold, or long-pressing a now-FULL word's start cell --
-  // fullness takes it out of "whole word" typing mode entirely, so it's not
-  // highlighted either, even though marking a just-finished word unsure is
-  // completely normal). A word's START (the numbered cell you deliberately
+  // long-pressing cold, before either direction here has ever been
+  // selected). A word's START (the numbered cell you deliberately
   // tap to begin solving it) is a much more deliberate signal than its END
   // (which is very often just wherever a crossing word happens to stop) --
   // so START always outranks END when the two conflict, not just "being an
