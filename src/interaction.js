@@ -149,7 +149,18 @@ export function wireInteractions(
       // the screen (long words, or a pinch-zoomed-in view) -- nudge it back
       // into view, but only the minimum needed: no scroll at all while it's
       // already visible, so ordinary typing doesn't jitter the page.
-      scrollActiveCellIntoView("nearest");
+      //
+      // The one exception: the word's actual last letter. There, the active
+      // cell doesn't move at all (nowhere left to advance to), so "nearest"
+      // -- which only acts when something isn't already in view -- silently
+      // does nothing, and the "next letter" buffer never gets a chance to
+      // reveal what's actually beyond the word (the board's edge, or another
+      // definition) to confirm it really ended there. A deliberate "center"
+      // forces that confirmation to happen right when it matters, the same
+      // way tapping a clue does.
+      const stayedPut = state.activeCell && state.activeCell.row === result.row && state.activeCell.col === result.col;
+      const finishedWholeWord = stayedPut && state.activeDirection;
+      scrollActiveCellIntoView(finishedWholeWord ? "center" : "nearest");
     }
   });
 
