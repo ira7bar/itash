@@ -115,6 +115,11 @@ export function createState(puzzle) {
     activeDirection: null,
     roomId: null,
     unsureWords: new Set(),
+    // Other participants' current active cell + color tint, keyed by their
+    // user id -- never includes this device's own entry (see
+    // applyRemotePresence), since the local active cell is already shown via
+    // the .active class, not a presence tint.
+    presence: new Map(),
   };
 }
 
@@ -164,6 +169,21 @@ export function flattenUnsure(state) {
 
 export function applyRemoteUnsure(state, unsureMap) {
   state.unsureWords = new Set(Object.keys(unsureMap || {}));
+}
+
+// Rebuilds the "who else is looking at what" map from a room's presence
+// snapshot. Drops this device's own entry (selfUserId) -- pushed by main.js
+// so other participants can render it, but never meaningful to render for
+// ourselves -- and anything malformed (e.g. a stale/partial write caught
+// mid-flight).
+export function applyRemotePresence(state, presenceMap, selfUserId) {
+  const presence = new Map();
+  for (const [userId, entry] of Object.entries(presenceMap || {})) {
+    if (userId === selfUserId) continue;
+    if (!entry || typeof entry.row !== "number" || typeof entry.col !== "number") continue;
+    presence.set(userId, entry);
+  }
+  state.presence = presence;
 }
 
 export function isBlocked(state, row, col) {

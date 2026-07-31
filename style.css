@@ -151,6 +151,12 @@ body {
 .cell.blank.active { background: var(--active-bg); }
 .cell.blank.in-word:not(.active) { background: var(--in-word-bg); }
 
+/* Another live-room participant's current cell -- box-shadow, not
+   background, so it layers on top of (rather than fights) the active/in-word
+   background above when it happens to be the same cell. --presence-color is
+   set per-cell in render.js from that user's own random hue. */
+.cell.presence-active { box-shadow: inset 0 0 0 999px var(--presence-color); }
+
 .letter {
   font-size: clamp(10px, 3.6vw, 30px);
   font-weight: 700;

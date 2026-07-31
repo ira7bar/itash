@@ -26,6 +26,8 @@ function loadModules() {
         ref: db.ref,
         onValue: db.onValue,
         set: db.set,
+        remove: db.remove,
+        onDisconnect: db.onDisconnect,
       };
     })();
   }
@@ -74,4 +76,28 @@ export async function pushUnsureFlag(roomId, wordId, isUnsure) {
   const { database, ref, set } = await loadModules();
   const flagRef = ref(database, `rooms/${roomId}/unsure/${wordId}`);
   await set(flagRef, isUnsure ? true : null);
+}
+
+// Writes this device's own "what I'm looking at" cell + color tint, so every
+// other participant can lightly paint that cell to show it's occupied.
+// Scoped to this one user's own child path, same reasoning as
+// pushAnswerCell -- concurrent presence updates from different people must
+// never stomp each other. Also arms an onDisconnect cleanup on every call:
+// if this device vanishes without a clean leaveRoom (closed tab, dead
+// network, phone locked), Firebase itself removes the stale entry rather
+// than leaving a cursor stuck on the grid for everyone else forever.
+export async function pushPresence(roomId, userId, presence) {
+  const { database, ref, set, onDisconnect } = await loadModules();
+  const presenceRef = ref(database, `rooms/${roomId}/presence/${userId}`);
+  onDisconnect(presenceRef).remove();
+  await set(presenceRef, presence);
+}
+
+// Explicit cleanup for the ordinary "leave room" action, so a departing
+// participant's cursor disappears immediately rather than waiting for the
+// onDisconnect above to notice.
+export async function clearPresence(roomId, userId) {
+  const { database, ref, remove } = await loadModules();
+  const presenceRef = ref(database, `rooms/${roomId}/presence/${userId}`);
+  await remove(presenceRef);
 }

@@ -1,4 +1,5 @@
 import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell } from "./model.js";
+import { presenceTintColor } from "./presence.js";
 
 // The grid is a rendered image of the actual PDF page -- clue text, dividers,
 // borders, and the source's own direction arrows all come through pixel-perfect,
@@ -54,6 +55,13 @@ export function updateGrid(state, overlayEl) {
   const activeWord = getActiveWord(state);
   const activeWordCellSet = new Set((activeWord?.cells ?? []).map(([r, c]) => `${r},${c}`));
 
+  // Last-write-wins if two participants happen to be on the exact same
+  // cell -- a rare overlap, not worth blending multiple tints for.
+  const presenceHueByCell = new Map();
+  for (const entry of state.presence.values()) {
+    presenceHueByCell.set(`${entry.row},${entry.col}`, entry.hue);
+  }
+
   const cells = overlayEl.children;
   for (let i = 0; i < cells.length; i++) {
     const cellEl = cells[i];
@@ -78,5 +86,18 @@ export function updateGrid(state, overlayEl) {
       ((entry.horizontal && state.unsureWords.has(entry.horizontal)) ||
         (entry.vertical && state.unsureWords.has(entry.vertical)));
     cellEl.classList.toggle("unsure", Boolean(isUnsure));
+
+    // A box-shadow tint rather than a background-color: .active/.in-word
+    // already set `background` via CSS classes, and box-shadow layers on top
+    // of that independently instead of fighting it for the same property --
+    // so a cell someone else is also looking at still shows its own
+    // active/in-word highlight underneath the tint.
+    const presenceHue = !blocked ? presenceHueByCell.get(`${r},${c}`) : undefined;
+    if (presenceHue !== undefined) {
+      cellEl.style.setProperty("--presence-color", presenceTintColor(presenceHue));
+      cellEl.classList.add("presence-active");
+    } else {
+      cellEl.classList.remove("presence-active");
+    }
   }
 }

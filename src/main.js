@@ -1,9 +1,10 @@
-import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, isPuzzleComplete } from "./model.js";
+import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete } from "./model.js";
 import { setupImage, renderGridShell, updateGrid } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag, pushPresence, clearPresence } from "./sync.js";
+import { getUserId, getUserHue } from "./presence.js";
 
 const RETRY_DELAY_MS = 1500;
 
@@ -44,6 +45,12 @@ async function main() {
   const state = createState(puzzle);
   loadProgress(state);
 
+  // This device's own live-room identity: a stable id (so a presence write
+  // has a path to key off of) and a random-but-persistent color tint (so the
+  // same person doesn't look like a new participant on every reload).
+  const userId = getUserId();
+  const userHue = getUserHue();
+
   setupImage(state, imageEl);
   renderGridShell(state, overlayEl);
   // No resize handling needed: cell positions are percentages of the image's own
@@ -71,6 +78,23 @@ async function main() {
     updateGrid(state, overlayEl);
     saveProgress(state);
     checkCelebration();
+    syncPresence();
+  };
+
+  // Broadcasts this device's active cell to a live room, so everyone else
+  // can lightly paint it in this user's color. Only fires an actual network
+  // write when the cell has changed since the last push -- onChange runs on
+  // every keystroke, not just cell-to-cell navigation, and re-writing the
+  // same cell every time would be pure noise. lastPushedCell is reset to
+  // null (forcing a fresh push) whenever the room identity itself changes:
+  // joining/creating a room, and re-subscribing on visibilitychange.
+  let lastPushedCell = null;
+  const syncPresence = () => {
+    if (!state.roomId || !state.activeCell) return;
+    const { row, col } = state.activeCell;
+    if (lastPushedCell && lastPushedCell.row === row && lastPushedCell.col === col) return;
+    lastPushedCell = { row, col };
+    pushWithRetry(pushPresence, state.roomId, userId, { row, col, hue: userHue });
   };
 
   // A typed letter or backspace syncs just that ONE cell to a live room --
@@ -116,11 +140,15 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteUnsure(state, roomState.unsure || []);
+      applyRemotePresence(state, roomState.presence || {}, userId);
       onChange();
     });
     if (unsubscribeRoom) unsubscribeRoom();
     unsubscribeRoom = unsubscribe;
     state.roomId = roomId;
+    // Force a fresh presence push under the (possibly new) room id, rather
+    // than trusting whatever cell was last pushed to a previous room.
+    lastPushedCell = null;
     // Put the room in THIS device's own address bar too, not just in the link
     // handed to others -- a live room should stay joined across reloads, and
     // mobile browsers reload backgrounded tabs constantly (e.g. switching
@@ -141,7 +169,18 @@ async function main() {
       unsubscribeRoom();
       unsubscribeRoom = null;
     }
+    if (state.roomId) {
+      // Best-effort: an explicit leave should clear this device's cursor for
+      // everyone else right away, rather than waiting on the onDisconnect
+      // cleanup in sync.js (which only fires once the connection actually
+      // drops, not on this ordinary in-app "back to solo" action).
+      clearPresence(state.roomId, userId).catch((err) => {
+        console.warn("Failed to clear presence on leaving room:", err);
+      });
+    }
     state.roomId = null;
+    state.presence = new Map();
+    lastPushedCell = null;
     history.replaceState(null, "", location.pathname + location.search);
     refreshRoomUi();
   };
