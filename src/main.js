@@ -92,9 +92,22 @@ async function main() {
   const syncPresence = () => {
     if (!state.roomId || !state.activeCell) return;
     const { row, col } = state.activeCell;
-    if (lastPushedCell && lastPushedCell.row === row && lastPushedCell.col === col) return;
-    lastPushedCell = { row, col };
-    pushWithRetry(pushPresence, state.roomId, userId, { row, col, hue: userHue });
+    const direction = state.activeDirection;
+    // Direction is part of the "did anything change" check too, not just
+    // row/col: re-tapping a dual-direction start cell can flip direction
+    // without moving the active cell at all (see selectCell in model.js),
+    // and that's exactly the case where the OTHER participants' view of
+    // "which whole word is highlighted for this person" needs to update.
+    if (
+      lastPushedCell &&
+      lastPushedCell.row === row &&
+      lastPushedCell.col === col &&
+      lastPushedCell.direction === direction
+    ) {
+      return;
+    }
+    lastPushedCell = { row, col, direction };
+    pushWithRetry(pushPresence, state.roomId, userId, { row, col, hue: userHue, direction });
   };
 
   // A typed letter or backspace syncs just that ONE cell to a live room --

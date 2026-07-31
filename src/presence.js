@@ -32,6 +32,16 @@ export function getUserHue() {
   return Number(hue);
 }
 
-export function presenceTintColor(hue) {
-  return `hsla(${hue}, 75%, 45%, 0.35)`;
+// Two shades of the same hue, mirroring how the app already distinguishes
+// "the word you're in" from "the exact cell you're on" for your OWN cursor
+// (--in-word-bg vs --active-bg) -- here for every other participant's
+// cursor instead. Kept much lighter than that own-cursor pair (0.28/0.55)
+// on purpose: this is ambient "who's working on what" texture, not a
+// primary highlight, so it shouldn't compete for attention.
+export function presenceWordTint(hue) {
+  return `hsla(${hue}, 65%, 50%, 0.16)`;
+}
+
+export function presenceLetterTint(hue) {
+  return `hsla(${hue}, 65%, 50%, 0.30)`;
 }

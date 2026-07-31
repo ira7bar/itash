@@ -1,5 +1,5 @@
-import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell } from "./model.js";
-import { presenceTintColor } from "./presence.js";
+import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell, getWordCellsForPresence } from "./model.js";
+import { presenceWordTint, presenceLetterTint } from "./presence.js";
 
 // The grid is a rendered image of the actual PDF page -- clue text, dividers,
 // borders, and the source's own direction arrows all come through pixel-perfect,
@@ -55,11 +55,21 @@ export function updateGrid(state, overlayEl) {
   const activeWord = getActiveWord(state);
   const activeWordCellSet = new Set((activeWord?.cells ?? []).map(([r, c]) => `${r},${c}`));
 
-  // Last-write-wins if two participants happen to be on the exact same
-  // cell -- a rare overlap, not worth blending multiple tints for.
-  const presenceHueByCell = new Map();
+  // Two separate maps, same reasoning as the local player's own
+  // in-word/active split: every cell of a remote participant's whole active
+  // word gets the lighter tint, and their one exact current cell gets the
+  // stronger tint on top. Last-write-wins if two participants happen to
+  // overlap on the same cell -- a rare case, not worth blending tints for.
+  const presenceWordHueByCell = new Map();
+  const presenceLetterHueByCell = new Map();
   for (const entry of state.presence.values()) {
-    presenceHueByCell.set(`${entry.row},${entry.col}`, entry.hue);
+    const wordCells = getWordCellsForPresence(state, entry.row, entry.col, entry.direction);
+    if (wordCells) {
+      for (const [r, c] of wordCells) {
+        presenceWordHueByCell.set(`${r},${c}`, entry.hue);
+      }
+    }
+    presenceLetterHueByCell.set(`${entry.row},${entry.col}`, entry.hue);
   }
 
   const cells = overlayEl.children;
@@ -91,13 +101,24 @@ export function updateGrid(state, overlayEl) {
     // already set `background` via CSS classes, and box-shadow layers on top
     // of that independently instead of fighting it for the same property --
     // so a cell someone else is also looking at still shows its own
-    // active/in-word highlight underneath the tint.
-    const presenceHue = !blocked ? presenceHueByCell.get(`${r},${c}`) : undefined;
-    if (presenceHue !== undefined) {
-      cellEl.style.setProperty("--presence-color", presenceTintColor(presenceHue));
-      cellEl.classList.add("presence-active");
+    // active/in-word highlight underneath the tint. The letter map (the
+    // exact cell a participant is on) takes priority over the word map
+    // (every cell of their active word) when a cell is in both.
+    let presenceColor;
+    if (!blocked) {
+      const letterHue = presenceLetterHueByCell.get(`${r},${c}`);
+      if (letterHue !== undefined) {
+        presenceColor = presenceLetterTint(letterHue);
+      } else {
+        const wordHue = presenceWordHueByCell.get(`${r},${c}`);
+        if (wordHue !== undefined) presenceColor = presenceWordTint(wordHue);
+      }
+    }
+    if (presenceColor) {
+      cellEl.style.setProperty("--presence-color", presenceColor);
+      cellEl.classList.add("presence-tint");
     } else {
-      cellEl.classList.remove("presence-active");
+      cellEl.classList.remove("presence-tint");
     }
   }
 }

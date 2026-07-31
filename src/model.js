@@ -186,6 +186,20 @@ export function applyRemotePresence(state, presenceMap, selfUserId) {
   state.presence = presence;
 }
 
+// Which cells belong to the word at (row, col) in the given direction, so
+// render.js can lightly tint a remote participant's WHOLE active word, not
+// just the single cell they're on right now -- mirroring how the local
+// player's own in-word/active distinction already works. Returns null when
+// direction is falsy (single-letter mode: nothing beyond that one cell to
+// highlight) or when that direction doesn't actually resolve to a word
+// there (a stale/malformed presence write).
+export function getWordCellsForPresence(state, row, col, direction) {
+  if (!direction) return null;
+  const entry = getCellEntry(state.index, row, col);
+  const wordId = entry?.[direction];
+  return wordId ? state.index.wordsById.get(wordId)?.cells ?? null : null;
+}
+
 export function isBlocked(state, row, col) {
   return state.puzzle.grid[row][col].type === "blocked";
 }

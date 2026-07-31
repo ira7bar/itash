@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v24";
+const CACHE_NAME = "tashbetz-shell-v25";
 const SHELL_FILES = [
   ".",
   "index.html",
