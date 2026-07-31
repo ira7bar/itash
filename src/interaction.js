@@ -106,25 +106,47 @@ export function wireInteractions(
   gridEl.addEventListener("contextmenu", suppressContextMenu);
   imageEl.addEventListener("contextmenu", suppressContextMenu);
 
-  // "center": a deliberate jump to a word tapped via its clue, so it lands
-  // somewhere comfortable to read and type into, not just barely on-screen.
-  // "nearest": the passive, minimal-motion case for staying with the active
-  // cell while typing/backspacing -- does nothing at all if already visible,
-  // so ordinary fast typing doesn't jitter the page every keystroke.
+  // Horizontal counterpart to "nearest": scrolls #grid-wrap by the minimum
+  // amount so `cellEl` ends up with at least one cell's width of clearance
+  // from whichever edge it's closest to (so the next letter -- or,
+  // backspacing, the previous one -- is always fully visible, not just
+  // peeking in), or does nothing if it already has that much room.
   //
-  // Either way, horizontal scroll-padding gives the landing spot a full
-  // cell's width of breathing room past the target, so the next letter --
-  // or, backspacing, the previous one -- lands fully visible rather than
-  // just peeking in at the edge. Recomputed from the cell's own current
-  // rendered width each time. Horizontal only, per direct feedback that
-  // vertical panning didn't need the same adjustment.
+  // Computed and applied directly, rather than via scrollIntoView's own
+  // "nearest" + scroll-padding-inline (tried first): that version silently
+  // did nothing on a word's actual last letter, since the active cell
+  // doesn't move there (nowhere left to advance to) and native "nearest"
+  // only reacts when a fresh target isn't already positioned -- it has no
+  // way to know the *reason* nothing moved is worth double-checking. This
+  // always recomputes fresh off the cell's current position, so it's
+  // correct there too, without ever overshooting into a full re-center.
+  const panHorizontallyToReveal = (cellEl) => {
+    const cellRect = cellEl.getBoundingClientRect();
+    const wrapRect = gridWrapEl.getBoundingClientRect();
+    const buffer = cellRect.width;
+    const cellLeft = cellRect.left - wrapRect.left;
+    const cellRight = cellRect.right - wrapRect.left;
+    if (cellLeft < buffer) {
+      gridWrapEl.scrollLeft += cellLeft - buffer;
+    } else if (cellRight > wrapRect.width - buffer) {
+      gridWrapEl.scrollLeft += cellRight - (wrapRect.width - buffer);
+    }
+  };
+
+  // "center": a deliberate jump to a word tapped via its clue, so it lands
+  // somewhere comfortable to read and type into, not just barely on-screen --
+  // full centering (both axes) makes sense here since it's landing somewhere
+  // new, not continuing from a nearby position.
+  // "nearest": the passive, minimal-motion case for staying with the active
+  // cell while typing/backspacing -- vertical uses the browser's own
+  // "nearest" (a no-op if already visible); horizontal uses
+  // panHorizontallyToReveal, for the reasons above.
   const scrollCellIntoView = (cellEl, mode) => {
-    const cellWidthPx = cellEl.getBoundingClientRect().width;
-    gridWrapEl.style.scrollPaddingInline = `${cellWidthPx}px`;
     if (mode === "center") {
       cellEl.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
     } else {
-      cellEl.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+      cellEl.scrollIntoView({ block: "nearest", behavior: "auto" });
+      panHorizontallyToReveal(cellEl);
     }
   };
 
@@ -148,19 +170,11 @@ export function wireInteractions(
       // Advancing through a word can walk the active cell off the edge of
       // the screen (long words, or a pinch-zoomed-in view) -- nudge it back
       // into view, but only the minimum needed: no scroll at all while it's
-      // already visible, so ordinary typing doesn't jitter the page.
-      //
-      // The one exception: the word's actual last letter. There, the active
-      // cell doesn't move at all (nowhere left to advance to), so "nearest"
-      // -- which only acts when something isn't already in view -- silently
-      // does nothing, and the "next letter" buffer never gets a chance to
-      // reveal what's actually beyond the word (the board's edge, or another
-      // definition) to confirm it really ended there. A deliberate "center"
-      // forces that confirmation to happen right when it matters, the same
-      // way tapping a clue does.
-      const stayedPut = state.activeCell && state.activeCell.row === result.row && state.activeCell.col === result.col;
-      const finishedWholeWord = stayedPut && state.activeDirection;
-      scrollActiveCellIntoView(finishedWholeWord ? "center" : "nearest");
+      // already visible, so ordinary typing doesn't jitter the page. This
+      // still correctly reveals the one-cell buffer past a word's actual
+      // last letter (see panHorizontallyToReveal), without the overshoot a
+      // full "center" caused there for longer words.
+      scrollActiveCellIntoView("nearest");
     }
   });
 

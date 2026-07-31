@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v22";
+const CACHE_NAME = "tashbetz-shell-v23";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -35,7 +35,9 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname.endsWith("puzzle.json") || url.pathname.endsWith("puzzle.png")) {
+  // Puzzle filenames carry the week's date (puzzle_YYYY-MM-DD.json/.png), so
+  // match by pattern rather than a fixed name.
+  if (/^puzzle.*\.(json|png)$/.test(url.pathname.split("/").pop())) {
     // network-first: always try to get this week's latest puzzle (data + rendered
     // page image), fall back to cache if offline
     event.respondWith(

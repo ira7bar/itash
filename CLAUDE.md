@@ -4,43 +4,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-תשחץ הארץ (Tashbetz Ha'aretz) — a live, collaborative solver for the weekly Haaretz Hebrew crossword. Two parts live in this working directory:
+תשחץ הארץ (Tashbetz Ha'aretz) — a live, collaborative solver for the weekly Haaretz Hebrew crossword. This whole working directory is a single git repo (remote `https://github.com/ira7bar/itash.git`, deployed via GitHub Pages at `https://ira7bar.github.io/itash/`) with two things living side by side in it:
 
-- **Root (`itash/`)** — an offline, one-off pipeline that turns a weekly `tashbetz.pdf` into `puzzle.json` + `puzzle.png`. Not a git repo; a scratch workspace of parser code plus many one-shot `check_*.py` / `*_check.json` debugging scripts written while reverse-engineering the PDF's layout (grid detection, arrow/clue routing, split cells, rotation, etc.). Most of these are throwaway investigation artifacts, not a maintained tool suite — don't assume they still run cleanly or need to.
-- **`pwa/`** — the actual shipped product: a static, no-build-step Progressive Web App that loads `puzzle.json`/`puzzle.png` and lets one or more people solve the grid together in real time. This is its own git repo (remote `https://github.com/ira7bar/itash.git`, deployed via GitHub Pages at `https://ira7bar.github.io/itash/`).
+- **The PWA** — the actual shipped product, living directly at repo root (`index.html`, `src/`, `style.css`, `service-worker.js`, `manifest.webmanifest`, `icons/`, `fonts/`): a static, no-build-step Progressive Web App that loads a dated `puzzle_YYYY-MM-DD.json`/`.png` pair and lets one or more people solve the grid together in real time.
+- **The weekly parsing pipeline** — also at root (`parse_puzzle.py`), an offline, one-off tool that turns a given week's `tashbetz.pdf` into that `puzzle_YYYY-MM-DD.json` + `.png` pair. `debug/` and `dev/` are both gitignored scratch workspaces (not shipped, not tracked): `debug/` holds each week's source PDF plus the many one-shot `check_*.py` / `*_check.json` scripts written while reverse-engineering the PDF's layout (grid detection, arrow/clue routing, split cells, rotation, etc.) — throwaway investigation artifacts, not a maintained tool suite, don't assume they still run cleanly or need to. `dev/` holds the Playwright verification scripts (see Testing below).
 
-When asked to "fix the app" or work on the solving experience, the work is almost always in `pwa/`. Work in the root only concerns generating/repairing a given week's puzzle data.
+When asked to "fix the app" or work on the solving experience, the work is almost always in `src/`/`index.html`/`style.css`. Parsing work only concerns generating/repairing a given week's puzzle data.
 
-## The weekly parsing pipeline (root)
+## Deploying a new week
 
 ```
-python parse_puzzle.py path/to/tashbetz.pdf --page 3 --out puzzle.json
+python parse_puzzle.py path/to/tashbetz.pdf --page 3 --out puzzle_YYYY-MM-DD.json --image-out puzzle_YYYY-MM-DD.png
 ```
+
+(`meta.source` in the output is whatever `pdf_path` string was passed, and `meta.image` is auto-derived from `--image-out`'s basename — so run this from repo root with a same-named copy of the PDF there, e.g. `tashbetz.pdf`, so `meta.source` stays a clean filename rather than a `debug/...` path.)
+
+The puzzle filenames carry the week's date and are **not** a fixed name — after generating the new pair, two places must be updated by hand for each deploy, and `git rm` the previous week's `puzzle_*.json`/`.png`:
+- `src/main.js`'s hardcoded `fetch("puzzle_YYYY-MM-DD.json", ...)` call.
+- `service-worker.js`'s `CACHE_NAME` (bump the version suffix so clients pick up the change — see below). Its fetch handler already matches puzzle files by pattern (`/^puzzle.*\.(json|png)$/` on the basename), so it does *not* need a per-week edit.
 
 Extracts everything from the PDF's vector/text layers — no OCR, no image processing. Documented in detail in the module docstring at the top of `parse_puzzle.py`:
 
 - **Grid structure**: clue cells are solid light-blue fill rectangles (`BLUE_FILL` in `parse_puzzle.py`); any grid cell overlapping one is `blocked`, everything else is `playable`.
 - **Clue text**: bucketed by cell, then by which fill rectangle within the cell (some cells hold two stacked clue boxes divided by a rule line, not one multi-line clue) — see `grid[r][c].clueParts` vs the combined `grid[r][c].clue`.
 - **Word runs**: derived purely from grid geometry (maximal horizontal/vertical strips of ≥2 contiguous playable cells), not from the PDF's own clue numbering.
-- **Known limitation**: a handful of cells route their clue via a bent/hook arrow to a non-adjacent run (e.g. a vertical word starting in the top row, with no cell above it to hold the clue). Adjacency-based matching can't catch these; they're expected to come out with a missing/wrong clue and get fixed by hand afterward, not solved in the parser.
+- **Known limitation**: a handful of cells route their clue via a bent/hook arrow to a non-adjacent run (e.g. a vertical word starting in the top row, with no cell above it to hold the clue). Adjacency-based matching can't catch these; a dozen or so runs typically come out with no clue each week (reported in the script's own output and in `puzzle.warnings.run_ids_without_clue`) and ship as-is — this has consistently been treated as an acceptable known limitation rather than something to hand-fix before deploying, and there is currently no in-app editing mode (one existed once; see `git log -- puzzle.json` around "Pivot to image-overlay rendering; remove edit mode").
 
-Output schema (`puzzle.json`): `meta` (rows, cols, source PDF/page, rendered image dimensions, and the grid's pixel origin/cell-size within that image — this is what lets the PWA overlay be purely percentage-based, see below), `grid` (2D array of cell type + clue text), `words` (id, direction, ordered list of `[row, col]` cells), `warnings`.
+Output schema (`puzzle_YYYY-MM-DD.json`): `meta` (rows, cols, source PDF/page, rendered image dimensions, and the grid's pixel origin/cell-size within that image — this is what lets the PWA overlay be purely percentage-based, see below), `grid` (2D array of cell type + clue text), `words` (id, direction, ordered list of `[row, col]` cells), `warnings`.
 
-The many root-level `check_*.py` scripts and matching `*.json` outputs were ad hoc tools for validating specific pieces of this extraction (arrow positions, glyph rotation, split-cell detection, etc.) against a specific PDF. Treat them as reference/history, not a CLI surface to keep working.
+The `check_*.py` scripts and matching `*.json` outputs under `debug/` were ad hoc tools for validating specific pieces of this extraction (arrow positions, glyph rotation, split-cell detection, etc.) against a specific PDF. Treat them as reference/history, not a CLI surface to keep working.
 
-## The PWA (`pwa/`)
+## The PWA
 
 No npm, no bundler, no build step — plain ES modules loaded directly by the browser (`<script type="module" src="src/main.js">`). Firebase's SDK is likewise loaded as native ES modules straight from Firebase's CDN, and only fetched once a live room is actually created/joined — solo solving never touches the network. This "no build step" property is deliberate; don't introduce a bundler/framework without discussing it first.
 
 ### Running it locally
 
-Serve `pwa/` with any static file server (e.g. `python -m http.server 8123` from inside `pwa/`) and open `index.html`. The `dev/` scripts (see Testing below) assume it's reachable at `http://localhost:8123`.
+Serve the repo root with any static file server (e.g. `python -m http.server 8123`) and open `index.html`. The `dev/` scripts (see Testing below) assume it's reachable at `http://localhost:8123`.
 
 ### Core architecture
 
 The grid is a **rendered image of the actual PDF page**, not a reconstructed CSS grid — clue text, dividers, borders, and the source's own direction arrows all come through pixel-perfect because none of it is redrawn. `render.js` positions a transparent, purely percentage-based interactive overlay (`div.cell` per grid cell) on top of that `<img>`, using `puzzle.meta`'s origin/cell-size fields converted to percentages of the image's own box. Percentages (not pixel math) mean the overlay stays aligned at any viewport size or native pinch-zoom level with zero resize handling.
 
-Module responsibilities (`pwa/src/`):
+Module responsibilities (`src/`):
 - **`model.js`** — all grid/word-run/state logic, deliberately DOM-free so it could survive a future rendering-layer swap unchanged. Owns cell selection, typing/backspace, unsure-word toggling, and the clue-cell reverse index — see **Typing & selection model** below for the actual rules, they're more subtle than a one-liner.
 - **`render.js`** — builds the cell overlay once (also marking clue cells that resolve to a word as `.clue-tappable`, for the cursor affordance), then re-renders per-cell state (letter, active/in-word/unsure/blocked classes) on every change.
 - **`interaction.js`** — wires DOM events to `model.js`: click-to-select (including clue-cell taps), the hidden-input trick for summoning the mobile keyboard, long-press (450ms, cancelled on >10px move) to toggle a word "unsure", arrow-key navigation, viewport panning (see **Viewport / pan-to-follow** below), and the share/join/leave-room UI.
@@ -50,7 +56,7 @@ Module responsibilities (`pwa/src/`):
 - **`main.js`** — wires everything together, owns the room join/leave/create lifecycle and the puzzle-complete celebration trigger.
 - **`firebase-config.js`** — public client config (not a secret — access control is via Realtime Database security rules, not by hiding this). Room IDs are random base36 strings embedded in the URL hash (`#room=xxxxxx`); opening a room's link/code joins that live room and overrides local progress, same as any explicit "load this" action.
 
-Service worker (`service-worker.js`) does app-shell caching for offline use (cache-first for the shell, network-first-with-fallback for `puzzle.json`/`puzzle.png` so a new week's puzzle is picked up when online). Bump `CACHE_NAME` when shipping a shell file change so clients pick it up.
+Service worker (`service-worker.js`) does app-shell caching for offline use (cache-first for the shell, network-first-with-fallback for the dated `puzzle_*.json`/`.png` pair, matched by filename pattern, so a new week's puzzle is picked up when online). Bump `CACHE_NAME` whenever shipping a shell file change (including the weekly `main.js` fetch-path edit) so clients pick it up.
 
 ### Typing & selection model
 
@@ -77,6 +83,6 @@ The app deliberately does **not** implement its own zoom — it relies entirely 
 
 ### Testing
 
-No automated test runner/CI — verification is done with one-off Playwright scripts in `pwa/dev/` (gitignored; local-only), each targeting a specific bug or feature (`test_live_two_clients.py`, `test_unsure_direction_and_delete_advance.py`, `test_hidden_input_position.py`, etc.) and writing its findings to a matching `*_report.json`. They assume the app is being served locally at `http://localhost:8123` (some `*_prod.py` variants instead point at the live GitHub Pages URL, for verifying real deploys). Follow this same pattern for new manual verification: a small standalone script under `dev/` that drives the page with Playwright and asserts/reports on the specific behavior in question, rather than adding a formal test framework.
+No automated test runner/CI — verification is done with one-off Playwright scripts in `dev/` (gitignored; local-only), each targeting a specific bug or feature (`test_live_two_clients.py`, `test_unsure_direction_and_delete_advance.py`, `test_hidden_input_position.py`, etc.) and writing its findings to a matching `*_report.json`. They assume the app is being served locally at `http://localhost:8123` (some `*_prod.py` variants instead point at the live GitHub Pages URL, for verifying real deploys). Follow this same pattern for new manual verification: a small standalone script under `dev/` that drives the page with Playwright and asserts/reports on the specific behavior in question, rather than adding a formal test framework.
 
 Many past mobile-specific bugs (documented in commit history and inline comments) came from Android/iOS quirks in how the OS keyboard, pinch-zoom, and long-press interact with the page — when touching `interaction.js`, `#hidden-input` positioning in `style.css`/`interaction.js`, or `touch-action`, be aware that real-device testing (not just Playwright) previously caught issues Playwright alone wouldn't.
