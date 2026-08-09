@@ -28,6 +28,8 @@ function loadModules() {
         set: db.set,
         remove: db.remove,
         onDisconnect: db.onDisconnect,
+        push: db.push,
+        serverTimestamp: db.serverTimestamp,
       };
     })();
   }
@@ -91,6 +93,20 @@ export async function pushPresence(roomId, userId, presence) {
   const presenceRef = ref(database, `rooms/${roomId}/presence/${userId}`);
   onDisconnect(presenceRef).remove();
   await set(presenceRef, presence);
+}
+
+// Appends one chat message as a brand new child (via push(), which mints its
+// own unique key) rather than writing to a fixed path -- unlike
+// answers/presence/unsure, many different people write to this same list
+// over time, so each message needs its own path rather than sharing one
+// per-writer slot the way those do. Still the same underlying rule: nobody
+// ever overwrites something another participant wrote. serverTimestamp()
+// (not a locally-read Date.now()) keeps message ordering consistent even if
+// a participant's device clock is off.
+export async function pushMessage(roomId, message) {
+  const { database, ref, push, set, serverTimestamp } = await loadModules();
+  const messageRef = push(ref(database, `rooms/${roomId}/messages`));
+  await set(messageRef, { ...message, ts: serverTimestamp() });
 }
 
 // Explicit cleanup for the ordinary "leave room" action, so a departing

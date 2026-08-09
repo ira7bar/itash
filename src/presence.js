@@ -5,6 +5,7 @@
 
 const USER_ID_KEY = "tashbetz:presence-user-id";
 const USER_HUE_KEY = "tashbetz:presence-user-hue";
+const USER_NAME_KEY = "tashbetz:presence-user-name";
 
 function randomId() {
   return Math.random().toString(36).slice(2, 10);
@@ -44,4 +45,21 @@ export function presenceWordTint(hue) {
 
 export function presenceLetterTint(hue) {
   return `hsla(${hue}, 65%, 50%, 0.30)`;
+}
+
+// Unlike id/hue, a display name has no sensible random default -- it only
+// exists once someone actually chooses one (see the lazy name prompt in
+// chat-interaction.js, triggered on a person's first chat message), so this
+// returns null rather than minting one. Stored the same way as id/hue --
+// keyed to the device, not any one puzzle -- so a chosen name persists
+// across reloads and future weeks exactly like the color does.
+export function getUserName() {
+  return localStorage.getItem(USER_NAME_KEY) || null;
+}
+
+export function setUserName(name) {
+  const trimmed = name.trim();
+  if (!trimmed) return null;
+  localStorage.setItem(USER_NAME_KEY, trimmed);
+  return trimmed;
 }

@@ -10,14 +10,45 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main id="grid-wrap">
-    <div id="grid">
-      <img id="puzzle-image" alt="" draggable="false" />
-      <div id="overlay-layer"></div>
-      <div id="celebration-overlay"></div>
-      <div id="celebration-text">כל הכבוד!</div>
-    </div>
-  </main>
+  <div id="app-row">
+    <main id="grid-wrap">
+      <div id="grid">
+        <img id="puzzle-image" alt="" draggable="false" />
+        <div id="overlay-layer"></div>
+        <div id="celebration-overlay"></div>
+        <div id="celebration-text">כל הכבוד!</div>
+      </div>
+    </main>
+
+    <aside id="chat-panel" hidden>
+      <div class="chat-handle"></div>
+      <div class="chat-header">
+        <span class="chat-title">צ'אט החדר</span>
+        <button id="chat-close-btn" type="button" aria-label="סגירת הצ'אט">︿</button>
+      </div>
+      <div id="roster" class="roster"></div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <form id="chat-form" class="chat-input-row">
+        <input id="chat-input" type="text" placeholder="כתבו הודעה…" maxlength="500"
+               autocomplete="off" autocorrect="off" spellcheck="false" />
+        <button id="chat-send-btn" type="submit">שליחה</button>
+      </form>
+    </aside>
+  </div>
+
+  <button id="chat-toggle" type="button" hidden aria-expanded="false" aria-label="פתיחת הצ'אט">
+    💬<span id="chat-badge" class="chat-badge" hidden>0</span>
+  </button>
+
+  <div id="name-modal" class="modal-backdrop" hidden>
+    <form id="name-form" class="modal-card">
+      <h3>איך קוראים לך?</h3>
+      <input id="name-input" type="text" placeholder="השם שיוצג לשאר החדר" maxlength="20"
+             autocomplete="off" autocorrect="off" spellcheck="false" />
+      <button type="submit">שמירה והמשך</button>
+      <p class="modal-note">🔒 נשמר במכשיר הזה — יזכור אותך גם בפעם הבאה</p>
+    </form>
+  </div>
 
   <footer>
     <button id="share-btn" type="button">משחק קבוצתי</button>

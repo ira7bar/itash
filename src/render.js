@@ -1,5 +1,6 @@
 import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell, getWordCellsForPresence } from "./model.js";
 import { presenceWordTint, presenceLetterTint } from "./presence.js";
+import { unreadCount } from "./chat.js";
 
 // The grid is a rendered image of the actual PDF page -- clue text, dividers,
 // borders, and the source's own direction arrows all come through pixel-perfect,
@@ -121,4 +122,68 @@ export function updateGrid(state, overlayEl) {
       cellEl.classList.remove("presence-tint");
     }
   }
+}
+
+// "Who's here": this device's own entry (never present in state.presence --
+// see applyRemotePresence in model.js -- so it's passed in separately, and
+// always rendered first) plus every other connected participant. Rebuilt
+// wholesale on every call, same as updateGrid -- the list is short enough
+// that a full rebuild is simpler than diffing and not worth optimizing.
+export function renderRoster(state, self, rosterEl) {
+  rosterEl.innerHTML = "";
+  const entries = [{ ...self, isSelf: true }, ...state.presence.values()];
+  for (const entry of entries) {
+    const chip = document.createElement("span");
+    chip.className = "roster-chip" + (entry.isSelf ? " me" : "");
+    if (entry.isSelf) {
+      chip.title = "לחיצה לשינוי השם";
+      chip.tabIndex = 0;
+    }
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.setProperty("--hue", entry.hue);
+    chip.appendChild(dot);
+    chip.appendChild(document.createTextNode(entry.name || (entry.isSelf ? "את/ה" : "אורח")));
+    rosterEl.appendChild(chip);
+  }
+}
+
+// Chat message list. Author/text go through textContent (never innerHTML --
+// this is other people's freely-typed input), and hue-tinting reuses the
+// same --hue custom-property technique render.js already uses for
+// --presence-color on the grid.
+//
+// wasNearBottom/scroll-to-bottom keeps the list pinned to the latest message
+// as new ones arrive, but only when the reader was already close to the
+// bottom -- so scrolling up to reread earlier messages doesn't get yanked
+// back down by an incoming message.
+export function renderChatMessages(chatState, selfUserId, listEl) {
+  const wasNearBottom = listEl.scrollHeight - listEl.scrollTop - listEl.clientHeight < 40;
+  listEl.innerHTML = "";
+  for (const msg of chatState.messages) {
+    const mine = msg.userId === selfUserId;
+    const row = document.createElement("div");
+    row.className = "chat-msg" + (mine ? " mine" : "");
+    row.style.setProperty("--hue", msg.hue);
+    const author = document.createElement("span");
+    author.className = "chat-msg-author";
+    author.textContent = mine ? "את/ה" : msg.name || "אורח";
+    const bubble = document.createElement("p");
+    bubble.textContent = msg.text;
+    row.appendChild(author);
+    row.appendChild(bubble);
+    listEl.appendChild(row);
+  }
+  if (wasNearBottom) listEl.scrollTop = listEl.scrollHeight;
+}
+
+// Toggle button (open/close class + unread badge) and the panel's own
+// open/close visual state -- kept together since both are driven by the
+// same chatState.open/unreadCount pair.
+export function renderChatToggle(chatState, chatToggleBtn, chatBadgeEl, chatPanelEl) {
+  const count = unreadCount(chatState);
+  chatBadgeEl.hidden = count === 0;
+  chatBadgeEl.textContent = String(count);
+  chatToggleBtn.setAttribute("aria-expanded", String(chatState.open));
+  chatPanelEl.classList.toggle("open", chatState.open);
 }

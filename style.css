@@ -42,6 +42,12 @@ body {
   flex-direction: column;
 }
 
+#app-row {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
 #grid-wrap {
   flex: 1;
   overflow: auto;
@@ -253,4 +259,282 @@ footer {
   opacity: 0;
   font-size: 16px; /* prevents iOS Safari from auto-zooming on focus */
   pointer-events: none;
+}
+
+/* ---------- chat: mobile bottom sheet, docks as a sidebar on wide screens
+   (see @media (min-width: 900px) below) ---------- */
+
+#chat-toggle {
+  position: fixed;
+  bottom: 4.5rem;
+  inset-inline-start: 1rem;
+  width: 3.1rem;
+  height: 3.1rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--share-accent);
+  color: #fff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+}
+#chat-toggle[hidden] { display: none; }
+
+.chat-badge {
+  position: absolute;
+  top: -0.15rem;
+  inset-inline-end: -0.15rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border: 2px solid var(--bg);
+  border-radius: 999px;
+  background: #d9534f;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-badge[hidden] { display: none; }
+
+#chat-panel {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: min(70vh, 34rem);
+  background: var(--bg);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -10px 26px rgba(0, 0, 0, 0.25);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.25, 0.9, 0.35, 1);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+}
+#chat-panel[hidden] { display: none; }
+#chat-panel.open { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  #chat-panel { transition: none; }
+}
+
+.chat-handle {
+  width: 2.2rem;
+  height: 0.28rem;
+  flex-shrink: 0;
+  margin: 0.55rem auto 0.2rem;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.4);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 0.2rem 0.9rem 0.5rem;
+}
+
+.chat-title { font-weight: 700; font-size: 0.95rem; }
+
+#chat-close-btn {
+  padding: 0.2rem 0.4rem;
+  border: none;
+  background: none;
+  color: var(--fg);
+  opacity: 0.6;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.roster {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0 0.7rem 0.55rem;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.roster-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  padding: 0.2rem 0.55rem 0.2rem 0.4rem;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.12);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.roster-chip.me {
+  border-color: var(--share-accent);
+  color: var(--share-accent);
+  cursor: pointer;
+}
+
+.dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: hsl(var(--hue), 65%, 46%);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-msg { max-width: 82%; }
+.chat-msg.mine { align-self: flex-start; }
+.chat-msg:not(.mine) { align-self: flex-end; }
+
+.chat-msg-author {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: hsl(var(--hue), 60%, 38%);
+}
+@media (prefers-color-scheme: dark) {
+  .chat-msg-author { color: hsl(var(--hue), 70%, 68%); }
+}
+
+.chat-msg p {
+  margin: 0;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.8rem;
+  background: hsla(var(--hue), 65%, 50%, 0.16);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+.chat-msg.mine p { background: rgba(28, 110, 140, 0.15); }
+
+.chat-input-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.65rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+#chat-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 16px; /* prevents iOS Safari from auto-zooming on focus */
+}
+
+#chat-send-btn {
+  padding: 0 1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--share-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+@media (min-width: 900px) {
+  #chat-toggle { display: none; }
+
+  #chat-panel {
+    position: static;
+    height: auto;
+    width: 320px;
+    flex-shrink: 0;
+    transform: none;
+    border-radius: 0;
+    box-shadow: none;
+    border-inline-start: 1px solid rgba(128, 128, 128, 0.25);
+  }
+
+  /* Permanently docked here -- closing it isn't a real state, so the
+     handle/close control from the mobile sheet would just be a dead click. */
+  .chat-handle,
+  #chat-close-btn {
+    display: none;
+  }
+}
+
+/* ---------- name prompt modal ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+.modal-backdrop[hidden] { display: none; }
+
+.modal-card {
+  width: min(100%, 320px);
+  padding: 1.4rem 1.3rem 1.1rem;
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+.modal-card h3 { margin: 0 0 0.9rem; font-size: 1.05rem; }
+
+.modal-card input {
+  width: 100%;
+  margin-bottom: 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 16px; /* prevents iOS Safari from auto-zooming on focus */
+  text-align: center;
+}
+
+.modal-card button[type="submit"] {
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--share-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.modal-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.72rem;
+  opacity: 0.65;
 }

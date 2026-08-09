@@ -1,4 +1,4 @@
-const CACHE_NAME = "tashbetz-shell-v25";
+const CACHE_NAME = "tashbetz-shell-v26";
 const SHELL_FILES = [
   ".",
   "index.html",
@@ -8,6 +8,8 @@ const SHELL_FILES = [
   "src/model.js",
   "src/render.js",
   "src/interaction.js",
+  "src/chat.js",
+  "src/chat-interaction.js",
   "src/storage.js",
   "src/share.js",
   "src/sync.js",

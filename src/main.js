@@ -1,10 +1,12 @@
 import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete } from "./model.js";
-import { setupImage, renderGridShell, updateGrid } from "./render.js";
+import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
+import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag, pushPresence, clearPresence } from "./sync.js";
-import { getUserId, getUserHue } from "./presence.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag, pushPresence, pushMessage, clearPresence } from "./sync.js";
+import { getUserId, getUserHue, getUserName } from "./presence.js";
+import { createChatState, applyRemoteMessages, resetChat } from "./chat.js";
 
 const RETRY_DELAY_MS = 1500;
 
@@ -36,6 +38,17 @@ async function main() {
   const joinBtn = document.getElementById("join-btn");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
+  const chatToggleBtn = document.getElementById("chat-toggle");
+  const chatBadgeEl = document.getElementById("chat-badge");
+  const chatPanelEl = document.getElementById("chat-panel");
+  const chatCloseBtn = document.getElementById("chat-close-btn");
+  const chatForm = document.getElementById("chat-form");
+  const chatInput = document.getElementById("chat-input");
+  const chatMessagesEl = document.getElementById("chat-messages");
+  const rosterEl = document.getElementById("roster");
+  const nameModal = document.getElementById("name-modal");
+  const nameForm = document.getElementById("name-form");
+  const nameInput = document.getElementById("name-input");
 
   // Bumped each week alongside the dated puzzle_YYYY-MM-DD.json/.png pair --
   // see CLAUDE.md's "Deploying a new week" section.
@@ -44,6 +57,7 @@ async function main() {
 
   const state = createState(puzzle);
   loadProgress(state);
+  const chatState = createChatState();
 
   // This device's own live-room identity: a stable id (so a presence write
   // has a path to key off of) and a random-but-persistent color tint (so the
@@ -74,40 +88,56 @@ async function main() {
     wasComplete = complete;
   };
 
+  // Chat's own render pass: the roster ("who's here") is derived from
+  // presence (already updated by the time onChange runs), the message list
+  // from chatState, and the toggle button's badge/open state from both --
+  // see render.js for why these are three separate functions sharing one
+  // call site here instead of one another module boundary each.
+  const renderChatUi = () => {
+    renderRoster(state, { hue: userHue, name: getUserName() }, rosterEl);
+    renderChatMessages(chatState, userId, chatMessagesEl);
+    renderChatToggle(chatState, chatToggleBtn, chatBadgeEl, chatPanelEl);
+  };
+
   const onChange = () => {
     updateGrid(state, overlayEl);
     saveProgress(state);
     checkCelebration();
     syncPresence();
+    renderChatUi();
   };
 
-  // Broadcasts this device's active cell to a live room, so everyone else
-  // can lightly paint it in this user's color. Only fires an actual network
-  // write when the cell has changed since the last push -- onChange runs on
-  // every keystroke, not just cell-to-cell navigation, and re-writing the
-  // same cell every time would be pure noise. lastPushedCell is reset to
-  // null (forcing a fresh push) whenever the room identity itself changes:
+  // Broadcasts this device's active cell (and current display name) to a
+  // live room, so everyone else can lightly paint it in this user's color
+  // and label it in the roster. Only fires an actual network write when
+  // something's changed since the last push -- onChange runs on every
+  // keystroke, not just cell-to-cell navigation, and re-writing the same
+  // thing every time would be pure noise. lastPushedCell is reset to null
+  // (forcing a fresh push) whenever the room identity itself changes:
   // joining/creating a room, and re-subscribing on visibilitychange.
   let lastPushedCell = null;
   const syncPresence = () => {
     if (!state.roomId || !state.activeCell) return;
     const { row, col } = state.activeCell;
     const direction = state.activeDirection;
-    // Direction is part of the "did anything change" check too, not just
-    // row/col: re-tapping a dual-direction start cell can flip direction
-    // without moving the active cell at all (see selectCell in model.js),
-    // and that's exactly the case where the OTHER participants' view of
-    // "which whole word is highlighted for this person" needs to update.
+    const name = getUserName();
+    // Direction (and now name) are part of the "did anything change" check
+    // too, not just row/col: re-tapping a dual-direction start cell can flip
+    // direction without moving the active cell at all (see selectCell in
+    // model.js), and choosing/changing a name doesn't move the cell at all
+    // -- both are exactly the cases where the OTHER participants' view
+    // needs to update even though row/col alone looks unchanged.
     if (
       lastPushedCell &&
       lastPushedCell.row === row &&
       lastPushedCell.col === col &&
-      lastPushedCell.direction === direction
+      lastPushedCell.direction === direction &&
+      lastPushedCell.name === name
     ) {
       return;
     }
-    lastPushedCell = { row, col, direction };
-    pushWithRetry(pushPresence, state.roomId, userId, { row, col, hue: userHue, direction });
+    lastPushedCell = { row, col, direction, name };
+    pushWithRetry(pushPresence, state.roomId, userId, { row, col, hue: userHue, direction, name });
   };
 
   // A typed letter or backspace syncs just that ONE cell to a live room --
@@ -140,6 +170,10 @@ async function main() {
     joinForm.hidden = inRoom;
     leaveRoomBtn.hidden = !inRoom;
     shareBtn.textContent = shareButtonRestingLabel(state.roomId);
+    // Chat only exists inside a live room -- solo solving never touches
+    // Firebase at all, so the toggle/panel have nothing to show without one.
+    chatToggleBtn.hidden = !inRoom;
+    chatPanelEl.hidden = !inRoom;
   };
 
   // Joining a room's live state overrides local progress, same as the old
@@ -154,6 +188,7 @@ async function main() {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteUnsure(state, roomState.unsure || []);
       applyRemotePresence(state, roomState.presence || {}, userId);
+      applyRemoteMessages(chatState, roomState.messages || {});
       onChange();
     });
     if (unsubscribeRoom) unsubscribeRoom();
@@ -194,6 +229,7 @@ async function main() {
     state.roomId = null;
     state.presence = new Map();
     lastPushedCell = null;
+    resetChat(chatState);
     history.replaceState(null, "", location.pathname + location.search);
     refreshRoomUi();
   };
@@ -253,6 +289,28 @@ async function main() {
     joinRoomByCode,
     leaveRoom,
   });
+
+  wireChat(chatState, {
+    chatToggleBtn,
+    chatPanelEl,
+    chatCloseBtn,
+    chatForm,
+    chatInput,
+    nameModal,
+    nameForm,
+    nameInput,
+    rosterEl,
+    onChatChange: renderChatUi,
+    onSendMessage: (text) => {
+      if (!state.roomId) return;
+      pushWithRetry(pushMessage, state.roomId, { userId, name: getUserName(), hue: userHue, text });
+    },
+    // Renaming doesn't move the active cell, so onChange (which only pushes
+    // presence when something in it actually changed -- see syncPresence)
+    // is what notices the new name and re-broadcasts it.
+    onRenameSelf: onChange,
+  });
+
   onChange();
 
   // Re-subscribe whenever the tab comes back to the foreground. Covers two
