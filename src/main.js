@@ -5,7 +5,7 @@ import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
 import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
-import { getUserId, getUserHue, hasUserHue, getUserName } from "./presence.js";
+import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 
 const RETRY_DELAY_MS = 1500;
@@ -85,6 +85,13 @@ async function main() {
     }
   }
   const userHue = getUserHue(avoidHues);
+  // Own-cursor highlighting used to be a fixed yellow, the same for every
+  // device -- now it's this person's own hue instead (same one their
+  // presence tint and answer-authorship tint already use elsewhere), so it
+  // reads as "their color" rather than an unrelated one clashing with the
+  // hue-based tints already on the board in a multi-person room.
+  document.documentElement.style.setProperty("--in-word-bg", ownInWordTint(userHue));
+  document.documentElement.style.setProperty("--active-bg", ownActiveTint(userHue));
 
   setupImage(state, imageEl);
   renderGridShell(state, overlayEl);

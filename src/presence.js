@@ -92,6 +92,22 @@ export function presenceLetterTint(hue) {
   return `hsla(${hue}, 65%, 50%, 0.30)`;
 }
 
+// The local player's own cursor (--in-word-bg / --active-bg) -- same hue
+// formula as presenceWordTint/presenceLetterTint above, at the same alpha
+// this pair always used back when it was a fixed color. Used to be a plain
+// hardcoded yellow, the same for every device; now it's this device's own
+// hue instead, so a person's own selection reads as "their color" rather
+// than an unrelated one competing with the hue-based author tints already
+// on the board. Computed once per session (the hue itself never changes)
+// and written to the CSS custom properties directly -- see main.js.
+export function ownInWordTint(hue) {
+  return `hsla(${hue}, 65%, 50%, 0.28)`;
+}
+
+export function ownActiveTint(hue) {
+  return `hsla(${hue}, 65%, 50%, 0.55)`;
+}
+
 // Who filled in a given answer -- unlike the two tints above, this is
 // permanent (every filled cell in a room shows it, all the time), not a
 // transient "someone's here right now" signal, so it needs to be lighter

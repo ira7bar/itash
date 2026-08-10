@@ -10,6 +10,9 @@
 :root {
   --bg: #ffffff;
   --fg: #1a1a1a;
+  /* Fallback only -- main.js overwrites both with this device's own hue
+     (ownActiveTint/ownInWordTint in presence.js) before the first cell ever
+     paints, so these plain-yellow values are never actually seen. */
   --active-bg: rgba(255, 213, 74, 0.55);
   --in-word-bg: rgba(255, 213, 74, 0.28);
   --letter-fg: #000000;
