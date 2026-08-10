@@ -52,7 +52,7 @@ async function main() {
 
   // Bumped each week alongside the dated puzzle_YYYY-MM-DD.json/.png pair --
   // see CLAUDE.md's "Deploying a new week" section.
-  const res = await fetch("puzzle_2026-07-31.json", { cache: "no-cache" });
+  const res = await fetch("puzzle_2026-08-09.json", { cache: "no-cache" });
   const puzzle = await res.json();
 
   const state = createState(puzzle);
