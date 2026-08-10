@@ -247,6 +247,7 @@ footer {
   color: var(--fg);
   opacity: 0.7;
   letter-spacing: 0.05em;
+  white-space: pre-line;
 }
 
 #join-form {

@@ -184,7 +184,14 @@ async function main() {
   const refreshRoomUi = () => {
     const inRoom = Boolean(state.roomId);
     roomCodeEl.hidden = !inRoom;
-    roomCodeEl.textContent = inRoom ? `קוד חדר: ${state.roomId.toUpperCase()}` : "";
+    // A line break, not a space, between the Hebrew label and the base36
+    // code -- on one line, mixing an RTL label with an LTR-ish alphanumeric
+    // code confuses the browser's bidi text ordering (the code's own
+    // characters render fine, but where it lands relative to the label
+    // doesn't). Splitting them onto separate lines sidesteps it entirely,
+    // since each line is then direction-consistent on its own; see
+    // white-space: pre-line on #room-code in style.css.
+    roomCodeEl.textContent = inRoom ? `קוד חדר:\n${state.roomId.toUpperCase()}` : "";
     joinForm.hidden = inRoom;
     leaveRoomBtn.hidden = !inRoom;
     shareBtn.textContent = shareButtonRestingLabel(state.roomId);

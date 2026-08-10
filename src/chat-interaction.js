@@ -43,9 +43,11 @@ export function wireChat(
   });
   chatCloseBtn.addEventListener("click", closePanel);
 
-  // No message is ever lost to a missing name: if none is stored yet, the
-  // typed text is held here until the name form resolves it, rather than
-  // being sent anonymously or discarded.
+  // If no name is stored yet, whatever's typed before the prompt resolves
+  // is held here rather than being lost or sent anonymously. In practice
+  // this stays empty now that the prompt fires on focus (see below), before
+  // there's usually anything typed -- it's kept as the fallback for the one
+  // remaining case where someone dismisses that prompt and sends anyway.
   let pendingText = null;
 
   const openNameModal = (prefill) => {
@@ -58,6 +60,16 @@ export function wireChat(
     nameModal.hidden = true;
     pendingText = null;
   };
+
+  // Asked at the moment someone's about to start typing, not after they've
+  // already written something -- on mobile that's the instant the sheet
+  // opens (openPanel already focuses chatInput, so this fires for free);
+  // on the desktop dock, where there's no "open" moment since the panel is
+  // always visible, it's this same listener firing on an ordinary click
+  // into the input. One check covers both, no viewport branching needed.
+  chatInput.addEventListener("focus", () => {
+    if (!getUserName()) openNameModal("");
+  });
 
   chatForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -84,6 +96,10 @@ export function wireChat(
       chatInput.value = "";
       onSendMessage(toSend);
     }
+    // Whether this was the focus-triggered prompt or the roster "change
+    // name" one, landing back in the input is the natural next step --
+    // they were either about to type or just did.
+    chatInput.focus({ preventScroll: true });
   });
 
   // Clicking the dimmed backdrop (not the card itself) cancels -- same as
