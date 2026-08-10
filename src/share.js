@@ -25,8 +25,18 @@ export function getRoomIdFromUrl() {
   return match ? match[1] : null;
 }
 
+// A line break, not a space, between the Hebrew label and the base36 code --
+// on one line, mixing an RTL label with an LTR-ish alphanumeric code
+// confuses the browser's bidi text ordering (the code's own characters
+// render fine, but where it lands relative to the label doesn't). Splitting
+// them onto separate lines sidesteps it entirely, since each line is then
+// direction-consistent on its own; the code is additionally wrapped in
+// <bdi> as cheap extra insurance. Callers must assign this via .innerHTML,
+// not .textContent, since the value contains real markup.
 export function shareButtonRestingLabel(roomId) {
-  return roomId ? "שתף קישור" : "משחק קבוצתי";
+  return roomId
+    ? `שתף.י חדר נוכחי:<br><bdi>${roomId.toUpperCase()}</bdi>`
+    : "משחק קבוצתי חדש";
 }
 
 // Tries the native OS share sheet first (WhatsApp, Messages, email, etc. show

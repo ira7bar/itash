@@ -203,9 +203,45 @@ footer {
   text-align: center;
 }
 
+/* Flex + gap (rather than the old text-align:center + per-button
+   margin-inline-start) so spacing between the VISIBLE buttons stays correct
+   regardless of which of join-btn/leave-room-btn is hidden for the current
+   room state -- a hidden button drops out of the flex flow entirely, so
+   there's never a stray gap where it used to sit. */
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 #share-btn {
-  padding: 0.5rem 1.25rem;
-  font-size: 1rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  border-radius: 999px;
+  border: 1px solid var(--share-accent);
+  background: transparent;
+  color: var(--share-accent);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* The in-room resting label is two lines (label + room code, see
+   shareButtonRestingLabel in share.js) -- the code itself is wrapped in
+   <bdi> there for bidi safety, so it doubles as the hook for this styling. */
+#share-btn bdi {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+#join-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
   border-radius: 999px;
   border: 1px solid var(--share-accent);
   background: transparent;
@@ -215,9 +251,8 @@ footer {
 }
 
 #leave-room-btn {
-  margin-inline-start: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  font-size: 1rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
   border-radius: 999px;
   border: 1px solid rgba(128, 128, 128, 0.5);
   background: transparent;
@@ -232,9 +267,8 @@ footer {
    (the unsure-word underline, the chat unread badge) rather than the
    ordinary teal buttons use. */
 #clear-board-btn {
-  margin-inline-start: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  font-size: 1rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
   border-radius: 999px;
   border: 1px solid #d9534f;
   background: transparent;
@@ -254,45 +288,6 @@ footer {
 .legal-note a {
   color: var(--share-accent);
   opacity: 1;
-}
-
-#room-code {
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: var(--fg);
-  opacity: 0.7;
-  letter-spacing: 0.05em;
-  white-space: pre-line;
-}
-
-#join-form {
-  margin-top: 0.6rem;
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-#join-code-input {
-  width: 7rem;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.95rem;
-  border-radius: 999px;
-  border: 1px solid rgba(128, 128, 128, 0.5);
-  background: transparent;
-  color: var(--fg);
-  font-family: inherit;
-  text-align: center;
-}
-
-#join-btn {
-  padding: 0.4rem 1rem;
-  font-size: 0.95rem;
-  border-radius: 999px;
-  border: 1px solid var(--share-accent);
-  background: transparent;
-  color: var(--share-accent);
-  cursor: pointer;
-  font-family: inherit;
 }
 
 #hidden-input {

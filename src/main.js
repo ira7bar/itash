@@ -33,9 +33,6 @@ async function main() {
   const shareBtn = document.getElementById("share-btn");
   const clearBoardBtn = document.getElementById("clear-board-btn");
   const leaveRoomBtn = document.getElementById("leave-room-btn");
-  const roomCodeEl = document.getElementById("room-code");
-  const joinForm = document.getElementById("join-form");
-  const joinCodeInput = document.getElementById("join-code-input");
   const joinBtn = document.getElementById("join-btn");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
@@ -209,23 +206,14 @@ async function main() {
   let unsubscribeRoom = null;
 
   // Single source of truth for every piece of UI that depends on "are we
-  // currently in a room": the room code text, the join-by-code form (only
-  // makes sense when NOT already in one), the leave button, and the share
-  // button's resting label.
+  // currently in a room": the join button (only makes sense when NOT already
+  // in one), the leave button, and the share button's resting label (which
+  // also carries the room code once in one -- see shareButtonRestingLabel).
   const refreshRoomUi = () => {
     const inRoom = Boolean(state.roomId);
-    roomCodeEl.hidden = !inRoom;
-    // A line break, not a space, between the Hebrew label and the base36
-    // code -- on one line, mixing an RTL label with an LTR-ish alphanumeric
-    // code confuses the browser's bidi text ordering (the code's own
-    // characters render fine, but where it lands relative to the label
-    // doesn't). Splitting them onto separate lines sidesteps it entirely,
-    // since each line is then direction-consistent on its own; see
-    // white-space: pre-line on #room-code in style.css.
-    roomCodeEl.textContent = inRoom ? `קוד חדר:\n${state.roomId.toUpperCase()}` : "";
-    joinForm.hidden = inRoom;
+    joinBtn.hidden = inRoom;
     leaveRoomBtn.hidden = !inRoom;
-    shareBtn.textContent = shareButtonRestingLabel(state.roomId);
+    shareBtn.innerHTML = shareButtonRestingLabel(state.roomId);
     // Chat only exists inside a live room -- solo solving never touches
     // Firebase at all, so the toggle/panel have nothing to show without one.
     chatToggleBtn.hidden = !inRoom;
@@ -353,8 +341,6 @@ async function main() {
     shareBtn,
     clearBoardBtn,
     leaveRoomBtn,
-    joinForm,
-    joinCodeInput,
     joinBtn,
     onChange,
     onAnswerCellChange,

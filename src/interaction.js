@@ -17,8 +17,6 @@ export function wireInteractions(
     shareBtn,
     clearBoardBtn,
     leaveRoomBtn,
-    joinForm,
-    joinCodeInput,
     joinBtn,
     onChange,
     onAnswerCellChange,
@@ -212,16 +210,16 @@ export function wireInteractions(
       if (result === "copied") {
         shareBtn.textContent = "הקישור הועתק!";
         setTimeout(() => {
-          shareBtn.textContent = shareButtonRestingLabel(state.roomId);
+          shareBtn.innerHTML = shareButtonRestingLabel(state.roomId);
         }, 2000);
       } else {
-        shareBtn.textContent = shareButtonRestingLabel(state.roomId);
+        shareBtn.innerHTML = shareButtonRestingLabel(state.roomId);
       }
     } catch (err) {
       console.warn("Failed to start/share a live room:", err);
       shareBtn.textContent = "שגיאה בשיתוף";
       setTimeout(() => {
-        shareBtn.textContent = shareButtonRestingLabel(state.roomId);
+        shareBtn.innerHTML = shareButtonRestingLabel(state.roomId);
       }, 2000);
     } finally {
       shareBtn.disabled = false;
@@ -243,16 +241,17 @@ export function wireInteractions(
     onChange();
   });
 
-  joinForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const code = joinCodeInput.value;
-    if (!code.trim()) return;
+  // A native prompt(), same fallback pattern shareRoomUrl already uses
+  // elsewhere in this app, rather than a dedicated text field + submit
+  // button permanently taking up a slot in the footer layout.
+  joinBtn.addEventListener("click", async () => {
+    const code = window.prompt("קוד חדר:", "");
+    if (!code || !code.trim()) return;
     joinBtn.disabled = true;
     const originalJoinText = joinBtn.textContent;
     try {
       const joined = await joinRoomByCode(code);
       if (joined) {
-        joinCodeInput.value = "";
         onChange();
       }
     } catch (err) {
