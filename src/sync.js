@@ -25,6 +25,7 @@ function loadModules() {
         database: db.getDatabase(app),
         ref: db.ref,
         onValue: db.onValue,
+        get: db.get,
         set: db.set,
         remove: db.remove,
         onDisconnect: db.onDisconnect,
@@ -45,6 +46,20 @@ export async function subscribeRoom(roomId, onUpdate) {
   const { database, ref, onValue } = await loadModules();
   const roomRef = ref(database, `rooms/${roomId}`);
   return onValue(roomRef, (snapshot) => onUpdate(snapshot.val() || {}));
+}
+
+// One-time read (not a subscription) of whichever hues are already present
+// in a room, used only to give a brand-new device's very first random hue a
+// head start away from theirs -- see pickFarHue in presence.js. A plain
+// get(), not onValue(), since this is a single "who's already here"
+// snapshot at the moment of joining, not something to keep listening to.
+export async function peekRoomPresenceHues(roomId) {
+  const { database, ref, get } = await loadModules();
+  const snapshot = await get(ref(database, `rooms/${roomId}/presence`));
+  const presence = snapshot.val() || {};
+  return Object.values(presence)
+    .map((entry) => entry?.hue)
+    .filter((hue) => typeof hue === "number");
 }
 
 // Overwrites the room's whole state. ONLY safe to use when seeding a brand

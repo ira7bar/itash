@@ -20,17 +20,62 @@ export function getUserId() {
   return id;
 }
 
+export function hasUserHue() {
+  return localStorage.getItem(USER_HUE_KEY) != null;
+}
+
 // Only a hue is randomized, not a full color -- every user's tint then
 // shares the same saturation/lightness/alpha, so there's no chance of
 // picking something so dark or so pale that the letter underneath it stops
 // being readable.
-export function getUserHue() {
+//
+// `avoidHues`, when given, is a list of hues already in use -- picked away
+// from, not just uniformly at random -- so two participants don't end up
+// with tints too close to tell apart (a real risk with only a handful of
+// people spread across 360 degrees, worse still once washed out to the
+// tints' own deliberately-light alpha). Only ever consulted the FIRST time
+// this device needs a hue at all: once assigned, it's permanent (see the
+// module comment), so this can't retroactively fix two ALREADY-established
+// devices whose hues happen to collide when they end up in the same room --
+// only a brand-new device joining a room that already has known
+// participants gets the benefit of spacing away from them.
+export function getUserHue(avoidHues) {
   let hue = localStorage.getItem(USER_HUE_KEY);
   if (!hue) {
-    hue = String(Math.floor(Math.random() * 360));
+    hue = String(pickFarHue(avoidHues));
     localStorage.setItem(USER_HUE_KEY, hue);
   }
   return Number(hue);
+}
+
+function hueDistance(a, b) {
+  const diff = Math.abs(a - b) % 360;
+  return Math.min(diff, 360 - diff);
+}
+
+// Samples several random candidates and keeps whichever has the largest
+// angular distance to its nearest existing hue -- simpler than an exact
+// "largest open gap" computation, and good enough for the handful of
+// participants a room like this ever realistically has. Falls back to plain
+// uniform random when there's nothing to avoid yet (no room context, or an
+// empty/brand-new room).
+const HUE_CANDIDATE_SAMPLES = 24;
+
+function pickFarHue(avoidHues) {
+  if (!avoidHues || avoidHues.length === 0) {
+    return Math.floor(Math.random() * 360);
+  }
+  let best = Math.floor(Math.random() * 360);
+  let bestMinDist = -1;
+  for (let i = 0; i < HUE_CANDIDATE_SAMPLES; i++) {
+    const candidate = Math.floor(Math.random() * 360);
+    const minDist = Math.min(...avoidHues.map((h) => hueDistance(candidate, h)));
+    if (minDist > bestMinDist) {
+      bestMinDist = minDist;
+      best = candidate;
+    }
+  }
+  return best;
 }
 
 // Two shades of the same hue, mirroring how the app already distinguishes

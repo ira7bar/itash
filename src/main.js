@@ -4,9 +4,9 @@ import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence } from "./sync.js";
-import { getUserId, getUserHue, getUserName } from "./presence.js";
-import { createChatState, applyRemoteMessages, resetChat } from "./chat.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { getUserId, getUserHue, hasUserHue, getUserName } from "./presence.js";
+import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 
 const RETRY_DELAY_MS = 1500;
 
@@ -69,9 +69,25 @@ async function main() {
 
   // This device's own live-room identity: a stable id (so a presence write
   // has a path to key off of) and a random-but-persistent color tint (so the
-  // same person doesn't look like a new participant on every reload).
+  // same person doesn't look like a new participant on every reload). If
+  // this device has never had a hue before AND it's opening a room link
+  // that already has other people in it, peek their hues first so this
+  // brand-new one starts spaced away from theirs (see pickFarHue in
+  // presence.js) -- skipped entirely for a returning device (its hue is
+  // already fixed) or a solo/fresh visit (nothing to space away from yet).
   const userId = getUserId();
-  const userHue = getUserHue();
+  let avoidHues = null;
+  if (!hasUserHue()) {
+    const linkedRoomId = getRoomIdFromUrl();
+    if (linkedRoomId) {
+      try {
+        avoidHues = await peekRoomPresenceHues(linkedRoomId);
+      } catch (err) {
+        console.warn("Failed to peek room presence for hue spacing:", err);
+      }
+    }
+  }
+  const userHue = getUserHue(avoidHues);
 
   setupImage(state, imageEl);
   renderGridShell(state, overlayEl);
@@ -221,6 +237,12 @@ async function main() {
   // this" action. Runs when joining someone else's room (from a URL or a
   // manually-entered code), and right after this device creates a brand new one.
   const joinRoom = async (roomId) => {
+    // Bound before subscribing, not after -- the very first snapshot can
+    // arrive as part of subscribeRoom's own setup, before the `await`
+    // below even resolves, and applyRemoteMessages needs chatState.roomId
+    // already set to correctly derive seenCount from what this device had
+    // already read here (see chat.js).
+    bindChatRoom(chatState, roomId);
     // Only commit to the new room (state.roomId, the old subscription being torn
     // down) once the new one actually succeeds -- a failed join must leave the
     // app exactly as usable as it was before the attempt, not half-broken.
