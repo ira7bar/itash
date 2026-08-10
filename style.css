@@ -206,6 +206,13 @@ footer {
   text-align: center;
 }
 
+/* Set by zoom-hide.js once pinch-zoom passes a "heavy zoom" threshold --
+   visibility (not display) so hiding/showing it doesn't reflow the grid
+   underneath. Applies to footer, #chat-toggle, and #chat-panel alike. */
+.zoom-hidden {
+  visibility: hidden;
+}
+
 /* Flex + gap (rather than the old text-align:center + per-button
    margin-inline-start) so spacing between the VISIBLE buttons stays correct
    regardless of which of join-btn/leave-room-btn is hidden for the current

@@ -7,7 +7,7 @@ import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabe
 import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
-import { pinNearVisualViewportBottom } from "./zoom-pin.js";
+import { hideWhileZoomedIn } from "./zoom-hide.js";
 
 const RETRY_DELAY_MS = 1500;
 
@@ -214,13 +214,14 @@ async function main() {
 
   let unsubscribeRoom = null;
 
-  // Keeps the footer and the chat FAB at their normal on-screen size while
-  // the page is pinch-zoomed -- see zoom-pin.js. The chat FAB's own natural
-  // sticky position already floats it just above the footer at rest, so
-  // reserveBottom mirrors that here by reading the footer's current
-  // (possibly one- or two-line) height live rather than hardcoding it.
-  const syncFooterPin = pinNearVisualViewportBottom(footerEl);
-  const syncChatTogglePin = pinNearVisualViewportBottom(chatToggleBtn, () => footerEl.offsetHeight);
+  // Hides the footer and chat chrome once pinch-zoom gets heavy enough that
+  // they'd otherwise balloon up to the same zoom level as the grid -- see
+  // zoom-hide.js. No resync needed on room-state changes (unlike an earlier
+  // counter-scaling attempt): this only reacts to zoom level, not to
+  // anything about these elements' own size or content.
+  hideWhileZoomedIn(footerEl);
+  hideWhileZoomedIn(chatToggleBtn);
+  hideWhileZoomedIn(chatPanelEl);
 
   // Single source of truth for every piece of UI that depends on "are we
   // currently in a room": the join button (only makes sense when NOT already
@@ -235,11 +236,6 @@ async function main() {
     // Firebase at all, so the toggle/panel have nothing to show without one.
     chatToggleBtn.hidden = !inRoom;
     chatPanelEl.hidden = !inRoom;
-    // The share button's label (one line vs. two once in a room) and the
-    // chat FAB's own hidden state both just changed, and neither is a
-    // visualViewport resize/scroll -- nothing else would re-run the pin math.
-    syncFooterPin();
-    syncChatTogglePin();
   };
 
   // Joining a room's live state overrides local progress, same as the old
