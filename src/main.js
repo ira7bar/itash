@@ -1,10 +1,10 @@
-import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete, clearBoard } from "./model.js";
+import { createState, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom } from "./model.js";
 import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushUnsureFlag, pushPresence, pushMessage, clearPresence } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence } from "./sync.js";
 import { getUserId, getUserHue, getUserName } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat } from "./chat.js";
 
@@ -53,8 +53,15 @@ async function main() {
 
   // Bumped each week alongside the dated puzzle_YYYY-MM-DD.json/.png pair --
   // see CLAUDE.md's "Deploying a new week" section.
-  const res = await fetch("puzzle_2026-08-09.json", { cache: "no-cache" });
+  const puzzleFile = "puzzle_2026-08-09.json";
+  const res = await fetch(puzzleFile, { cache: "no-cache" });
   const puzzle = await res.json();
+  // Solo progress (storage.js) is scoped by this, not by puzzle.meta's own
+  // source/page fields -- those are deliberately kept constant across weeks
+  // (see parse_puzzle.py's docs), so keying off them would load last week's
+  // answers into this week's differently-shaped grid instead of starting
+  // fresh.
+  puzzle.meta.week = puzzleFile;
 
   const state = createState(puzzle);
   loadProgress(state);
@@ -97,7 +104,7 @@ async function main() {
   const renderChatUi = () => {
     renderRoster(state, { hue: userHue, name: getUserName() }, rosterEl);
     renderChatMessages(chatState, userId, chatMessagesEl);
-    renderChatToggle(chatState, chatToggleBtn, chatBadgeEl, chatPanelEl);
+    renderChatToggle(chatState, userId, chatToggleBtn, chatBadgeEl, chatPanelEl);
   };
 
   const onChange = () => {
@@ -144,10 +151,17 @@ async function main() {
   // A typed letter or backspace syncs just that ONE cell to a live room --
   // never the whole grid, so concurrent edits (or a device still mid-load)
   // can't clobber someone else's answers. See pushAnswerCell in sync.js.
+  //
+  // The hue is stamped locally regardless of room state (so it's already
+  // correct the instant a room is later created from it -- see
+  // ownAnswersForNewRoom), but only synced/rendered while actually in one;
+  // solo solving has exactly one possible author, so it's never shown there.
   const onAnswerCellChange = (row, col, letter) => {
+    setAnswerHue(state, row, col, letter ? userHue : null);
     onChange();
     if (state.roomId) {
       pushWithRetry(pushAnswerCell, state.roomId, row, col, letter);
+      pushWithRetry(pushAnswerHue, state.roomId, row, col, letter ? userHue : null);
     }
   };
 
@@ -168,6 +182,7 @@ async function main() {
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
+        pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
       }
       for (const wordId of clearedWordIds) {
         pushWithRetry(pushUnsureFlag, state.roomId, wordId, false);
@@ -211,6 +226,7 @@ async function main() {
     // app exactly as usable as it was before the attempt, not half-broken.
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
+      applyRemoteAnswerHues(state, roomState.answerHues || {});
       applyRemoteUnsure(state, roomState.unsure || []);
       applyRemotePresence(state, roomState.presence || {}, userId);
       applyRemoteMessages(chatState, roomState.messages || {});
@@ -263,10 +279,20 @@ async function main() {
   // current local progress is pushed BEFORE subscribing, since a brand new
   // room starts empty -- subscribing first would have its first snapshot
   // (nothing there yet) wipe out whatever the user already filled in solo.
+  //
+  // Only THIS user's own answers seed it (ownAnswersForNewRoom), not every
+  // filled cell currently on screen -- genuine solo progress still carries
+  // in (that's the whole point of seeding at all), but another room's
+  // collaborators' answers, left sitting in memory after leaving that room,
+  // never silently become a brand-new, unrelated room's starting state.
+  // Unsure flags aren't tracked per-author (nothing here to distinguish
+  // "your own" ones), so those still carry over unfiltered -- a much
+  // lower-stakes carryover than actual answer content.
   const ensureRoomAndGetShareUrl = async () => {
     if (!state.roomId) {
       const roomId = createRoomId();
-      const roomState = { answers: flattenAnswers(state), unsure: flattenUnsure(state) };
+      const { answers, answerHues } = ownAnswersForNewRoom(state, userHue);
+      const roomState = { answers, answerHues, unsure: flattenUnsure(state) };
       await pushRoomState(roomId, roomState);
       await joinRoom(roomId);
     }

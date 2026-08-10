@@ -23,8 +23,17 @@ export function applyRemoteMessages(chatState, messagesMap) {
   if (chatState.open) chatState.seenCount = chatState.messages.length;
 }
 
-export function unreadCount(chatState) {
-  return Math.max(0, chatState.messages.length - chatState.seenCount);
+// Counts only OTHER people's messages past seenCount -- your own sent
+// messages must never bump your own unread badge, regardless of whether
+// the panel happened to be open at the moment you sent (seenCount's own
+// timing already covers the open-panel case; this covers it unconditionally
+// so it holds even if that ever races).
+export function unreadCount(chatState, selfUserId) {
+  let count = 0;
+  for (let i = chatState.seenCount; i < chatState.messages.length; i++) {
+    if (chatState.messages[i].userId !== selfUserId) count++;
+  }
+  return count;
 }
 
 export function openChat(chatState) {

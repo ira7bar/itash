@@ -107,10 +107,17 @@ function nextTypeIndex(state, word, idx) {
 export function createState(puzzle) {
   const index = buildIndex(puzzle);
   const answers = Array.from({ length: index.rows }, () => Array(index.cols).fill(""));
+  // Which hue filled each answer cell, parallel to `answers` -- null for a
+  // cell that's empty, or was filled before this device ever synced to any
+  // room (see ownAnswersForNewRoom for why that distinction matters). Only
+  // meaningful/rendered inside a live room; solo solving has exactly one
+  // possible author, so there's nothing for it to show.
+  const answerHues = Array.from({ length: index.rows }, () => Array(index.cols).fill(null));
   return {
     puzzle,
     index,
     answers,
+    answerHues,
     activeCell: null,
     activeDirection: null,
     roomId: null,
@@ -123,17 +130,53 @@ export function createState(puzzle) {
   };
 }
 
-// Sparse map of only the filled cells, for pushing to a live room -- no point
-// syncing a few hundred empty-string entries over the network every keystroke.
-export function flattenAnswers(state) {
-  const map = {};
+export function setAnswerHue(state, row, col, hue) {
+  state.answerHues[row][col] = hue ?? null;
+}
+
+// Rebuilds state.answerHues from a room's full snapshot map. Same
+// full-replace reasoning as applyRemoteAnswers.
+export function applyRemoteAnswerHues(state, huesMap) {
   const { rows, cols } = state.index;
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      if (state.answers[r][c]) map[`${r}_${c}`] = state.answers[r][c];
+      state.answerHues[r][c] = null;
     }
   }
-  return map;
+  for (const key of Object.keys(huesMap || {})) {
+    const [r, c] = key.split("_").map(Number);
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      state.answerHues[r][c] = huesMap[key];
+    }
+  }
+}
+
+// The subset of this user's own answers to seed a brand-new room with: a
+// cell counts as "theirs" if its hue is unset (written before this device
+// ever synced to any room -- genuinely local/solo authorship) or matches
+// `hue` (their own past contributions, even from a room they've since
+// left). Cells some OTHER participant filled in a previous room are
+// deliberately excluded -- solo progress carrying into a room you create is
+// the whole point of seeding it at all, but another room's collaborators'
+// answers silently seeding an unrelated new room is not. Both maps come
+// back keyed the same way flattenAnswers/flattenUnsure already are, ready
+// to push as-is.
+export function ownAnswersForNewRoom(state, hue) {
+  const answers = {};
+  const answerHues = {};
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const letter = state.answers[r][c];
+      const cellHue = state.answerHues[r][c];
+      if (letter && (cellHue == null || cellHue === hue)) {
+        const key = `${r}_${c}`;
+        answers[key] = letter;
+        answerHues[key] = hue;
+      }
+    }
+  }
+  return { answers, answerHues };
 }
 
 // Rebuilds state.answers from a room's full snapshot map. Always a full
@@ -359,6 +402,7 @@ export function clearBoard(state) {
       if (state.answers[r][c]) {
         clearedCells.push([r, c]);
         state.answers[r][c] = "";
+        state.answerHues[r][c] = null;
       }
     }
   }

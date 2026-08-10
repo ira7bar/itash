@@ -1,5 +1,5 @@
 import { isBlocked, getCellEntry, getActiveWord, getWordsForClueCell, getWordCellsForPresence } from "./model.js";
-import { presenceWordTint, presenceLetterTint } from "./presence.js";
+import { presenceWordTint, presenceLetterTint, answerAuthorTint } from "./presence.js";
 import { unreadCount } from "./chat.js";
 
 // The grid is a rendered image of the actual PDF page -- clue text, dividers,
@@ -121,6 +121,24 @@ export function updateGrid(state, overlayEl) {
     } else {
       cellEl.classList.remove("presence-tint");
     }
+
+    // Persistent "who filled this in" wash, gated to live rooms only --
+    // solo solving has exactly one possible author, nothing to show. A
+    // separate box-shadow layer (not folded into presenceColor above) with
+    // its own combined-selector CSS rule (see style.css), the same
+    // reasoning as why presence-tint itself layers on top of
+    // active/in-word's background instead of overwriting it.
+    let authorColor;
+    if (!blocked && state.roomId) {
+      const authorHue = state.answerHues[r][c];
+      if (authorHue != null) authorColor = answerAuthorTint(authorHue);
+    }
+    if (authorColor) {
+      cellEl.style.setProperty("--author-color", authorColor);
+      cellEl.classList.add("author-tint");
+    } else {
+      cellEl.classList.remove("author-tint");
+    }
   }
 }
 
@@ -180,8 +198,8 @@ export function renderChatMessages(chatState, selfUserId, listEl) {
 // Toggle button (open/close class + unread badge) and the panel's own
 // open/close visual state -- kept together since both are driven by the
 // same chatState.open/unreadCount pair.
-export function renderChatToggle(chatState, chatToggleBtn, chatBadgeEl, chatPanelEl) {
-  const count = unreadCount(chatState);
+export function renderChatToggle(chatState, selfUserId, chatToggleBtn, chatBadgeEl, chatPanelEl) {
+  const count = unreadCount(chatState, selfUserId);
   chatBadgeEl.hidden = count === 0;
   chatBadgeEl.textContent = String(count);
   chatToggleBtn.setAttribute("aria-expanded", String(chatState.open));

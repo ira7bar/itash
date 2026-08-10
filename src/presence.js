@@ -47,6 +47,14 @@ export function presenceLetterTint(hue) {
   return `hsla(${hue}, 65%, 50%, 0.30)`;
 }
 
+// Who filled in a given answer -- unlike the two tints above, this is
+// permanent (every filled cell in a room shows it, all the time), not a
+// transient "someone's here right now" signal, so it needs to be lighter
+// still or a multi-person room's grid would look noisy rather than clean.
+export function answerAuthorTint(hue) {
+  return `hsla(${hue}, 65%, 50%, 0.10)`;
+}
+
 // Unlike id/hue, a display name has no sensible random default -- it only
 // exists once someone actually chooses one (see the lazy name prompt in
 // chat-interaction.js, triggered on a person's first chat message), so this

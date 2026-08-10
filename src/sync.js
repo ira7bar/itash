@@ -73,6 +73,16 @@ export async function pushAnswerCell(roomId, row, col, letter) {
   await set(cellRef, letter || null);
 }
 
+// A separate path from pushAnswerCell, not a combined { letter, hue } value
+// at the same path -- so the answers path's shape stays exactly what it's
+// always been, and anything only reading answers (e.g. isPuzzleComplete's
+// data, or an older cached client) is unaffected by this being added later.
+export async function pushAnswerHue(roomId, row, col, hue) {
+  const { database, ref, set } = await loadModules();
+  const hueRef = ref(database, `rooms/${roomId}/answerHues/${row}_${col}`);
+  await set(hueRef, hue ?? null);
+}
+
 // Same reasoning as pushAnswerCell, for a single word's unsure flag.
 export async function pushUnsureFlag(roomId, wordId, isUnsure) {
   const { database, ref, set } = await loadModules();
