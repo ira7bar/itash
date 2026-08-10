@@ -15,6 +15,7 @@ export function wireInteractions(
     gridWrapEl,
     hiddenInput,
     shareBtn,
+    clearBoardBtn,
     leaveRoomBtn,
     joinForm,
     joinCodeInput,
@@ -25,6 +26,7 @@ export function wireInteractions(
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,
+    clearBoard,
   }
 ) {
   gridEl.addEventListener("click", (e) => {
@@ -224,6 +226,16 @@ export function wireInteractions(
     } finally {
       shareBtn.disabled = false;
     }
+  });
+
+  // A whole-board clear is destructive and irreversible (no undo, no
+  // solution key to recover a wrong guess from), so it's gated behind a
+  // native confirm() -- the simplest possible "are you sure," appropriate
+  // for a rare, one-shot action that doesn't need a custom modal.
+  clearBoardBtn.addEventListener("click", () => {
+    if (!window.confirm("בטוח.ה? הפעולה תנקה את כל התשובות בלוח.")) return;
+    clearBoard();
+    onChange();
   });
 
   leaveRoomBtn.addEventListener("click", () => {

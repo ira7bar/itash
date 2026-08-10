@@ -346,6 +346,27 @@ export function toggleUnsure(state, row, col) {
   return { wordId: word.id, isUnsure };
 }
 
+// Clears every filled answer cell and unsure flag -- the "start over"
+// action. Returns the full list of what changed (not a single before/after
+// cell like typeLetter/backspace) since callers need it to sync each
+// cleared cell/word individually to a live room, never as one whole-room
+// overwrite (see pushRoomState's warning in sync.js).
+export function clearBoard(state) {
+  const { rows, cols } = state.index;
+  const clearedCells = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (state.answers[r][c]) {
+        clearedCells.push([r, c]);
+        state.answers[r][c] = "";
+      }
+    }
+  }
+  const clearedWordIds = [...state.unsureWords];
+  state.unsureWords.clear();
+  return { clearedCells, clearedWordIds };
+}
+
 // Returns { row, col } for the cell that was actually cleared, or null if
 // nothing changed -- same reasoning as typeLetter's return value.
 export function backspace(state) {

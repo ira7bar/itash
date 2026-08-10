@@ -212,6 +212,35 @@ footer {
   font-family: inherit;
 }
 
+/* Destructive/irreversible (see the confirm() gate in interaction.js), so it
+   borrows the same red already used elsewhere for "pay attention here"
+   (the unsure-word underline, the chat unread badge) rather than the
+   ordinary teal buttons use. */
+#clear-board-btn {
+  margin-inline-start: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1px solid #d9534f;
+  background: transparent;
+  color: #d9534f;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.legal-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--fg);
+  opacity: 0.55;
+}
+
+.legal-note a {
+  color: var(--share-accent);
+  opacity: 1;
+}
+
 #room-code {
   margin-top: 0.4rem;
   font-size: 0.85rem;
@@ -264,10 +293,15 @@ footer {
 /* ---------- chat: mobile bottom sheet, docks as a sidebar on wide screens
    (see @media (min-width: 900px) below) ---------- */
 
+/* Sticky within #grid-wrap's own scroll box (not fixed to the viewport) so
+   it always sits at the bottom of the visible grid area -- robust to the
+   footer's height changing (it has, more than once) without needing to
+   re-guess a clearance number every time. */
 #chat-toggle {
-  position: fixed;
-  bottom: 4.5rem;
-  inset-inline-start: 1rem;
+  position: sticky;
+  bottom: 0.75rem;
+  inset-inline-start: 0;
+  margin-inline-start: 0.25rem;
   width: 3.1rem;
   height: 3.1rem;
   padding: 0;

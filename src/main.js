@@ -1,4 +1,4 @@
-import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete } from "./model.js";
+import { createState, flattenAnswers, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete, clearBoard } from "./model.js";
 import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
@@ -31,6 +31,7 @@ async function main() {
   const gridWrapEl = document.getElementById("grid-wrap");
   const hiddenInput = document.getElementById("hidden-input");
   const shareBtn = document.getElementById("share-btn");
+  const clearBoardBtn = document.getElementById("clear-board-btn");
   const leaveRoomBtn = document.getElementById("leave-room-btn");
   const roomCodeEl = document.getElementById("room-code");
   const joinForm = document.getElementById("join-form");
@@ -157,6 +158,23 @@ async function main() {
     }
   };
 
+  // Same per-path sync discipline as every other edit -- a board clear syncs
+  // each cleared cell/word individually (exactly like typing/backspacing
+  // through them one at a time would), never as a single whole-room
+  // overwrite, so it can't clobber someone else's concurrent edit either.
+  const onClearBoard = () => {
+    const { clearedCells, clearedWordIds } = clearBoard(state);
+    onChange();
+    if (state.roomId) {
+      for (const [row, col] of clearedCells) {
+        pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
+      }
+      for (const wordId of clearedWordIds) {
+        pushWithRetry(pushUnsureFlag, state.roomId, wordId, false);
+      }
+    }
+  };
+
   let unsubscribeRoom = null;
 
   // Single source of truth for every piece of UI that depends on "are we
@@ -278,6 +296,7 @@ async function main() {
     gridWrapEl,
     hiddenInput,
     shareBtn,
+    clearBoardBtn,
     leaveRoomBtn,
     joinForm,
     joinCodeInput,
@@ -288,6 +307,7 @@ async function main() {
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,
+    clearBoard: onClearBoard,
   });
 
   wireChat(chatState, {
