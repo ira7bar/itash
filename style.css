@@ -190,12 +190,26 @@ body {
   line-height: 1;
 }
 
-.cell.unsure .letter {
-  text-decoration: underline;
-  text-decoration-style: dashed;
-  text-decoration-color: #d9534f;
-  text-underline-offset: 2px;
+/* Draft/pencil-mark candidates -- one slot per direction, in opposite
+   corners rather than each direction's own edge (a side edge and the bottom
+   edge are adjacent, so at real cell sizes two marks placed that way still
+   land in the same neighborhood and read as one blob -- see CLAUDE.md's
+   "Draft mode" section). Colors are fixed and reserved, never drawn from the
+   live-room per-user hue pool: color is the only thing separating "across
+   idea" from "down idea" once there's no divider or quadrant to lean on, so
+   the two hues have to mean exactly one thing each. Deliberately NOT
+   inverted for dark mode, same reasoning as --letter-fg: these sit on the
+   puzzle scan image, which is always light regardless of OS theme. */
+.draft-mark {
+  position: absolute;
+  font-weight: 700;
+  line-height: 1;
+  font-size: clamp(6px, 2.1vw, 17px);
+  pointer-events: none;
 }
+.draft-mark:empty { display: none; }
+.draft-mark.across { top: 5%; right: 6%; color: #1f6f78; }
+.draft-mark.down { bottom: 3%; left: 6%; color: #b5551f; }
 
 footer {
   position: sticky;
@@ -208,7 +222,8 @@ footer {
 
 /* Set by zoom-hide.js once pinch-zoom passes a "heavy zoom" threshold --
    visibility (not display) so hiding/showing it doesn't reflow the grid
-   underneath. Applies to footer, #chat-toggle, and #chat-panel alike. */
+   underneath. Applies to footer, #chat-toggle, #chat-panel, and
+   #draft-toggle alike. */
 .zoom-hidden {
   visibility: hidden;
 }
@@ -274,8 +289,7 @@ footer {
 
 /* Destructive/irreversible (see the confirm() gate in interaction.js), so it
    borrows the same red already used elsewhere for "pay attention here"
-   (the unsure-word underline, the chat unread badge) rather than the
-   ordinary teal buttons use. */
+   (the chat unread badge) rather than the ordinary teal buttons use. */
 #clear-board-btn {
   padding: 0.4rem 0.9rem;
   font-size: 0.9rem;
@@ -317,11 +331,36 @@ footer {
 /* Sticky within #grid-wrap's own scroll box (not fixed to the viewport) so
    it always sits at the bottom of the visible grid area -- robust to the
    footer's height changing (it has, more than once) without needing to
-   re-guess a clearance number every time. */
-#chat-toggle {
+   re-guess a clearance number every time.
+   The two buttons live in a shared flex row rather than each being
+   independently sticky: position:sticky only ever applies its offset once
+   its content actually needs to scroll -- on a puzzle short enough to fit
+   without scrolling, a sticky element just renders at its plain in-flow
+   position instead (see CLAUDE.md's "Draft mode" section), which for two
+   block-level siblings would stack them in the same left-anchored spot
+   rather than opposite corners. Flex + margin-inline-start:auto on
+   #draft-toggle solves that with ordinary layout instead of relying on the
+   sticky offset ever engaging: it always consumes the row's remaining
+   space and lands at the far end, whether or not #chat-toggle is present
+   ([hidden] removes it from the flex row entirely, same margin-auto still
+   pushes #draft-toggle all the way over) and whether or not the row itself
+   is currently stuck. */
+#floating-controls {
   position: sticky;
   bottom: 0.75rem;
-  inset-inline-start: 0;
+  display: flex;
+  align-items: flex-end;
+  z-index: 20;
+  /* The row spans the full width for the flex math above to work, but only
+     the two buttons themselves should actually catch clicks -- the empty
+     space between them must stay click-through to the grid underneath. */
+  pointer-events: none;
+}
+#floating-controls > button {
+  pointer-events: auto;
+}
+
+#chat-toggle {
   margin-inline-start: 0.25rem;
   width: 3.1rem;
   height: 3.1rem;
@@ -336,9 +375,40 @@ footer {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  z-index: 20;
 }
 #chat-toggle[hidden] { display: none; }
+
+/* Mirrors #chat-toggle's own visual language (size, shape, shadow) -- real
+   screenshots off the running app showed the chat button landing in blank
+   margin below the puzzle image on this puzzle's fixed dimensions, so
+   there's no cell-occlusion cost to sharing the row this way (see the
+   toggle-placement design discussion). Unlike #chat-toggle, never [hidden]
+   -- draft mode isn't room-gated (see createState in model.js), so it's
+   equally available solo or in a room; margin-inline-start:auto (rather
+   than a fixed inset-inline-end) is what actually keeps it pinned to the
+   far end of the row regardless of #chat-toggle's own visibility. */
+#draft-toggle {
+  margin-inline-start: auto;
+  margin-inline-end: 0.25rem;
+  width: 3.1rem;
+  height: 3.1rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #8a8578;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+#draft-toggle[aria-pressed="true"] {
+  background: #1f6f78;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(31, 111, 120, 0.55), 0 0 0 3px rgba(31, 111, 120, 0.25);
+}
 
 .chat-badge {
   position: absolute;

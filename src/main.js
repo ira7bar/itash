@@ -1,10 +1,10 @@
-import { createState, applyRemoteAnswers, flattenUnsure, applyRemoteUnsure, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom } from "./model.js";
-import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
+import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom, toggleDraftMode } from "./model.js";
+import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle, renderDraftToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
@@ -38,7 +38,9 @@ async function main() {
   const joinBtn = document.getElementById("join-btn");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
+  const floatingControlsEl = document.getElementById("floating-controls");
   const chatToggleBtn = document.getElementById("chat-toggle");
+  const draftToggleBtn = document.getElementById("draft-toggle");
   const chatBadgeEl = document.getElementById("chat-badge");
   const chatPanelEl = document.getElementById("chat-panel");
   const chatCloseBtn = document.getElementById("chat-close-btn");
@@ -131,6 +133,7 @@ async function main() {
 
   const onChange = () => {
     updateGrid(state, overlayEl);
+    renderDraftToggle(state, draftToggleBtn);
     saveProgress(state);
     checkCelebration();
     syncPresence();
@@ -187,40 +190,42 @@ async function main() {
     }
   };
 
-  const onUnsureFlagChange = (wordId, isUnsure) => {
+  // Draft mode has no network dimension yet (see createState in model.js) --
+  // this only ever flips local state and re-renders, unlike every other
+  // callback here that also has a room-sync branch.
+  const onToggleDraftMode = () => {
+    toggleDraftMode(state);
     onChange();
-    if (state.roomId) {
-      pushWithRetry(pushUnsureFlag, state.roomId, wordId, isUnsure);
-    }
   };
 
   // Same per-path sync discipline as every other edit -- a board clear syncs
-  // each cleared cell/word individually (exactly like typing/backspacing
-  // through them one at a time would), never as a single whole-room
-  // overwrite, so it can't clobber someone else's concurrent edit either.
+  // each cleared cell individually (exactly like typing/backspacing through
+  // them one at a time would), never as a single whole-room overwrite, so it
+  // can't clobber someone else's concurrent edit either. Cleared draft
+  // candidates need no such loop -- nothing syncs those anywhere yet.
   const onClearBoard = () => {
-    const { clearedCells, clearedWordIds } = clearBoard(state);
+    const { clearedCells } = clearBoard(state);
     onChange();
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
         pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
       }
-      for (const wordId of clearedWordIds) {
-        pushWithRetry(pushUnsureFlag, state.roomId, wordId, false);
-      }
     }
   };
 
   let unsubscribeRoom = null;
 
-  // Hides the footer and chat chrome once pinch-zoom gets heavy enough that
-  // they'd otherwise balloon up to the same zoom level as the grid -- see
-  // zoom-hide.js. No resync needed on room-state changes (unlike an earlier
-  // counter-scaling attempt): this only reacts to zoom level, not to
-  // anything about these elements' own size or content.
+  // Hides the footer and floating chrome once pinch-zoom gets heavy enough
+  // that they'd otherwise balloon up to the same zoom level as the grid --
+  // see zoom-hide.js. No resync needed on room-state changes (unlike an
+  // earlier counter-scaling attempt): this only reacts to zoom level, not to
+  // anything about these elements' own size or content. One call for the
+  // whole #floating-controls row (chat + draft toggles together), not one
+  // per button -- they should hide and reappear in lockstep, and
+  // visibility:hidden on the row already covers both children.
   hideWhileZoomedIn(footerEl);
-  hideWhileZoomedIn(chatToggleBtn);
+  hideWhileZoomedIn(floatingControlsEl);
   hideWhileZoomedIn(chatPanelEl);
 
   // Single source of truth for every piece of UI that depends on "are we
@@ -255,7 +260,6 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteAnswerHues(state, roomState.answerHues || {});
-      applyRemoteUnsure(state, roomState.unsure || []);
       applyRemotePresence(state, roomState.presence || {}, userId);
       applyRemoteMessages(chatState, roomState.messages || {});
       onChange();
@@ -313,14 +317,14 @@ async function main() {
   // in (that's the whole point of seeding at all), but another room's
   // collaborators' answers, left sitting in memory after leaving that room,
   // never silently become a brand-new, unrelated room's starting state.
-  // Unsure flags aren't tracked per-author (nothing here to distinguish
-  // "your own" ones), so those still carry over unfiltered -- a much
-  // lower-stakes carryover than actual answer content.
+  // Draft candidates aren't seeded at all -- there's no sync schema for them
+  // yet (see createState in model.js), so they simply stay local rather than
+  // silently carrying into a room where nobody else could ever see them.
   const ensureRoomAndGetShareUrl = async () => {
     if (!state.roomId) {
       const roomId = createRoomId();
       const { answers, answerHues } = ownAnswersForNewRoom(state, userHue);
-      const roomState = { answers, answerHues, unsure: flattenUnsure(state) };
+      const roomState = { answers, answerHues };
       await pushRoomState(roomId, roomState);
       await joinRoom(roomId);
     }
@@ -360,9 +364,10 @@ async function main() {
     clearBoardBtn,
     leaveRoomBtn,
     joinBtn,
+    draftToggleBtn,
     onChange,
     onAnswerCellChange,
-    onUnsureFlagChange,
+    onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,

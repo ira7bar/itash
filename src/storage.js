@@ -13,7 +13,12 @@ function keyFor(puzzle) {
 
 export function saveProgress(state) {
   const key = keyFor(state.puzzle);
-  const payload = { answers: state.answers, unsureWords: [...state.unsureWords] };
+  const payload = {
+    answers: state.answers,
+    draftMode: state.draftMode,
+    draftHorizontal: state.draftHorizontal,
+    draftVertical: state.draftVertical,
+  };
   try {
     localStorage.setItem(key, JSON.stringify(payload));
   } catch (err) {
@@ -32,7 +37,17 @@ export function loadProgress(state) {
       // normalization existed may still have un-normalized letters in it.
       state.answers = payload.answers.map((row) => row.map((letter) => (letter ? normalizeLetter(letter) : letter)));
     }
-    if (payload.unsureWords) state.unsureWords = new Set(payload.unsureWords);
+    if (typeof payload.draftMode === "boolean") state.draftMode = payload.draftMode;
+    if (payload.draftHorizontal) {
+      state.draftHorizontal = payload.draftHorizontal.map((row) =>
+        row.map((letter) => (letter ? normalizeLetter(letter) : letter))
+      );
+    }
+    if (payload.draftVertical) {
+      state.draftVertical = payload.draftVertical.map((row) =>
+        row.map((letter) => (letter ? normalizeLetter(letter) : letter))
+      );
+    }
   } catch (err) {
     console.warn("Could not load saved progress:", err);
   }

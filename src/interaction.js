@@ -1,11 +1,9 @@
-import { selectCell, typeLetter, backspace, toggleUnsure, isBlocked, getWordsForClueCell } from "./model.js";
+import { selectCell, typeLetter, backspace, isBlocked, getWordsForClueCell } from "./model.js";
 import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
 
 // Includes the punctuation keys that map to ת/ץ/ף on the standard Hebrew
 // keyboard layout (, . ; and their shifted forms < > :) -- see hebrew.js.
 const HEBREW_OR_LATIN_LETTER = /[א-תa-zA-Z,.;<>:]/;
-const LONG_PRESS_MS = 450;
-const MOVE_TOLERANCE_PX = 10;
 
 export function wireInteractions(
   state,
@@ -18,9 +16,10 @@ export function wireInteractions(
     clearBoardBtn,
     leaveRoomBtn,
     joinBtn,
+    draftToggleBtn,
     onChange,
     onAnswerCellChange,
-    onUnsureFlagChange,
+    onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,
@@ -58,50 +57,11 @@ export function wireInteractions(
     if (targetCellEl !== cellEl) scrollCellIntoView(targetCellEl, "center");
   });
 
-  // Long-press (hold, don't drag) a cell to flag its word as "unsure" --
-  // independent of the click handler above, which still fires normally
-  // afterward and selects the cell as usual.
-  let pressTimer = null;
-  let pressStart = null;
-
-  const cancelPress = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      pressTimer = null;
-    }
-    pressStart = null;
-  };
-
-  gridEl.addEventListener("pointerdown", (e) => {
-    const cellEl = e.target.closest(".cell");
-    if (!cellEl) return;
-    const row = Number(cellEl.dataset.row);
-    const col = Number(cellEl.dataset.col);
-    pressStart = { x: e.clientX, y: e.clientY };
-    pressTimer = setTimeout(() => {
-      const result = toggleUnsure(state, row, col);
-      if (result) onUnsureFlagChange(result.wordId, result.isUnsure);
-      pressTimer = null;
-    }, LONG_PRESS_MS);
-  });
-
-  gridEl.addEventListener("pointermove", (e) => {
-    if (!pressStart) return;
-    const dx = e.clientX - pressStart.x;
-    const dy = e.clientY - pressStart.y;
-    if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) cancelPress();
-  });
-
-  gridEl.addEventListener("pointerup", cancelPress);
-  gridEl.addEventListener("pointercancel", cancelPress);
-  gridEl.addEventListener("pointerleave", cancelPress);
-
-  // Android fires its own native "image options" menu (copy/share image) on a
-  // long-press of the puzzle <img>, competing with the long-press-to-toggle-
-  // unsure gesture above. Suppress it on both the image and the overlay --
-  // the overlay's cells sit on top and normally take the touch, but Android's
-  // image-menu detection isn't reliable DOM hit-testing, so it can still fire
-  // as if the image itself were touched.
+  // Android fires its own native "image options" menu (copy/share image) on
+  // a long-press of the puzzle <img>. Suppress it on both the image and the
+  // overlay -- the overlay's cells sit on top and normally take the touch,
+  // but Android's image-menu detection isn't reliable DOM hit-testing, so it
+  // can still fire as if the image itself were touched.
   const suppressContextMenu = (e) => e.preventDefault();
   gridEl.addEventListener("contextmenu", suppressContextMenu);
   imageEl.addEventListener("contextmenu", suppressContextMenu);
@@ -263,6 +223,14 @@ export function wireInteractions(
     } finally {
       joinBtn.disabled = false;
     }
+  });
+
+  // Solo AND live-room alike -- draft mode isn't gated on being in a room
+  // (see createState in model.js: candidates aren't synced anywhere yet),
+  // so unlike chat-toggle this button is never hidden based on room state.
+  draftToggleBtn.addEventListener("click", () => {
+    onToggleDraftMode();
+    onChange();
   });
 }
 

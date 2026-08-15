@@ -37,11 +37,11 @@ function loadModules() {
   return modulesPromise;
 }
 
-// Subscribes to a room's whole state ({ answers, unsure }). Fires immediately
-// with whatever's already there (empty room -> {}), then again on every
-// change from any participant, including our own writes -- callers should
-// treat every call as a full snapshot, not a delta. Returns an unsubscribe
-// function.
+// Subscribes to a room's whole state ({ answers, answerHues, presence,
+// messages }). Fires immediately with whatever's already there (empty room
+// -> {}), then again on every change from any participant, including our
+// own writes -- callers should treat every call as a full snapshot, not a
+// delta. Returns an unsubscribe function.
 export async function subscribeRoom(roomId, onUpdate) {
   const { database, ref, onValue } = await loadModules();
   const roomRef = ref(database, `rooms/${roomId}`);
@@ -98,13 +98,6 @@ export async function pushAnswerHue(roomId, row, col, hue) {
   await set(hueRef, hue ?? null);
 }
 
-// Same reasoning as pushAnswerCell, for a single word's unsure flag.
-export async function pushUnsureFlag(roomId, wordId, isUnsure) {
-  const { database, ref, set } = await loadModules();
-  const flagRef = ref(database, `rooms/${roomId}/unsure/${wordId}`);
-  await set(flagRef, isUnsure ? true : null);
-}
-
 // Writes this device's own "what I'm looking at" cell + color tint, so every
 // other participant can lightly paint that cell to show it's occupied.
 // Scoped to this one user's own child path, same reasoning as
@@ -122,8 +115,8 @@ export async function pushPresence(roomId, userId, presence) {
 
 // Appends one chat message as a brand new child (via push(), which mints its
 // own unique key) rather than writing to a fixed path -- unlike
-// answers/presence/unsure, many different people write to this same list
-// over time, so each message needs its own path rather than sharing one
+// answers/presence, many different people write to this same list over
+// time, so each message needs its own path rather than sharing one
 // per-writer slot the way those do. Still the same underlying rule: nobody
 // ever overwrites something another participant wrote. serverTimestamp()
 // (not a locally-read Date.now()) keeps message ordering consistent even if
