@@ -98,6 +98,19 @@ export async function pushAnswerHue(roomId, row, col, hue) {
   await set(hueRef, hue ?? null);
 }
 
+// Draft candidates get their own top-level path per direction
+// (draftHorizontal/draftVertical), entirely separate from answers/
+// answerHues -- deliberately no per-writer hue here (see CLAUDE.md's
+// "Draft mode" section on why candidate color stays fixed to direction, not
+// drawn from the presence hue pool), so there's nothing to combine at this
+// path the way pushAnswerHue exists alongside pushAnswerCell.
+export async function pushDraftCell(roomId, direction, row, col, letter) {
+  const { database, ref, set } = await loadModules();
+  const path = direction === "horizontal" ? "draftHorizontal" : "draftVertical";
+  const cellRef = ref(database, `rooms/${roomId}/${path}/${row}_${col}`);
+  await set(cellRef, letter || null);
+}
+
 // Writes this device's own "what I'm looking at" cell + color tint, so every
 // other participant can lightly paint that cell to show it's occupied.
 // Scoped to this one user's own child path, same reasoning as

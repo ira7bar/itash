@@ -19,6 +19,7 @@ export function wireInteractions(
     draftToggleBtn,
     onChange,
     onAnswerCellChange,
+    onDraftCellChange,
     onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
@@ -126,7 +127,15 @@ export function wireInteractions(
     hiddenInput.value = "";
     const result = candidate ? typeLetter(state, candidate) : null;
     if (result) {
-      onAnswerCellChange(result.row, result.col, result.letter);
+      // A draft write and a committed write look identical here except for
+      // `draft` -- routing a candidate through onAnswerCellChange would
+      // silently push it into the real answer cell for everyone in the
+      // room, so this branch is load-bearing, not a style choice.
+      if (result.draft) {
+        onDraftCellChange(result.draft, result.row, result.col, result.letter);
+      } else {
+        onAnswerCellChange(result.row, result.col, result.letter);
+      }
       // Advancing through a word can walk the active cell off the edge of
       // the screen (long words, or a pinch-zoomed-in view) -- nudge it back
       // into view, but only the minimum needed: no scroll at all while it's
@@ -143,7 +152,11 @@ export function wireInteractions(
       e.preventDefault();
       const result = backspace(state);
       if (result) {
-        onAnswerCellChange(result.row, result.col, "");
+        if (result.draft) {
+          onDraftCellChange(result.draft, result.row, result.col, "");
+        } else {
+          onAnswerCellChange(result.row, result.col, "");
+        }
         scrollActiveCellIntoView("nearest");
       }
     } else if (e.key.startsWith("Arrow")) {

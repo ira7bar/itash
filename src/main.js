@@ -1,10 +1,10 @@
-import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom, toggleDraftMode } from "./model.js";
+import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom, toggleDraftMode, applyRemoteDraft } from "./model.js";
 import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle, renderDraftToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushDraftCell, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
@@ -190,9 +190,21 @@ async function main() {
     }
   };
 
-  // Draft mode has no network dimension yet (see createState in model.js) --
-  // this only ever flips local state and re-renders, unlike every other
-  // callback here that also has a room-sync branch.
+  // Mirrors onAnswerCellChange's per-cell sync discipline, but on the
+  // draftHorizontal/draftVertical paths instead of answers -- no hue to
+  // stamp here, since candidate color stays fixed to direction rather than
+  // drawn from the presence hue pool (see CLAUDE.md's "Draft mode" section).
+  const onDraftCellChange = (direction, row, col, letter) => {
+    onChange();
+    if (state.roomId) {
+      pushWithRetry(pushDraftCell, state.roomId, direction, row, col, letter);
+    }
+  };
+
+  // Draft mode itself (on/off) has no network dimension -- it's a per-device
+  // preference like which cell you're looking at, not shared puzzle state,
+  // so this only ever flips local state and re-renders. The candidates it
+  // produces are a different matter -- see onDraftCellChange.
   const onToggleDraftMode = () => {
     toggleDraftMode(state);
     onChange();
@@ -202,14 +214,17 @@ async function main() {
   // each cleared cell individually (exactly like typing/backspacing through
   // them one at a time would), never as a single whole-room overwrite, so it
   // can't clobber someone else's concurrent edit either. Cleared draft
-  // candidates need no such loop -- nothing syncs those anywhere yet.
+  // candidates get the same treatment now, on their own path.
   const onClearBoard = () => {
-    const { clearedCells } = clearBoard(state);
+    const { clearedCells, clearedDraftCells } = clearBoard(state);
     onChange();
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
         pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
+      }
+      for (const [direction, row, col] of clearedDraftCells) {
+        pushWithRetry(pushDraftCell, state.roomId, direction, row, col, "");
       }
     }
   };
@@ -260,6 +275,8 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteAnswerHues(state, roomState.answerHues || {});
+      applyRemoteDraft(state, "horizontal", roomState.draftHorizontal || {});
+      applyRemoteDraft(state, "vertical", roomState.draftVertical || {});
       applyRemotePresence(state, roomState.presence || {}, userId);
       applyRemoteMessages(chatState, roomState.messages || {});
       onChange();
@@ -317,9 +334,18 @@ async function main() {
   // in (that's the whole point of seeding at all), but another room's
   // collaborators' answers, left sitting in memory after leaving that room,
   // never silently become a brand-new, unrelated room's starting state.
-  // Draft candidates aren't seeded at all -- there's no sync schema for them
-  // yet (see createState in model.js), so they simply stay local rather than
-  // silently carrying into a room where nobody else could ever see them.
+  // Draft candidates deliberately AREN'T seeded, even though they do sync
+  // once inside a room (see onDraftCellChange) -- ownAnswersForNewRoom's
+  // filtering works because every answer cell is hue-stamped with whoever
+  // wrote it (setAnswerHue), so "was this genuinely mine" is answerable.
+  // Drafts have no such per-cell authorship (see CLAUDE.md's "Draft mode"
+  // section on why candidate color stays fixed to direction, not drawn from
+  // the presence hue pool), so there's no way to tell "this device's own
+  // solo scratch notes" apart from "candidates that arrived from a
+  // DIFFERENT room's collaborators and are still sitting in local state" --
+  // exactly the leak ownAnswersForNewRoom exists to prevent for answers.
+  // Starting a new room with a blank draft layer sidesteps that leak
+  // entirely, at the cost of not carrying pre-room solo drafts in.
   const ensureRoomAndGetShareUrl = async () => {
     if (!state.roomId) {
       const roomId = createRoomId();
@@ -367,6 +393,7 @@ async function main() {
     draftToggleBtn,
     onChange,
     onAnswerCellChange,
+    onDraftCellChange,
     onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
