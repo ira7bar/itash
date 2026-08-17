@@ -201,6 +201,22 @@ async function main() {
     }
   };
 
+  // Long-press promote/demote (toggleCellDraft in model.js) touches BOTH
+  // the answer and draft paths in one gesture -- syncs each independently,
+  // same per-path discipline as every other edit, just two of them at once.
+  // The hue write mirrors onAnswerCellChange's: stamped whenever the cell
+  // ends up with an answer (promote), cleared whenever it ends up without
+  // one (demote).
+  const onCellDraftToggle = (row, col, direction, answer, draftLetter) => {
+    setAnswerHue(state, row, col, answer ? userHue : null);
+    onChange();
+    if (state.roomId) {
+      pushWithRetry(pushAnswerCell, state.roomId, row, col, answer);
+      pushWithRetry(pushAnswerHue, state.roomId, row, col, answer ? userHue : null);
+      pushWithRetry(pushDraftCell, state.roomId, direction, row, col, draftLetter);
+    }
+  };
+
   // Draft mode itself (on/off) has no network dimension -- it's a per-device
   // preference like which cell you're looking at, not shared puzzle state,
   // so this only ever flips local state and re-renders. The candidates it
@@ -394,6 +410,7 @@ async function main() {
     onChange,
     onAnswerCellChange,
     onDraftCellChange,
+    onCellDraftToggle,
     onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,

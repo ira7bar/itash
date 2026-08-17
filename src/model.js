@@ -468,3 +468,71 @@ export function backspace(state) {
   }
   return null;
 }
+
+// Which direction a long-press at (row, col) should act on, for
+// toggleCellDraft below. Same resolution the removed "unsure" toggle used:
+// prefer whichever direction is currently active, if it actually resolves
+// to a word at THIS cell (entry[state.activeDirection] is exactly that
+// check -- reflects deliberate intent better than geometry), otherwise
+// prefer a word that STARTS here over one that just crosses/ends here (a
+// start is always a deliberate tap; an end is often just wherever some
+// other word's crossing happens to land).
+function resolveDirectionForCell(state, row, col) {
+  const entry = getCellEntry(state.index, row, col);
+  if (!entry) return null;
+
+  if (state.activeDirection && entry[state.activeDirection]) {
+    return state.activeDirection;
+  }
+
+  const hWordId = entry.horizontal;
+  const vWordId = entry.vertical;
+  if (hWordId && !vWordId) return "horizontal";
+  if (vWordId && !hWordId) return "vertical";
+  if (!hWordId && !vWordId) return null;
+
+  const hWord = state.index.wordsById.get(hWordId);
+  const vWord = state.index.wordsById.get(vWordId);
+  const hStart = isStartCell(hWord, row, col);
+  const vStart = isStartCell(vWord, row, col);
+  if (hStart && !vStart) return "horizontal";
+  if (vStart && !hStart) return "vertical";
+  return "horizontal";
+}
+
+// Long-press a cell to flip it between a committed answer and a draft
+// candidate for its resolved direction (resolveDirectionForCell) -- a
+// filled cell demotes into that direction's draft slot; an empty cell with
+// a candidate there promotes it into the answer; an empty cell with
+// nothing there is a no-op (nothing to convert either way, so returns
+// null same as typeLetter/backspace do when nothing changed).
+//
+// Returns { row, col, direction, answer, draftLetter }: `answer` is the
+// cell's new committed letter (possibly "") and `draftLetter` is the new
+// value of that direction's draft slot (also possibly "") -- callers push
+// BOTH halves to a live room, on their own very different sync paths (see
+// onCellDraftToggle in main.js), since this one gesture touches both
+// answers and drafts at once.
+export function toggleCellDraft(state, row, col) {
+  if (isBlocked(state, row, col)) return null;
+  const direction = resolveDirectionForCell(state, row, col);
+  if (!direction) return null;
+  const draftGrid = direction === "horizontal" ? state.draftHorizontal : state.draftVertical;
+
+  if (state.answers[row][col]) {
+    const letter = state.answers[row][col];
+    state.answers[row][col] = "";
+    state.answerHues[row][col] = null;
+    draftGrid[row][col] = letter;
+    return { row, col, direction, answer: "", draftLetter: letter };
+  }
+
+  if (draftGrid[row][col]) {
+    const letter = draftGrid[row][col];
+    draftGrid[row][col] = "";
+    state.answers[row][col] = letter;
+    return { row, col, direction, answer: letter, draftLetter: "" };
+  }
+
+  return null;
+}
