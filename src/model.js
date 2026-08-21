@@ -67,10 +67,10 @@ function isWordEmpty(state, word) {
 // either STARTS at this exact cell (typing forward -- the convention every
 // crossword solver knows from paper: you begin at the numbered cell -- and
 // lands exactly there, however full or empty the word already is; see
-// nextTypeIndex for how already-filled cells get skipped as typing
-// advances, never on the initial tap itself), or ENDS at this exact cell and
-// still has something to delete (backspacing backward -- the mirror image,
-// for reviewing/correcting a word from its last letter). Any other cell --
+// nextTypeIndex for the plain left-to-right advance as typing continues),
+// or ENDS at this exact cell and still has something to delete (backspacing
+// backward -- the mirror image, for reviewing/correcting a word from its
+// last letter). Any other cell --
 // a mid-word cell, or an end cell whose word is already empty -- is
 // unambiguous: there's nothing to auto-advance into either direction, so a
 // tap there just edits that one letter.
@@ -89,19 +89,14 @@ function wholeWordCandidates(state, entry, row, col) {
   return candidates;
 }
 
-// Where typing forward should land after filling word.cells[idx]: the next
-// still-blank cell ahead (per `grid`, either state.answers for a committed
-// fill or a draft grid for a candidate one), if any -- skipping past cells
-// already filled in, almost always correctly, via a crossing word --
-// otherwise the plain next cell in sequence, so a full rewrite of an
-// already-full word (see wholeWordCandidates: tapping a FULL word's start
-// is almost always "this was wrong, redo it") still advances normally;
-// otherwise -1, at the word's actual last cell with nowhere left to go.
-function nextTypeIndex(grid, word, idx) {
-  for (let i = idx + 1; i < word.cells.length; i++) {
-    const [r, c] = word.cells[i];
-    if (!grid[r][c]) return i;
-  }
+// Where typing forward should land after filling word.cells[idx]: always the
+// plain next cell in sequence, or -1 at the word's actual last cell with
+// nowhere left to go. People type whole words left-to-right the way they
+// would on paper, so this deliberately never skips ahead over an
+// already-filled cell (crossing-word letter or a redo) -- that skipping was
+// tried and felt surprising to solvers used to writing entire words in one
+// pass.
+function nextTypeIndex(word, idx) {
   return idx < word.cells.length - 1 ? idx + 1 : -1;
 }
 
@@ -351,14 +346,13 @@ function activeDraftGrid(state, word) {
 //
 // In draft mode, a keystroke writes into that direction's single candidate
 // slot instead of state.answers, but otherwise walks the word exactly like
-// a committed fill does -- same nextTypeIndex, just checking the draft grid
-// for "already has a candidate" instead of state.answers for "already
-// filled." This isn't optional: activeDirection is only ever set by
-// selectCell at a word's start (or a filled end) -- a middle cell reached
-// without advancing through the word this way never carries an active
-// direction at all (see activeDraftGrid), so without auto-advance there'd
-// be no way to reach most of a word's cells in draft mode in the first
-// place, not just a worse typing flow.
+// a committed fill does -- same nextTypeIndex, plain left-to-right advance
+// regardless of what's already in the draft grid. This isn't optional:
+// activeDirection is only ever set by selectCell at a word's start (or a
+// filled end) -- a middle cell reached without advancing through the word
+// this way never carries an active direction at all (see activeDraftGrid),
+// so without auto-advance there'd be no way to reach most of a word's cells
+// in draft mode in the first place, not just a worse typing flow.
 export function typeLetter(state, rawLetter) {
   if (!state.activeCell || isBlocked(state, state.activeCell.row, state.activeCell.col)) return null;
   const letter = normalizeLetter(rawLetter);
@@ -371,7 +365,7 @@ export function typeLetter(state, rawLetter) {
     if (!draftGrid) return null;
     draftGrid[row][col] = letter;
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    const nextIdx = idx >= 0 ? nextTypeIndex(draftGrid, word, idx) : -1;
+    const nextIdx = idx >= 0 ? nextTypeIndex(word, idx) : -1;
     if (nextIdx >= 0) {
       const [nr, nc] = word.cells[nextIdx];
       state.activeCell = { row: nr, col: nc };
@@ -382,7 +376,7 @@ export function typeLetter(state, rawLetter) {
   state.answers[row][col] = letter;
   if (word) {
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    const nextIdx = idx >= 0 ? nextTypeIndex(state.answers, word, idx) : -1;
+    const nextIdx = idx >= 0 ? nextTypeIndex(word, idx) : -1;
     if (nextIdx >= 0) {
       const [nr, nc] = word.cells[nextIdx];
       state.activeCell = { row: nr, col: nc };
