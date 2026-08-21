@@ -41,19 +41,6 @@ export function renderGridShell(state, overlayEl) {
       letterEl.className = "letter";
       cellEl.appendChild(letterEl);
 
-      // Draft/pencil-mark candidates: one slot per direction, positioned in
-      // opposite corners (see CLAUDE.md's "Draft mode" section for why
-      // opposite corners rather than each direction's own edge -- adjacent
-      // edges land two marks in the same neighborhood at real cell sizes).
-      // Empty textContent means empty DOM (":empty" hides them in CSS), so
-      // there's nothing to toggle here beyond what updateGrid sets.
-      const draftAcrossEl = document.createElement("div");
-      draftAcrossEl.className = "draft-mark across";
-      cellEl.appendChild(draftAcrossEl);
-      const draftDownEl = document.createElement("div");
-      draftDownEl.className = "draft-mark down";
-      cellEl.appendChild(draftDownEl);
-
       // Static per puzzle (independent of answers/active state), so it's set
       // once here rather than recomputed every updateGrid call.
       if (getWordsForClueCell(state, r, c).length > 0) {
@@ -102,13 +89,6 @@ export function updateGrid(state, overlayEl) {
     const isActive = state.activeCell && state.activeCell.row === r && state.activeCell.col === c;
     cellEl.classList.toggle("active", Boolean(isActive));
     cellEl.classList.toggle("in-word", !blocked && activeWordCellSet.has(`${r},${c}`));
-
-    // Draft marks render whenever a candidate exists, independent of
-    // state.draftMode -- toggling draft mode off is "stop adding more,"
-    // not "hide what's already there," the same way turning off notes mode
-    // in Sudoku doesn't erase existing pencil marks.
-    cellEl.querySelector(".draft-mark.across").textContent = blocked ? "" : (state.draftHorizontal[r][c] ?? "");
-    cellEl.querySelector(".draft-mark.down").textContent = blocked ? "" : (state.draftVertical[r][c] ?? "");
 
     // A box-shadow tint rather than a background-color: .active/.in-word
     // already set `background` via CSS classes, and box-shadow layers on top
@@ -216,12 +196,4 @@ export function renderChatToggle(chatState, selfUserId, chatToggleBtn, chatBadge
   chatBadgeEl.textContent = String(count);
   chatToggleBtn.setAttribute("aria-expanded", String(chatState.open));
   chatPanelEl.classList.toggle("open", chatState.open);
-}
-
-// aria-pressed drives both the accessible state and the on/off visual (see
-// #draft-toggle[aria-pressed="true"] in style.css) from the one source of
-// truth, state.draftMode -- covers both a click (via the toggle callback)
-// and the solo-progress restore on page load (storage.js) alike.
-export function renderDraftToggle(state, draftToggleBtn) {
-  draftToggleBtn.setAttribute("aria-pressed", String(state.draftMode));
 }
