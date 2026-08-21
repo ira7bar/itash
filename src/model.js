@@ -67,10 +67,10 @@ function isWordEmpty(state, word) {
 // either STARTS at this exact cell (typing forward -- the convention every
 // crossword solver knows from paper: you begin at the numbered cell -- and
 // lands exactly there, however full or empty the word already is; see
-// nextTypeIndex for how already-filled cells get skipped as typing
-// advances, never on the initial tap itself), or ENDS at this exact cell and
-// still has something to delete (backspacing backward -- the mirror image,
-// for reviewing/correcting a word from its last letter). Any other cell --
+// nextTypeIndex for the plain left-to-right advance as typing continues),
+// or ENDS at this exact cell and still has something to delete (backspacing
+// backward -- the mirror image, for reviewing/correcting a word from its
+// last letter). Any other cell --
 // a mid-word cell, or an end cell whose word is already empty -- is
 // unambiguous: there's nothing to auto-advance into either direction, so a
 // tap there just edits that one letter.
@@ -89,18 +89,14 @@ function wholeWordCandidates(state, entry, row, col) {
   return candidates;
 }
 
-// Where typing forward should land after filling word.cells[idx]: the next
-// still-blank cell ahead in state.answers, if any -- skipping past cells
-// already filled in, almost always correctly, via a crossing word --
-// otherwise the plain next cell in sequence, so a full rewrite of an
-// already-full word (see wholeWordCandidates: tapping a FULL word's start
-// is almost always "this was wrong, redo it") still advances normally;
-// otherwise -1, at the word's actual last cell with nowhere left to go.
-function nextTypeIndex(state, word, idx) {
-  for (let i = idx + 1; i < word.cells.length; i++) {
-    const [r, c] = word.cells[i];
-    if (!state.answers[r][c]) return i;
-  }
+// Where typing forward should land after filling word.cells[idx]: always the
+// plain next cell in sequence, or -1 at the word's actual last cell with
+// nowhere left to go. People type whole words left-to-right the way they
+// would on paper, so this deliberately never skips ahead over an
+// already-filled cell (crossing-word letter or a redo) -- that skipping was
+// tried and felt surprising to solvers used to writing entire words in one
+// pass.
+function nextTypeIndex(word, idx) {
   return idx < word.cells.length - 1 ? idx + 1 : -1;
 }
 
@@ -304,7 +300,7 @@ export function typeLetter(state, rawLetter) {
   state.answers[row][col] = letter;
   if (word) {
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    const nextIdx = idx >= 0 ? nextTypeIndex(state, word, idx) : -1;
+    const nextIdx = idx >= 0 ? nextTypeIndex(word, idx) : -1;
     if (nextIdx >= 0) {
       const [nr, nc] = word.cells[nextIdx];
       state.activeCell = { row: nr, col: nc };
