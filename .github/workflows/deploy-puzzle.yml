@@ -1,0 +1,71 @@
+name: Deploy weekly puzzle
+
+on:
+  schedule:
+    # Every 2 hours on Thu/Fri/Sat (UTC) -- the puzzle is emailed sometime
+    # Thursday, and this is a loose window around that. Cheap no-op if
+    # nothing's arrived yet or this week is already deployed.
+    - cron: "0 */2 * * 4,5,6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pymupdf
+
+      - name: Fetch puzzle email
+        id: fetch
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python3 fetch_puzzle_email.py
+
+      - name: Check if already deployed
+        id: check
+        if: steps.fetch.outputs.found == 'true'
+        run: |
+          if [ -f "puzzle_${{ steps.fetch.outputs.target_date }}.json" ]; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Parse puzzle
+        if: steps.fetch.outputs.found == 'true' && steps.check.outputs.already == 'false'
+        run: |
+          python3 parse_puzzle.py tashbetz.pdf --page 3 \
+            --out "puzzle_${{ steps.fetch.outputs.target_date }}.json" \
+            --image-out "puzzle_${{ steps.fetch.outputs.target_date }}.png"
+
+      - name: Update app references
+        if: steps.fetch.outputs.found == 'true' && steps.check.outputs.already == 'false'
+        run: python3 update_deploy_refs.py "${{ steps.fetch.outputs.target_date }}"
+
+      - name: Commit and push
+        if: steps.fetch.outputs.found == 'true' && steps.check.outputs.already == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          shopt -s nullglob
+          for f in puzzle_*.json puzzle_*.png; do
+            if [ "$f" != "puzzle_${{ steps.fetch.outputs.target_date }}.json" ] && \
+               [ "$f" != "puzzle_${{ steps.fetch.outputs.target_date }}.png" ]; then
+              git rm -f "$f"
+            fi
+          done
+          git add "puzzle_${{ steps.fetch.outputs.target_date }}.json" \
+                  "puzzle_${{ steps.fetch.outputs.target_date }}.png" \
+                  src/main.js service-worker.js
+          git commit -m "Deploy ${{ steps.fetch.outputs.target_date }} puzzle"
+          git push
