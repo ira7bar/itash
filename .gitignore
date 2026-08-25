@@ -2,3 +2,4 @@ dev/
 debug/
 .claude/settings.local.json
 /tashbetz.pdf
+__pycache__/
