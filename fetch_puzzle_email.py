@@ -12,6 +12,7 @@ puzzle_YYYY-MM-DD.json files are named after (see CLAUDE.md).
 """
 
 import email
+import email.message
 import imaplib
 import os
 from datetime import datetime, timedelta
