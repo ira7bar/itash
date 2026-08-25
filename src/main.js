@@ -1,10 +1,10 @@
-import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom, toggleDraftMode, applyRemoteDraft } from "./model.js";
-import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle, renderDraftToggle } from "./render.js";
+import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom } from "./model.js";
+import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushDraftCell, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
@@ -38,9 +38,7 @@ async function main() {
   const joinBtn = document.getElementById("join-btn");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
-  const floatingControlsEl = document.getElementById("floating-controls");
   const chatToggleBtn = document.getElementById("chat-toggle");
-  const draftToggleBtn = document.getElementById("draft-toggle");
   const chatBadgeEl = document.getElementById("chat-badge");
   const chatPanelEl = document.getElementById("chat-panel");
   const chatCloseBtn = document.getElementById("chat-close-btn");
@@ -133,7 +131,6 @@ async function main() {
 
   const onChange = () => {
     updateGrid(state, overlayEl);
-    renderDraftToggle(state, draftToggleBtn);
     saveProgress(state);
     checkCelebration();
     syncPresence();
@@ -190,57 +187,17 @@ async function main() {
     }
   };
 
-  // Mirrors onAnswerCellChange's per-cell sync discipline, but on the
-  // draftHorizontal/draftVertical paths instead of answers -- no hue to
-  // stamp here, since candidate color stays fixed to direction rather than
-  // drawn from the presence hue pool (see CLAUDE.md's "Draft mode" section).
-  const onDraftCellChange = (direction, row, col, letter) => {
-    onChange();
-    if (state.roomId) {
-      pushWithRetry(pushDraftCell, state.roomId, direction, row, col, letter);
-    }
-  };
-
-  // Long-press promote/demote (toggleCellDraft in model.js) touches BOTH
-  // the answer and draft paths in one gesture -- syncs each independently,
-  // same per-path discipline as every other edit, just two of them at once.
-  // The hue write mirrors onAnswerCellChange's: stamped whenever the cell
-  // ends up with an answer (promote), cleared whenever it ends up without
-  // one (demote).
-  const onCellDraftToggle = (row, col, direction, answer, draftLetter) => {
-    setAnswerHue(state, row, col, answer ? userHue : null);
-    onChange();
-    if (state.roomId) {
-      pushWithRetry(pushAnswerCell, state.roomId, row, col, answer);
-      pushWithRetry(pushAnswerHue, state.roomId, row, col, answer ? userHue : null);
-      pushWithRetry(pushDraftCell, state.roomId, direction, row, col, draftLetter);
-    }
-  };
-
-  // Draft mode itself (on/off) has no network dimension -- it's a per-device
-  // preference like which cell you're looking at, not shared puzzle state,
-  // so this only ever flips local state and re-renders. The candidates it
-  // produces are a different matter -- see onDraftCellChange.
-  const onToggleDraftMode = () => {
-    toggleDraftMode(state);
-    onChange();
-  };
-
   // Same per-path sync discipline as every other edit -- a board clear syncs
   // each cleared cell individually (exactly like typing/backspacing through
   // them one at a time would), never as a single whole-room overwrite, so it
-  // can't clobber someone else's concurrent edit either. Cleared draft
-  // candidates get the same treatment now, on their own path.
+  // can't clobber someone else's concurrent edit either.
   const onClearBoard = () => {
-    const { clearedCells, clearedDraftCells } = clearBoard(state);
+    const { clearedCells } = clearBoard(state);
     onChange();
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
         pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
-      }
-      for (const [direction, row, col] of clearedDraftCells) {
-        pushWithRetry(pushDraftCell, state.roomId, direction, row, col, "");
       }
     }
   };
@@ -251,12 +208,9 @@ async function main() {
   // that they'd otherwise balloon up to the same zoom level as the grid --
   // see zoom-hide.js. No resync needed on room-state changes (unlike an
   // earlier counter-scaling attempt): this only reacts to zoom level, not to
-  // anything about these elements' own size or content. One call for the
-  // whole #floating-controls row (chat + draft toggles together), not one
-  // per button -- they should hide and reappear in lockstep, and
-  // visibility:hidden on the row already covers both children.
+  // anything about these elements' own size or content.
   hideWhileZoomedIn(footerEl);
-  hideWhileZoomedIn(floatingControlsEl);
+  hideWhileZoomedIn(chatToggleBtn);
   hideWhileZoomedIn(chatPanelEl);
 
   // Single source of truth for every piece of UI that depends on "are we
@@ -291,8 +245,6 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteAnswerHues(state, roomState.answerHues || {});
-      applyRemoteDraft(state, "horizontal", roomState.draftHorizontal || {});
-      applyRemoteDraft(state, "vertical", roomState.draftVertical || {});
       applyRemotePresence(state, roomState.presence || {}, userId);
       applyRemoteMessages(chatState, roomState.messages || {});
       onChange();
@@ -350,18 +302,6 @@ async function main() {
   // in (that's the whole point of seeding at all), but another room's
   // collaborators' answers, left sitting in memory after leaving that room,
   // never silently become a brand-new, unrelated room's starting state.
-  // Draft candidates deliberately AREN'T seeded, even though they do sync
-  // once inside a room (see onDraftCellChange) -- ownAnswersForNewRoom's
-  // filtering works because every answer cell is hue-stamped with whoever
-  // wrote it (setAnswerHue), so "was this genuinely mine" is answerable.
-  // Drafts have no such per-cell authorship (see CLAUDE.md's "Draft mode"
-  // section on why candidate color stays fixed to direction, not drawn from
-  // the presence hue pool), so there's no way to tell "this device's own
-  // solo scratch notes" apart from "candidates that arrived from a
-  // DIFFERENT room's collaborators and are still sitting in local state" --
-  // exactly the leak ownAnswersForNewRoom exists to prevent for answers.
-  // Starting a new room with a blank draft layer sidesteps that leak
-  // entirely, at the cost of not carrying pre-room solo drafts in.
   const ensureRoomAndGetShareUrl = async () => {
     if (!state.roomId) {
       const roomId = createRoomId();
@@ -406,12 +346,8 @@ async function main() {
     clearBoardBtn,
     leaveRoomBtn,
     joinBtn,
-    draftToggleBtn,
     onChange,
     onAnswerCellChange,
-    onDraftCellChange,
-    onCellDraftToggle,
-    onToggleDraftMode,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,

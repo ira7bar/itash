@@ -67,10 +67,10 @@ function isWordEmpty(state, word) {
 // either STARTS at this exact cell (typing forward -- the convention every
 // crossword solver knows from paper: you begin at the numbered cell -- and
 // lands exactly there, however full or empty the word already is; see
-// nextTypeIndex for how already-filled cells get skipped as typing
-// advances, never on the initial tap itself), or ENDS at this exact cell and
-// still has something to delete (backspacing backward -- the mirror image,
-// for reviewing/correcting a word from its last letter). Any other cell --
+// nextTypeIndex for the plain left-to-right advance as typing continues),
+// or ENDS at this exact cell and still has something to delete (backspacing
+// backward -- the mirror image, for reviewing/correcting a word from its
+// last letter). Any other cell --
 // a mid-word cell, or an end cell whose word is already empty -- is
 // unambiguous: there's nothing to auto-advance into either direction, so a
 // tap there just edits that one letter.
@@ -89,19 +89,14 @@ function wholeWordCandidates(state, entry, row, col) {
   return candidates;
 }
 
-// Where typing forward should land after filling word.cells[idx]: the next
-// still-blank cell ahead (per `grid`, either state.answers for a committed
-// fill or a draft grid for a candidate one), if any -- skipping past cells
-// already filled in, almost always correctly, via a crossing word --
-// otherwise the plain next cell in sequence, so a full rewrite of an
-// already-full word (see wholeWordCandidates: tapping a FULL word's start
-// is almost always "this was wrong, redo it") still advances normally;
-// otherwise -1, at the word's actual last cell with nowhere left to go.
-function nextTypeIndex(grid, word, idx) {
-  for (let i = idx + 1; i < word.cells.length; i++) {
-    const [r, c] = word.cells[i];
-    if (!grid[r][c]) return i;
-  }
+// Where typing forward should land after filling word.cells[idx]: always the
+// plain next cell in sequence, or -1 at the word's actual last cell with
+// nowhere left to go. People type whole words left-to-right the way they
+// would on paper, so this deliberately never skips ahead over an
+// already-filled cell (crossing-word letter or a redo) -- that skipping was
+// tried and felt surprising to solvers used to writing entire words in one
+// pass.
+function nextTypeIndex(word, idx) {
   return idx < word.cells.length - 1 ? idx + 1 : -1;
 }
 
@@ -114,23 +109,11 @@ export function createState(puzzle) {
   // meaningful/rendered inside a live room; solo solving has exactly one
   // possible author, so there's nothing for it to show.
   const answerHues = Array.from({ length: index.rows }, () => Array(index.cols).fill(null));
-  // Draft/pencil-mark candidates, parallel to `answers` -- one slot per
-  // direction per cell, never more (see CLAUDE.md's "Draft mode" section for
-  // why one-per-direction was chosen over a Sudoku-style multi-candidate
-  // cell). Sync in a live room the same per-cell way answers do (see
-  // pushDraftCell in sync.js), but with no per-cell authorship the way
-  // answerHues gives answers -- see ensureRoomAndGetShareUrl in main.js for
-  // why that's exactly why they aren't seeded into a brand-new room.
-  const draftHorizontal = Array.from({ length: index.rows }, () => Array(index.cols).fill(""));
-  const draftVertical = Array.from({ length: index.rows }, () => Array(index.cols).fill(""));
   return {
     puzzle,
     index,
     answers,
     answerHues,
-    draftMode: false,
-    draftHorizontal,
-    draftVertical,
     activeCell: null,
     activeDirection: null,
     roomId: null,
@@ -209,26 +192,6 @@ export function applyRemoteAnswers(state, answersMap) {
       // version of the app (before this normalization existed) could still
       // push an un-normalized final-form letter into a shared room.
       state.answers[r][c] = normalizeLetter(answersMap[key]);
-    }
-  }
-}
-
-// Rebuilds one draft grid (horizontal or vertical) from a room's full
-// snapshot map -- same full-replace reasoning as applyRemoteAnswers, called
-// once per direction since they're separate sync paths (see pushDraftCell
-// in sync.js).
-export function applyRemoteDraft(state, direction, draftMap) {
-  const grid = direction === "horizontal" ? state.draftHorizontal : state.draftVertical;
-  const { rows, cols } = state.index;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      grid[r][c] = "";
-    }
-  }
-  for (const key of Object.keys(draftMap || {})) {
-    const [r, c] = key.split("_").map(Number);
-    if (r >= 0 && r < rows && c >= 0 && c < cols) {
-      grid[r][c] = normalizeLetter(draftMap[key]);
     }
   }
 }
@@ -322,43 +285,11 @@ export function getActiveWord(state) {
   return wordId ? state.index.wordsById.get(wordId) : null;
 }
 
-export function toggleDraftMode(state) {
-  state.draftMode = !state.draftMode;
-}
-
-// The draft grid (draftHorizontal/draftVertical) that a draft-mode keystroke
-// at the current active cell should target: whichever direction is actually
-// active, i.e. exactly the case getActiveWord already resolves to a real
-// word for. A cell reached without an active direction (a mid-word single-
-// letter edit, or an end-cell edit -- see selectCell) has no direction to
-// attribute a candidate to, so draft mode has nothing to target there and
-// typing/backspacing falls back to the ordinary committed-letter behavior.
-function activeDraftGrid(state, word) {
-  if (!word) return null;
-  return state.activeDirection === "horizontal" ? state.draftHorizontal : state.draftVertical;
-}
-
-// Returns { row, col, letter, draft } for the cell that was actually
-// written, or null if nothing was committed (e.g. stray punctuation from a
-// mismapped key) -- callers use this both to skip a wasted render/save when
-// nothing changed, and to know exactly which single cell (and which of the
-// two very different sync paths -- see pushAnswerCell vs pushDraftCell in
-// sync.js) to push to a live room. `draft` is the direction ("horizontal"/
-// "vertical") when this was a candidate write, or absent for a committed
-// one -- callers MUST branch on it rather than assuming every result is a
-// committed answer, since routing a draft write through the committed path
-// would silently overwrite the real answer cell for everyone in the room.
-//
-// In draft mode, a keystroke writes into that direction's single candidate
-// slot instead of state.answers, but otherwise walks the word exactly like
-// a committed fill does -- same nextTypeIndex, just checking the draft grid
-// for "already has a candidate" instead of state.answers for "already
-// filled." This isn't optional: activeDirection is only ever set by
-// selectCell at a word's start (or a filled end) -- a middle cell reached
-// without advancing through the word this way never carries an active
-// direction at all (see activeDraftGrid), so without auto-advance there'd
-// be no way to reach most of a word's cells in draft mode in the first
-// place, not just a worse typing flow.
+// Returns { row, col, letter } for the cell that was actually written, or
+// null if nothing was committed (e.g. stray punctuation from a mismapped
+// key) -- callers use this both to skip a wasted render/save when nothing
+// changed, and to know exactly which single cell to push to a live room
+// (see pushAnswerCell in sync.js).
 export function typeLetter(state, rawLetter) {
   if (!state.activeCell || isBlocked(state, state.activeCell.row, state.activeCell.col)) return null;
   const letter = normalizeLetter(rawLetter);
@@ -366,23 +297,10 @@ export function typeLetter(state, rawLetter) {
   const { row, col } = state.activeCell;
   const word = getActiveWord(state);
 
-  if (state.draftMode) {
-    const draftGrid = activeDraftGrid(state, word);
-    if (!draftGrid) return null;
-    draftGrid[row][col] = letter;
-    const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    const nextIdx = idx >= 0 ? nextTypeIndex(draftGrid, word, idx) : -1;
-    if (nextIdx >= 0) {
-      const [nr, nc] = word.cells[nextIdx];
-      state.activeCell = { row: nr, col: nc };
-    }
-    return { row, col, letter, draft: state.activeDirection };
-  }
-
   state.answers[row][col] = letter;
   if (word) {
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    const nextIdx = idx >= 0 ? nextTypeIndex(state.answers, word, idx) : -1;
+    const nextIdx = idx >= 0 ? nextTypeIndex(word, idx) : -1;
     if (nextIdx >= 0) {
       const [nr, nc] = word.cells[nextIdx];
       state.activeCell = { row: nr, col: nc };
@@ -391,16 +309,12 @@ export function typeLetter(state, rawLetter) {
   return { row, col, letter };
 }
 
-// Clears every filled answer cell and draft candidate -- the "start over"
-// action. Returns both what changed, separately (clearedCells for answers,
-// clearedDraftCells for candidates -- two very different sync paths, see
-// clearBoard's caller in main.js) so each can be synced to a live room
-// individually, never as one whole-room overwrite (see pushRoomState's
-// warning in sync.js).
+// Clears every filled answer cell -- the "start over" action. Returns which
+// cells changed so each can be synced to a live room individually, never as
+// one whole-room overwrite (see pushRoomState's warning in sync.js).
 export function clearBoard(state) {
   const { rows, cols } = state.index;
   const clearedCells = [];
-  const clearedDraftCells = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (state.answers[r][c]) {
@@ -408,50 +322,16 @@ export function clearBoard(state) {
         state.answers[r][c] = "";
         state.answerHues[r][c] = null;
       }
-      if (state.draftHorizontal[r][c]) {
-        clearedDraftCells.push(["horizontal", r, c]);
-        state.draftHorizontal[r][c] = "";
-      }
-      if (state.draftVertical[r][c]) {
-        clearedDraftCells.push(["vertical", r, c]);
-        state.draftVertical[r][c] = "";
-      }
     }
   }
-  return { clearedCells, clearedDraftCells };
+  return { clearedCells };
 }
 
-// Returns { row, col, draft } for the cell that was actually cleared, or
-// null if nothing changed -- same reasoning as typeLetter's return value,
-// `draft` included the same way for the same reason (callers must route a
-// cleared candidate to pushDraftCell, never pushAnswerCell). In draft mode
-// this steps backward through the word exactly like the committed path
-// does, just clearing the draft grid instead of state.answers -- same
-// reasoning as typeLetter's draft branch: without this, backspacing off a
-// cell would drop activeDirection entirely (see activeDraftGrid) and strand
-// the rest of the word out of draft mode's reach.
+// Returns { row, col } for the cell that was actually cleared, or null if
+// nothing changed -- same reasoning as typeLetter's return value.
 export function backspace(state) {
   if (!state.activeCell) return null;
   const { row, col } = state.activeCell;
-
-  if (state.draftMode) {
-    const word = getActiveWord(state);
-    const draftGrid = activeDraftGrid(state, word);
-    if (!draftGrid) return null;
-    const direction = state.activeDirection;
-    if (draftGrid[row][col]) {
-      draftGrid[row][col] = "";
-      return { row, col, draft: direction };
-    }
-    const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
-    if (idx > 0) {
-      const [pr, pc] = word.cells[idx - 1];
-      state.activeCell = { row: pr, col: pc };
-      draftGrid[pr][pc] = "";
-      return { row: pr, col: pc, draft: direction };
-    }
-    return null;
-  }
 
   if (state.answers[row][col]) {
     state.answers[row][col] = "";
@@ -469,70 +349,3 @@ export function backspace(state) {
   return null;
 }
 
-// Which direction a long-press at (row, col) should act on, for
-// toggleCellDraft below. Same resolution the removed "unsure" toggle used:
-// prefer whichever direction is currently active, if it actually resolves
-// to a word at THIS cell (entry[state.activeDirection] is exactly that
-// check -- reflects deliberate intent better than geometry), otherwise
-// prefer a word that STARTS here over one that just crosses/ends here (a
-// start is always a deliberate tap; an end is often just wherever some
-// other word's crossing happens to land).
-function resolveDirectionForCell(state, row, col) {
-  const entry = getCellEntry(state.index, row, col);
-  if (!entry) return null;
-
-  if (state.activeDirection && entry[state.activeDirection]) {
-    return state.activeDirection;
-  }
-
-  const hWordId = entry.horizontal;
-  const vWordId = entry.vertical;
-  if (hWordId && !vWordId) return "horizontal";
-  if (vWordId && !hWordId) return "vertical";
-  if (!hWordId && !vWordId) return null;
-
-  const hWord = state.index.wordsById.get(hWordId);
-  const vWord = state.index.wordsById.get(vWordId);
-  const hStart = isStartCell(hWord, row, col);
-  const vStart = isStartCell(vWord, row, col);
-  if (hStart && !vStart) return "horizontal";
-  if (vStart && !hStart) return "vertical";
-  return "horizontal";
-}
-
-// Long-press a cell to flip it between a committed answer and a draft
-// candidate for its resolved direction (resolveDirectionForCell) -- a
-// filled cell demotes into that direction's draft slot; an empty cell with
-// a candidate there promotes it into the answer; an empty cell with
-// nothing there is a no-op (nothing to convert either way, so returns
-// null same as typeLetter/backspace do when nothing changed).
-//
-// Returns { row, col, direction, answer, draftLetter }: `answer` is the
-// cell's new committed letter (possibly "") and `draftLetter` is the new
-// value of that direction's draft slot (also possibly "") -- callers push
-// BOTH halves to a live room, on their own very different sync paths (see
-// onCellDraftToggle in main.js), since this one gesture touches both
-// answers and drafts at once.
-export function toggleCellDraft(state, row, col) {
-  if (isBlocked(state, row, col)) return null;
-  const direction = resolveDirectionForCell(state, row, col);
-  if (!direction) return null;
-  const draftGrid = direction === "horizontal" ? state.draftHorizontal : state.draftVertical;
-
-  if (state.answers[row][col]) {
-    const letter = state.answers[row][col];
-    state.answers[row][col] = "";
-    state.answerHues[row][col] = null;
-    draftGrid[row][col] = letter;
-    return { row, col, direction, answer: "", draftLetter: letter };
-  }
-
-  if (draftGrid[row][col]) {
-    const letter = draftGrid[row][col];
-    draftGrid[row][col] = "";
-    state.answers[row][col] = letter;
-    return { row, col, direction, answer: letter, draftLetter: "" };
-  }
-
-  return null;
-}
