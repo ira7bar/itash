@@ -53,11 +53,23 @@ export function wireInteractions(
   };
 
   gridEl.addEventListener("pointerdown", (e) => {
+    // A second finger touching down while a press is already pending means
+    // this is turning into a multi-touch gesture (pinch-zoom), not a
+    // long-press -- cancel outright rather than letting the first finger's
+    // timer, now orphaned, still fire later regardless of what the gesture
+    // turns into (this was firing the unsure/copy action on ordinary
+    // pinch-zooming, since a second pointerdown used to just overwrite
+    // pressStart/pressTimer without clearing the first timer). isPrimary is
+    // false for every pointer after the first simultaneous one of its type.
+    if (!e.isPrimary || pressStart) {
+      cancelPress();
+      return;
+    }
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;
     const row = Number(cellEl.dataset.row);
     const col = Number(cellEl.dataset.col);
-    pressStart = { x: e.clientX, y: e.clientY };
+    pressStart = { x: e.clientX, y: e.clientY, pointerId: e.pointerId };
     pressTimer = setTimeout(() => {
       pressTimer = null;
       if (isBlocked(state, row, col)) {
@@ -74,15 +86,19 @@ export function wireInteractions(
   });
 
   gridEl.addEventListener("pointermove", (e) => {
-    if (!pressStart) return;
+    if (!pressStart || e.pointerId !== pressStart.pointerId) return;
     const dx = e.clientX - pressStart.x;
     const dy = e.clientY - pressStart.y;
     if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) cancelPress();
   });
 
-  gridEl.addEventListener("pointerup", cancelPress);
-  gridEl.addEventListener("pointercancel", cancelPress);
-  gridEl.addEventListener("pointerleave", cancelPress);
+  const cancelPressForPointer = (e) => {
+    if (!pressStart || e.pointerId !== pressStart.pointerId) return;
+    cancelPress();
+  };
+  gridEl.addEventListener("pointerup", cancelPressForPointer);
+  gridEl.addEventListener("pointercancel", cancelPressForPointer);
+  gridEl.addEventListener("pointerleave", cancelPressForPointer);
 
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");

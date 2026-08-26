@@ -76,15 +76,24 @@ body {
   width: min(100%, 900px);
   margin: 0 auto;
   line-height: 0; /* avoid the image's own inline-baseline gap adding stray space below it */
+  /* Every real touch now lands on #overlay-layer/.cell (the image itself is
+     pointer-events: none, see below) -- without this, an ordinary long-press
+     there (unsure-marking, or copying a clue) could trigger iOS's own
+     native text-selection loupe/callout instead of (or alongside) our own
+     gesture, since neither had ever needed its own user-select/touch-callout
+     rule before there was anything to long-press on the overlay itself. Set
+     once here, on the common ancestor, so it covers the image and every
+     overlay cell without repeating it per element. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #puzzle-image {
   display: block;
   width: 100%;
   height: auto;
-  user-select: none;
   -webkit-user-drag: none;
-  -webkit-touch-callout: none;
   /* Android's "save/copy image" long-press menu has been seen firing even
      though #overlay-layer sits on top and normally takes every touch --
      its detection isn't reliable DOM hit-testing (confirmed: the
@@ -93,7 +102,8 @@ body {
      overlay instead, which never triggers it. Safe here specifically
      because the image is purely decorative background -- every real
      interaction already goes through .cell elements in the overlay, never
-     the image itself. */
+     the image itself. (user-select/-webkit-touch-callout are set on #grid,
+     the shared ancestor, not repeated here.) */
   pointer-events: none;
 }
 
