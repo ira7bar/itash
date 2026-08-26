@@ -17,6 +17,12 @@
   --in-word-bg: rgba(255, 213, 74, 0.28);
   --letter-fg: #000000;
   --share-accent: #1c6e8c;
+  /* Pencil-gray for a long-pressed "unsure" word -- 75% lightness (#bfbfbf),
+     chosen against the actual puzzle scan background, same reasoning as
+     --letter-fg staying fixed regardless of theme: the grid's visual
+     background is always the light scan image, so this isn't overridden in
+     dark mode either. */
+  --unsure-gray: #bfbfbf;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -188,6 +194,14 @@ body {
   font-weight: 700;
   color: var(--letter-fg);
   line-height: 1;
+}
+
+/* Long-press a word to flag it "unsure" -- the letter itself goes
+   pencil-gray instead of a red dashed underline (an earlier version of this
+   feature), so it reads as "written in pencil" rather than "flagged as an
+   error." Toggled by resolveWordForToggle in model.js. */
+.cell.unsure .letter {
+  color: var(--unsure-gray);
 }
 
 footer {

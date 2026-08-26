@@ -1,9 +1,12 @@
-import { selectCell, typeLetter, backspace, isBlocked, getWordsForClueCell } from "./model.js";
+import { selectCell, typeLetter, backspace, isBlocked, getWordsForClueCell, toggleUnsure } from "./model.js";
 import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
 
 // Includes the punctuation keys that map to ת/ץ/ף on the standard Hebrew
 // keyboard layout (, . ; and their shifted forms < > :) -- see hebrew.js.
 const HEBREW_OR_LATIN_LETTER = /[א-תa-zA-Z,.;<>:]/;
+
+const LONG_PRESS_MS = 450;
+const MOVE_TOLERANCE_PX = 10;
 
 export function wireInteractions(
   state,
@@ -18,12 +21,57 @@ export function wireInteractions(
     joinBtn,
     onChange,
     onAnswerCellChange,
+    onUnsureToggle,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,
     clearBoard,
   }
 ) {
+  // Long-press (hold, don't drag) a cell to flag its word "unsure" --
+  // independent of the click handler below, which still fires normally
+  // afterward and selects the cell as usual. The timer starts on
+  // pointerDOWN and reads state BEFORE this press's own eventual click runs
+  // selectCell, which is exactly the signal resolveWordForToggle (in
+  // model.js) needs -- see its own comment for why.
+  let pressTimer = null;
+  let pressStart = null;
+
+  const cancelPress = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+    pressStart = null;
+  };
+
+  gridEl.addEventListener("pointerdown", (e) => {
+    const cellEl = e.target.closest(".cell");
+    if (!cellEl) return;
+    const row = Number(cellEl.dataset.row);
+    const col = Number(cellEl.dataset.col);
+    pressStart = { x: e.clientX, y: e.clientY };
+    pressTimer = setTimeout(() => {
+      pressTimer = null;
+      const result = toggleUnsure(state, row, col);
+      if (result) {
+        onUnsureToggle(result.wordId, result.isUnsure);
+        onChange();
+      }
+    }, LONG_PRESS_MS);
+  });
+
+  gridEl.addEventListener("pointermove", (e) => {
+    if (!pressStart) return;
+    const dx = e.clientX - pressStart.x;
+    const dy = e.clientY - pressStart.y;
+    if (Math.hypot(dx, dy) > MOVE_TOLERANCE_PX) cancelPress();
+  });
+
+  gridEl.addEventListener("pointerup", cancelPress);
+  gridEl.addEventListener("pointercancel", cancelPress);
+  gridEl.addEventListener("pointerleave", cancelPress);
+
   gridEl.addEventListener("click", (e) => {
     const cellEl = e.target.closest(".cell");
     if (!cellEl) return;

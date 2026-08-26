@@ -1,10 +1,10 @@
-import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom } from "./model.js";
+import { createState, applyRemoteAnswers, applyRemotePresence, isPuzzleComplete, clearBoard, setAnswerHue, applyRemoteAnswerHues, ownAnswersForNewRoom, flattenUnsure, applyRemoteUnsure } from "./model.js";
 import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessages, renderChatToggle } from "./render.js";
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
 import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
@@ -192,13 +192,26 @@ async function main() {
   // them one at a time would), never as a single whole-room overwrite, so it
   // can't clobber someone else's concurrent edit either.
   const onClearBoard = () => {
-    const { clearedCells } = clearBoard(state);
+    const { clearedCells, clearedWordIds } = clearBoard(state);
     onChange();
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
         pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
       }
+      for (const wordId of clearedWordIds) {
+        pushWithRetry(pushUnsureFlag, state.roomId, wordId, false);
+      }
+    }
+  };
+
+  // A long-press flips one word's unsure flag locally (toggleUnsure, called
+  // from interaction.js, already updated state.unsureWords by the time this
+  // runs); only the sync write is gated on actually being in a room, same as
+  // every other edit here.
+  const onUnsureToggle = (wordId, isUnsure) => {
+    if (state.roomId) {
+      pushWithRetry(pushUnsureFlag, state.roomId, wordId, isUnsure);
     }
   };
 
@@ -245,6 +258,7 @@ async function main() {
     const unsubscribe = await subscribeRoom(roomId, (roomState) => {
       applyRemoteAnswers(state, roomState.answers || {});
       applyRemoteAnswerHues(state, roomState.answerHues || {});
+      applyRemoteUnsure(state, roomState.unsure || {});
       applyRemotePresence(state, roomState.presence || {}, userId);
       applyRemoteMessages(chatState, roomState.messages || {});
       onChange();
@@ -306,7 +320,10 @@ async function main() {
     if (!state.roomId) {
       const roomId = createRoomId();
       const { answers, answerHues } = ownAnswersForNewRoom(state, userHue);
-      const roomState = { answers, answerHues };
+      // Unlike answers/answerHues, unsure flags carry no per-user authorship
+      // to filter by -- they're seeded wholesale from whatever this device
+      // currently has marked, same as the original design.
+      const roomState = { answers, answerHues, unsure: flattenUnsure(state) };
       await pushRoomState(roomId, roomState);
       await joinRoom(roomId);
     }
@@ -348,6 +365,7 @@ async function main() {
     joinBtn,
     onChange,
     onAnswerCellChange,
+    onUnsureToggle,
     ensureRoomAndGetShareUrl,
     joinRoomByCode,
     leaveRoom,

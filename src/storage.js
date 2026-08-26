@@ -15,6 +15,8 @@ export function saveProgress(state) {
   const key = keyFor(state.puzzle);
   const payload = {
     answers: state.answers,
+    // Array, not the Set itself -- JSON has no Set type.
+    unsureWords: [...state.unsureWords],
   };
   try {
     localStorage.setItem(key, JSON.stringify(payload));
@@ -33,6 +35,9 @@ export function loadProgress(state) {
       // Normalize here too: progress saved before final-form/English-keyboard
       // normalization existed may still have un-normalized letters in it.
       state.answers = payload.answers.map((row) => row.map((letter) => (letter ? normalizeLetter(letter) : letter)));
+    }
+    if (payload.unsureWords) {
+      state.unsureWords = new Set(payload.unsureWords);
     }
   } catch (err) {
     console.warn("Could not load saved progress:", err);

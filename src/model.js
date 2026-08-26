@@ -122,6 +122,10 @@ export function createState(puzzle) {
     // applyRemotePresence), since the local active cell is already shown via
     // the .active class, not a presence tint.
     presence: new Map(),
+    // Word ids flagged "unsure" (pencil-gray letters) -- a set, not a
+    // per-cell map, since the flag is a whole-word annotation, not tied to
+    // any one cell within it (see toggleUnsure).
+    unsureWords: new Set(),
   };
 }
 
@@ -285,6 +289,65 @@ export function getActiveWord(state) {
   return wordId ? state.index.wordsById.get(wordId) : null;
 }
 
+// Which word a long-press at (row, col) should flag as unsure. Called from a
+// timer started on pointerDOWN, before that same press's eventual click event
+// runs selectCell -- so state.activeCell/activeDirection here still reflect
+// whatever was active from BEFORE this press began, not the cell being
+// pressed. That's the right signal to use: if you've been typing/reviewing a
+// word (it's the one currently highlighted) and long-press one of its cells
+// -- including a crossing cell that's also part of some other word -- you
+// clearly mean the word you were just looking at, not whichever direction
+// happens to be geometrically first.
+function resolveWordForToggle(state, row, col) {
+  const entry = getCellEntry(state.index, row, col);
+  if (!entry) return null;
+
+  const activeWord = getActiveWord(state);
+  if (activeWord && activeWord.cells.some(([r, c]) => r === row && c === col)) {
+    return activeWord;
+  }
+
+  // No currently-highlighted word covers this cell (e.g. long-pressing a
+  // fresh intersection cold, without having tapped either word first). If
+  // only one direction crosses here, that's unambiguous; if both do, this is
+  // an honest limitation -- default to horizontal. Tapping the word you mean
+  // first (so it's highlighted), then long-pressing anywhere within it,
+  // always resolves correctly regardless of direction.
+  const wordId = entry.horizontal || entry.vertical;
+  return wordId ? state.index.wordsById.get(wordId) : null;
+}
+
+// Returns { wordId, isUnsure } for the word that was toggled, or null if the
+// cell isn't part of any word.
+export function toggleUnsure(state, row, col) {
+  const word = resolveWordForToggle(state, row, col);
+  if (!word) return null;
+  let isUnsure;
+  if (state.unsureWords.has(word.id)) {
+    state.unsureWords.delete(word.id);
+    isUnsure = false;
+  } else {
+    state.unsureWords.add(word.id);
+    isUnsure = true;
+  }
+  return { wordId: word.id, isUnsure };
+}
+
+// Sparse map ({wordId: true}, same shape as flattenAnswers/answerHues) for
+// pushing to a live room -- a map, not an array, so a single flag can be
+// added/removed as its own child path (see pushUnsureFlag in sync.js).
+export function flattenUnsure(state) {
+  const map = {};
+  for (const id of state.unsureWords) map[id] = true;
+  return map;
+}
+
+// Rebuilds state.unsureWords from a room's full snapshot map. Same
+// full-replace reasoning as applyRemoteAnswers.
+export function applyRemoteUnsure(state, unsureMap) {
+  state.unsureWords = new Set(Object.keys(unsureMap || {}));
+}
+
 // Returns { row, col, letter } for the cell that was actually written, or
 // null if nothing was committed (e.g. stray punctuation from a mismapped
 // key) -- callers use this both to skip a wasted render/save when nothing
@@ -309,9 +372,11 @@ export function typeLetter(state, rawLetter) {
   return { row, col, letter };
 }
 
-// Clears every filled answer cell -- the "start over" action. Returns which
-// cells changed so each can be synced to a live room individually, never as
-// one whole-room overwrite (see pushRoomState's warning in sync.js).
+// Clears every filled answer cell -- the "start over" action. Also clears
+// every unsure flag, since "unsure about this answer" has no meaning once
+// the answer itself is gone. Returns which cells/words changed so each can
+// be synced to a live room individually, never as one whole-room overwrite
+// (see pushRoomState's warning in sync.js).
 export function clearBoard(state) {
   const { rows, cols } = state.index;
   const clearedCells = [];
@@ -324,7 +389,9 @@ export function clearBoard(state) {
       }
     }
   }
-  return { clearedCells };
+  const clearedWordIds = [...state.unsureWords];
+  state.unsureWords = new Set();
+  return { clearedCells, clearedWordIds };
 }
 
 // Returns { row, col } for the cell that was actually cleared, or null if

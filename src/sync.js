@@ -98,6 +98,18 @@ export async function pushAnswerHue(roomId, row, col, hue) {
   await set(hueRef, hue ?? null);
 }
 
+// A separate path from both answers and answerHues -- one child per WORD id,
+// not per cell, since the flag is a whole-word annotation (see toggleUnsure
+// in model.js). Same per-path-per-writer reasoning as pushAnswerCell:
+// concurrent unsure toggles on different words from different people must
+// never clobber each other. Deletes the path (rather than writing false) for
+// "no longer unsure" so an empty room's unsure map stays truly empty.
+export async function pushUnsureFlag(roomId, wordId, isUnsure) {
+  const { database, ref, set } = await loadModules();
+  const flagRef = ref(database, `rooms/${roomId}/unsure/${wordId}`);
+  await set(flagRef, isUnsure ? true : null);
+}
+
 // Writes this device's own "what I'm looking at" cell + color tint, so every
 // other participant can lightly paint that cell to show it's occupied.
 // Scoped to this one user's own child path, same reasoning as
