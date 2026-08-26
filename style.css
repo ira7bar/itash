@@ -84,6 +84,17 @@ body {
   height: auto;
   user-select: none;
   -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  /* Android's "save/copy image" long-press menu has been seen firing even
+     though #overlay-layer sits on top and normally takes every touch --
+     its detection isn't reliable DOM hit-testing (confirmed: the
+     contextmenu-preventDefault below isn't enough on its own). Taking the
+     image fully out of hit-testing forces that detection to land on the
+     overlay instead, which never triggers it. Safe here specifically
+     because the image is purely decorative background -- every real
+     interaction already goes through .cell elements in the overlay, never
+     the image itself. */
+  pointer-events: none;
 }
 
 #overlay-layer {

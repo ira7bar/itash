@@ -104,11 +104,15 @@ export function wireInteractions(
   });
 
   // Android fires its own native "image options" menu (copy/share image) on
-  // a long-press of the puzzle <img> (holding to scroll, typing slowly).
-  // Suppress it on both the image and the overlay -- the overlay's cells sit
-  // on top and normally take the touch, but Android's image-menu detection
-  // isn't reliable DOM hit-testing, so it can still fire as if the image
-  // itself were touched.
+  // a long-press of the puzzle <img> (holding to scroll, typing slowly, or
+  // now the unsure-marking long-press below). The primary fix is
+  // `pointer-events: none` on #puzzle-image in style.css -- Android's
+  // image-menu detection wasn't reliable DOM hit-testing, so even with the
+  // overlay's cells sitting visually on top and normally taking the touch,
+  // it could still fire as if the image itself were touched; taking the
+  // image out of hit-testing entirely closes that gap. This preventDefault
+  // is defense-in-depth on top of that (and still needed for an ordinary
+  // desktop right-click on the overlay itself).
   const suppressContextMenu = (e) => e.preventDefault();
   gridEl.addEventListener("contextmenu", suppressContextMenu);
   imageEl.addEventListener("contextmenu", suppressContextMenu);
