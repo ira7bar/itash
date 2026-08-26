@@ -95,6 +95,15 @@ Long-pressing a cell flags its whole word "unsure" — the letters render in a l
 - **Persistence**: solo progress persists it too (`storage.js`, alongside `answers`), as an array (`[...state.unsureWords]`) since JSON has no Set type.
 - **Clearing**: `clearBoard` wipes every unsure flag along with every answer — "unsure about this answer" has no meaning once the answer itself is gone — and returns the cleared word ids so `main.js` can sync each removal individually, same discipline as the cleared cells.
 
+### Copying a clue's text
+
+Long-pressing a clue (blocked) cell copies that clue's text to the clipboard instead of flagging a word unsure — the same long-press gesture branches on `isBlocked` in `interaction.js`. Reported by a user on iOS, where the OS's own copy/paste affordances make "just select the text" impossible here (it's a rendered image, not real text), so this is the only way to get a clue's wording out of the app at all — into a search engine, a group chat, wherever.
+
+- **Split-cell reuse**: resolves which word's clue to copy with the exact same `resolveClueTapWord` the ordinary tap-to-jump click handler already uses — top half of a dual-direction clue cell is the horizontal clue, bottom half vertical (see `_split_dual_direction_clues` in `parse_puzzle.py`), evaluated against the Y position of the press's *start* (`pointerdown`), not wherever the pointer happens to be when the timer fires.
+- **What gets copied**: `word.clue`, the same already-split text the app renders for that direction — not the combined `grid[r][c].clue` (which would incorrectly include both stacked clues for a shared cell). A run with no matched clue (the parser's known hook-arrow limitation) has `clue: null`; long-pressing it copies nothing.
+- **Feedback**: `navigator.clipboard.writeText`, same as the room-share link (`shareRoomUrl` in `share.js`), with the identical `window.prompt` fallback for a denied/unsupported clipboard — but since there's no button here to swap a label on, a transient toast (`#clue-toast`) shows what got copied for ~1.8s. The fallback prompt already displays the text on its own, so no toast in that branch.
+- **Click still fires afterward**: same as the unsure-toggle long-press, this doesn't suppress the click that follows — a long-press-then-release on a clue cell both copies its text AND jumps to that word, exactly like an ordinary tap would.
+
 ### Chat (live-room messaging)
 
 A collapsible bottom sheet on mobile (toggle FAB over the grid, unread badge, slides up over the bottom of the screen) that docks instead as a persistent 320px sidebar past `900px` width (see the `@media (min-width: 900px)` block in `style.css`) — same panel/markup either way, CSS-only breakpoint, no separate component. Solo solving never touches any of this, same as presence — the panel/toggle stay `hidden` whenever `state.roomId` is null (`refreshRoomUi` in `main.js`).

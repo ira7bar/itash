@@ -317,6 +317,38 @@ footer {
   opacity: 1;
 }
 
+/* Long-pressing a clue cell copies its definition to the clipboard (see
+   copyClueToClipboard in interaction.js) -- this is the transient
+   confirmation for it. Fixed dark pill regardless of theme, same reasoning
+   as celebration-text's shadow: it's a brief overlay, not part of the
+   page's own light/dark surface, so it doesn't need to negotiate with
+   --bg/--fg. Always in the DOM (no `hidden`) so opacity/transform can
+   transition; toggled purely via the .show class. */
+.clue-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 5.5rem;
+  transform: translateX(-50%) translateY(0.4rem);
+  max-width: min(90vw, 420px);
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgba(20, 20, 20, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 40;
+}
+.clue-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 #hidden-input {
   position: fixed;
   top: 0;

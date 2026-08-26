@@ -19,6 +19,7 @@ export function wireInteractions(
     clearBoardBtn,
     leaveRoomBtn,
     joinBtn,
+    clueToastEl,
     onChange,
     onAnswerCellChange,
     onUnsureToggle,
@@ -28,12 +29,18 @@ export function wireInteractions(
     clearBoard,
   }
 ) {
-  // Long-press (hold, don't drag) a cell to flag its word "unsure" --
-  // independent of the click handler below, which still fires normally
-  // afterward and selects the cell as usual. The timer starts on
-  // pointerDOWN and reads state BEFORE this press's own eventual click runs
-  // selectCell, which is exactly the signal resolveWordForToggle (in
-  // model.js) needs -- see its own comment for why.
+  // Long-press (hold, don't drag) a cell. On a playable cell this flags its
+  // word "unsure" (see toggleUnsure); on a clue (blocked) cell it instead
+  // copies that clue's text to the clipboard -- reusing resolveClueTapWord's
+  // top-half/bottom-half resolution below, so a long-press on a split
+  // clue cell (two stacked clue boxes, one per direction) copies whichever
+  // half was actually pressed, not always the same one.
+  //
+  // Either way, this is independent of the click handler further below,
+  // which still fires normally afterward and selects/jumps to the cell as
+  // usual. The timer starts on pointerDOWN and reads state BEFORE this
+  // press's own eventual click runs selectCell, which is exactly the signal
+  // resolveWordForToggle (in model.js) needs -- see its own comment for why.
   let pressTimer = null;
   let pressStart = null;
 
@@ -53,6 +60,11 @@ export function wireInteractions(
     pressStart = { x: e.clientX, y: e.clientY };
     pressTimer = setTimeout(() => {
       pressTimer = null;
+      if (isBlocked(state, row, col)) {
+        const word = resolveClueTapWord(state, row, col, pressStart.y, cellEl);
+        if (word && word.clue) copyClueToClipboard(word.clue, clueToastEl);
+        return;
+      }
       const result = toggleUnsure(state, row, col);
       if (result) {
         onUnsureToggle(result.wordId, result.isUnsure);
@@ -275,6 +287,33 @@ export function wireInteractions(
       joinBtn.disabled = false;
     }
   });
+}
+
+// Toast is always in the DOM (see index.html/style.css) so opacity/transform
+// can transition -- shown/hidden purely via the .show class, on a timer that
+// restarts on every call so a second long-press before the first toast fades
+// doesn't leave it stuck flickering between two auto-hide timers.
+let clueToastTimer = null;
+function showClueToast(clueToastEl, text) {
+  clueToastEl.textContent = text;
+  clueToastEl.classList.add("show");
+  clearTimeout(clueToastTimer);
+  clueToastTimer = setTimeout(() => clueToastEl.classList.remove("show"), 1800);
+}
+
+// Same clipboard-first, prompt() fallback shape as shareRoomUrl in share.js
+// (older browsers, or clipboard permission denied) -- simpler here since
+// there's no native-share-sheet option worth offering for a single clue's
+// text, and the fallback prompt already shows the text on its own, so no
+// toast is needed in that branch.
+async function copyClueToClipboard(text, clueToastEl) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showClueToast(clueToastEl, `הועתק: ${text}`);
+  } catch (err) {
+    console.warn("Clipboard write failed, showing definition instead:", err);
+    window.prompt("העתיקו את ההגדרה:", text);
+  }
 }
 
 // #hidden-input is a real DOM input purely to summon the OS keyboard and

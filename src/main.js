@@ -36,6 +36,7 @@ async function main() {
   const clearBoardBtn = document.getElementById("clear-board-btn");
   const leaveRoomBtn = document.getElementById("leave-room-btn");
   const joinBtn = document.getElementById("join-btn");
+  const clueToastEl = document.getElementById("clue-toast");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
   const chatToggleBtn = document.getElementById("chat-toggle");
@@ -363,6 +364,7 @@ async function main() {
     clearBoardBtn,
     leaveRoomBtn,
     joinBtn,
+    clueToastEl,
     onChange,
     onAnswerCellChange,
     onUnsureToggle,
