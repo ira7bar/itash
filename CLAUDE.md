@@ -105,6 +105,14 @@ Long-pressing a clue (blocked) cell copies that clue's text to the clipboard ins
 - **Feedback**: `navigator.clipboard.writeText`, same as the room-share link (`shareRoomUrl` in `share.js`), with the identical `window.prompt` fallback for a denied/unsupported clipboard — but since there's no button here to swap a label on, a transient toast (`#clue-toast`) shows what got copied for ~1.8s. The fallback prompt already displays the text on its own, so no toast in that branch.
 - **Click still fires afterward**: same as the unsure-toggle long-press, this doesn't suppress the click that follows — a long-press-then-release on a clue cell both copies its text AND jumps to that word, exactly like an ordinary tap would.
 
+### One-time hint for the unsure long-press
+
+Neither the unsure-marking nor the copy-clue long-press has any visible affordance in the UI — nothing on screen suggests holding a cell does anything — so `#unsure-hint-banner` nudges toward the first of those once, the first time the app is ever opened on a device.
+
+- **Placement**: a real element in normal document flow, first child of `#grid-wrap` above `#grid` — deliberately not an overlay on top of the puzzle image, so it never covers actual playable cells while it's showing. Dismissing it (`hidden = true`) fully reclaims that space rather than just hiding content in place, since it's gone for good afterward anyway.
+- **Scope**: shown once per *device*, not once per puzzle — `hasSeenUnsureHint`/`markUnsureHintSeen` in `main.js` use a plain, un-namespaced `localStorage` key (`tashbetz:seen-unsure-hint`), deliberately not scoped by `puzzle.meta.week` the way `storage.js`'s solo progress is. Scoping it per-week would re-show "here's a feature you already know" every single Thursday when a new puzzle loads, which defeats the point — once dismissed, it should stay dismissed across every future week too, the same device-scoped-not-puzzle-scoped reasoning `presence.js`'s userId/hue already use.
+- **Entirely independent of puzzle/room state**: no `state`, no `onChange`, no model.js involvement — wired directly in `main.js` as a self-contained show-once/dismiss-once block, since there's nothing here for `interaction.js`'s state-driven wiring to coordinate with.
+
 ### Chat (live-room messaging)
 
 A collapsible bottom sheet on mobile (toggle FAB over the grid, unread badge, slides up over the bottom of the screen) that docks instead as a persistent 320px sidebar past `900px` width (see the `@media (min-width: 900px)` block in `style.css`) — same panel/markup either way, CSS-only breakpoint, no separate component. Solo solving never touches any of this, same as presence — the panel/toggle stay `hidden` whenever `state.roomId` is null (`refreshRoomUi` in `main.js`).

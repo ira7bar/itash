@@ -71,6 +71,44 @@ body {
   background: var(--bg);
 }
 
+/* One-time hint pointing at the unsure-marking long-press -- shown once per
+   device (see main.js), dismissed with the close button and never shown
+   again. Sits in normal flow above the grid (not an overlay on top of it),
+   so it never covers actual puzzle cells, and its space is fully reclaimed
+   -- not just hidden -- the moment it's dismissed. */
+.unsure-hint-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(100%, 900px);
+  margin: 0 auto 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(28, 110, 140, 0.12);
+  color: var(--share-accent);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.unsure-hint-banner[hidden] {
+  display: none;
+}
+.unsure-hint-banner span {
+  flex: 1;
+}
+.unsure-hint-banner button {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(28, 110, 140, 0.15);
+  color: var(--share-accent);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
 #grid {
   position: relative;
   width: min(100%, 900px);

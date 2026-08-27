@@ -11,6 +11,22 @@ import { hideWhileZoomedIn } from "./zoom-hide.js";
 
 const RETRY_DELAY_MS = 1500;
 
+// Whether the one-time unsure-marking hint banner has already been dismissed
+// on this device. Deliberately device-scoped, not keyed to puzzle.meta.week
+// like storage.js's solo progress -- this is "have you seen this FEATURE
+// before," which should stay dismissed across every future week too, not
+// reappear the moment a new puzzle_YYYY-MM-DD.json rolls over. Same
+// device-scoped-not-puzzle-scoped reasoning as presence.js's userId/hue.
+const UNSURE_HINT_SEEN_KEY = "tashbetz:seen-unsure-hint";
+
+function hasSeenUnsureHint() {
+  return localStorage.getItem(UNSURE_HINT_SEEN_KEY) != null;
+}
+
+function markUnsureHintSeen() {
+  localStorage.setItem(UNSURE_HINT_SEEN_KEY, "1");
+}
+
 // A transient mobile-network blip can silently drop a single write, and
 // since the local screen already shows the typed letter (it's in local
 // state regardless of whether the network call succeeds), there'd be no
@@ -37,6 +53,8 @@ async function main() {
   const leaveRoomBtn = document.getElementById("leave-room-btn");
   const joinBtn = document.getElementById("join-btn");
   const clueToastEl = document.getElementById("clue-toast");
+  const unsureHintBanner = document.getElementById("unsure-hint-banner");
+  const unsureHintCloseBtn = document.getElementById("unsure-hint-close");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
   const chatToggleBtn = document.getElementById("chat-toggle");
@@ -354,6 +372,16 @@ async function main() {
     }
   }
   refreshRoomUi();
+
+  // Independent of puzzle/room state entirely -- shown once per device (see
+  // hasSeenUnsureHint above), dismissed for good the moment it's closed.
+  if (!hasSeenUnsureHint()) {
+    unsureHintBanner.hidden = false;
+  }
+  unsureHintCloseBtn.addEventListener("click", () => {
+    unsureHintBanner.hidden = true;
+    markUnsureHintSeen();
+  });
 
   wireInteractions(state, {
     gridEl: overlayEl,
