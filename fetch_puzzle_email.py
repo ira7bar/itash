@@ -6,14 +6,18 @@ attachment, sent within the last few days, in the mailbox at GMAIL_ADDRESS
 (authenticated via an app password in GMAIL_APP_PASSWORD). Saves the
 attachment as tashbetz.pdf in the current directory.
 
-Writes found/target_date to $GITHUB_OUTPUT so the workflow can decide whether
-to proceed. target_date is the Friday of the week the matched EMAIL was sent
-(Asia/Jerusalem time) -- matching the print magazine's cover date, which is
-what this repo's puzzle_YYYY-MM-DD.json files are named after (see
-CLAUDE.md). Deliberately based on the email's own Date header, not on
-whenever this workflow happens to run (which can lag or be triggered
-manually any day) or on the attachment's filename (which isn't required to
-follow any convention -- see find_pdf_attachment).
+Writes found/target_date/current_week_date to $GITHUB_OUTPUT so the workflow
+can decide whether to proceed. target_date is the Friday of the week the
+matched EMAIL was sent (Asia/Jerusalem time) -- matching the print
+magazine's cover date, which is what this repo's puzzle_YYYY-MM-DD.json
+files are named after (see CLAUDE.md). Deliberately based on the email's own
+Date header, not on whenever this workflow happens to run (which can lag or
+be triggered manually any day) or on the attachment's filename (which isn't
+required to follow any convention -- see find_pdf_attachment).
+current_week_date is the same Friday-of-week calculation but anchored to
+"now" instead -- always written, even when found is False, so the workflow
+can tell "genuinely nothing new since this week's puzzle already deployed"
+apart from "still actually waiting" without emailing about the former.
 """
 
 import email
@@ -71,6 +75,7 @@ def find_pdf_attachment(msg: email.message.Message) -> bytes | None:
 def main() -> None:
     address = os.environ["GMAIL_ADDRESS"]
     app_password = os.environ["GMAIL_APP_PASSWORD"]
+    current_week_date = compute_target_date(datetime.now(ZoneInfo("Asia/Jerusalem")))
 
     imap = imaplib.IMAP4_SSL("imap.gmail.com")
     imap.login(address, app_password)
@@ -79,7 +84,7 @@ def main() -> None:
     since = (datetime.now() - timedelta(days=SEARCH_WINDOW_DAYS)).strftime("%d-%b-%Y")
     status, data = imap.search(None, f'(SUBJECT "tashbetz" SINCE "{since}")')
     if status != "OK" or not data or not data[0]:
-        write_output(found=False)
+        write_output(found=False, current_week_date=current_week_date)
         return
 
     ids = data[0].split()
@@ -105,18 +110,22 @@ def main() -> None:
     imap.logout()
 
     if best_pdf is None:
-        write_output(found=False)
+        write_output(found=False, current_week_date=current_week_date)
         return
 
     with open("tashbetz.pdf", "wb") as f:
         f.write(best_pdf)
 
-    write_output(found=True, target_date=compute_target_date(best_date))
+    write_output(
+        found=True,
+        target_date=compute_target_date(best_date),
+        current_week_date=current_week_date,
+    )
 
 
-def write_output(found: bool, target_date: str = "") -> None:
+def write_output(found: bool, current_week_date: str, target_date: str = "") -> None:
     github_output = os.environ.get("GITHUB_OUTPUT")
-    lines = [f"found={'true' if found else 'false'}"]
+    lines = [f"found={'true' if found else 'false'}", f"current_week_date={current_week_date}"]
     if target_date:
         lines.append(f"target_date={target_date}")
     print("\n".join(lines))

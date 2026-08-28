@@ -37,9 +37,17 @@ jobs:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
-          python3 send_notification_email.py \
-            "Tashbetz auto-deploy: no email found" \
-            "Checked just now and didn't find a tashbetz puzzle email yet. Will check again next run."
+          # Only actually worth emailing about while THIS week's puzzle is
+          # still missing -- once it's deployed, the old email ageing out of
+          # the search window shouldn't start re-triggering "no email" pings
+          # every run until next week's actually arrives.
+          if [ -f "puzzle_${{ steps.fetch.outputs.current_week_date }}.json" ]; then
+            echo "This week's puzzle is already deployed -- staying quiet."
+          else
+            python3 send_notification_email.py \
+              "Tashbetz auto-deploy: no email found" \
+              "Checked just now and didn't find a tashbetz puzzle email yet. Will check again next run."
+          fi
 
       - name: Check if already deployed
         id: check
@@ -79,3 +87,13 @@ jobs:
                   src/main.js service-worker.js
           git commit -m "Deploy ${{ steps.fetch.outputs.target_date }} puzzle"
           git push
+
+      - name: Notify on successful deploy
+        if: steps.fetch.outputs.found == 'true' && steps.check.outputs.already == 'false'
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          python3 send_notification_email.py \
+            "Tashbetz auto-deploy: deployed ${{ steps.fetch.outputs.target_date }}" \
+            "This week's puzzle (${{ steps.fetch.outputs.target_date }}) was found and deployed successfully."
