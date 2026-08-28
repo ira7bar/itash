@@ -1,14 +1,19 @@
 """Fetch this week's tashbetz PDF from Gmail via IMAP, for the weekly deploy workflow.
 
-Looks for the newest email matching subject "tashbetz" with a PDF attachment,
-sent within the last few days, in the mailbox at GMAIL_ADDRESS (authenticated
-via an app password in GMAIL_APP_PASSWORD). Saves the attachment as
-tashbetz.pdf in the current directory.
+Looks for the newest email whose subject contains "tashbetz" (case-insensitive,
+IMAP SUBJECT search is substring/case-insensitive by spec) with a PDF
+attachment, sent within the last few days, in the mailbox at GMAIL_ADDRESS
+(authenticated via an app password in GMAIL_APP_PASSWORD). Saves the
+attachment as tashbetz.pdf in the current directory.
 
 Writes found/target_date to $GITHUB_OUTPUT so the workflow can decide whether
-to proceed. target_date is always the Friday of the current week (Asia/Jerusalem
-time) -- matching the print magazine's cover date, which is what this repo's
-puzzle_YYYY-MM-DD.json files are named after (see CLAUDE.md).
+to proceed. target_date is the Friday of the week the matched EMAIL was sent
+(Asia/Jerusalem time) -- matching the print magazine's cover date, which is
+what this repo's puzzle_YYYY-MM-DD.json files are named after (see
+CLAUDE.md). Deliberately based on the email's own Date header, not on
+whenever this workflow happens to run (which can lag or be triggered
+manually any day) or on the attachment's filename (which isn't required to
+follow any convention -- see find_pdf_attachment).
 """
 
 import email
@@ -22,28 +27,45 @@ from zoneinfo import ZoneInfo
 SEARCH_WINDOW_DAYS = 4
 
 
-def compute_target_date() -> str:
-    now = datetime.now(ZoneInfo("Asia/Jerusalem"))
-    weekday = now.weekday()  # Monday=0 ... Sunday=6
+def compute_target_date(reference: datetime) -> str:
+    reference = reference.astimezone(ZoneInfo("Asia/Jerusalem"))
+    weekday = reference.weekday()  # Monday=0 ... Sunday=6
     if weekday == 3:  # Thursday
-        friday = now + timedelta(days=1)
+        friday = reference + timedelta(days=1)
     elif weekday == 4:  # Friday
-        friday = now
+        friday = reference
     elif weekday == 5:  # Saturday
-        friday = now - timedelta(days=1)
+        friday = reference - timedelta(days=1)
     else:
-        friday = now + timedelta(days=(4 - weekday) % 7)
+        friday = reference + timedelta(days=(4 - weekday) % 7)
     return friday.strftime("%Y-%m-%d")
 
 
 def find_pdf_attachment(msg: email.message.Message) -> bytes | None:
+    candidates = []
     for part in msg.walk():
-        filename = part.get_filename()
-        if part.get_content_type() == "application/pdf" or (
-            filename and filename.lower().endswith(".pdf")
-        ):
-            return part.get_payload(decode=True)
-    return None
+        filename = part.get_filename() or ""
+        is_pdf = part.get_content_type() == "application/pdf" or filename.lower().endswith(
+            ".pdf"
+        )
+        if not is_pdf:
+            continue
+        payload = part.get_payload(decode=True)
+        if payload:
+            candidates.append((filename, payload))
+
+    if not candidates:
+        return None
+
+    # Prefer an attachment whose filename mentions "tashbetz" (case-insensitive)
+    # when there's more than one PDF attached; otherwise any PDF attachment is
+    # fine -- the filename isn't required to follow any convention (e.g.
+    # sharing straight from a phone's downloads often keeps it as-is,
+    # "tashbetz.pdf", with no per-week naming at all).
+    for filename, payload in candidates:
+        if "tashbetz" in filename.lower():
+            return payload
+    return candidates[0][1]
 
 
 def main() -> None:
@@ -61,7 +83,6 @@ def main() -> None:
         return
 
     ids = data[0].split()
-    best_msg = None
     best_date = None
     best_pdf = None
 
@@ -79,7 +100,7 @@ def main() -> None:
         except (TypeError, ValueError):
             continue
         if best_date is None or msg_date > best_date:
-            best_date, best_msg, best_pdf = msg_date, msg, pdf_bytes
+            best_date, best_pdf = msg_date, pdf_bytes
 
     imap.logout()
 
@@ -90,7 +111,7 @@ def main() -> None:
     with open("tashbetz.pdf", "wb") as f:
         f.write(best_pdf)
 
-    write_output(found=True, target_date=compute_target_date())
+    write_output(found=True, target_date=compute_target_date(best_date))
 
 
 def write_output(found: bool, target_date: str = "") -> None:
