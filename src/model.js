@@ -109,11 +109,17 @@ export function createState(puzzle) {
   // meaningful/rendered inside a live room; solo solving has exactly one
   // possible author, so there's nothing for it to show.
   const answerHues = Array.from({ length: index.rows }, () => Array(index.cols).fill(null));
+  // Which cells render pencil-gray ("unsure"), parallel to `answers` -- a
+  // per-cell flag, not a per-word one, since a long-press can flag either a
+  // whole word or just one letter (see toggleUnsure) exactly like editing
+  // can affect a whole word or just one letter.
+  const unsureCells = Array.from({ length: index.rows }, () => Array(index.cols).fill(false));
   return {
     puzzle,
     index,
     answers,
     answerHues,
+    unsureCells,
     activeCell: null,
     activeDirection: null,
     roomId: null,
@@ -122,10 +128,6 @@ export function createState(puzzle) {
     // applyRemotePresence), since the local active cell is already shown via
     // the .active class, not a presence tint.
     presence: new Map(),
-    // Word ids flagged "unsure" (pencil-gray letters) -- a set, not a
-    // per-cell map, since the flag is a whole-word annotation, not tied to
-    // any one cell within it (see toggleUnsure).
-    unsureWords: new Set(),
   };
 }
 
@@ -289,9 +291,9 @@ export function getActiveWord(state) {
   return wordId ? state.index.wordsById.get(wordId) : null;
 }
 
-// Which word a long-press at (row, col) should flag as unsure. Called from a
-// timer started on pointerDOWN, before that same press's eventual click event
-// runs selectCell -- so state.activeCell/activeDirection here still reflect
+// Which word a long-press at (row, col) should consider. Called from a timer
+// started on pointerDOWN, before that same press's eventual click event runs
+// selectCell -- so state.activeCell/activeDirection here still reflect
 // whatever was active from BEFORE this press began, not the cell being
 // pressed. That's the right signal to use: if you've been typing/reviewing a
 // word (it's the one currently highlighted) and long-press one of its cells
@@ -317,42 +319,79 @@ function resolveWordForToggle(state, row, col) {
   return wordId ? state.index.wordsById.get(wordId) : null;
 }
 
-// Returns { wordId, isUnsure } for the word that was toggled, or null if the
+// Long-pressing a cell toggles "unsure" gray, scoped exactly the way editing
+// that same cell already is: `wholeWordCandidates` (the very function
+// selectCell itself uses) says whether this cell is a word's start/end --
+// if so, the whole word toggles, same as tapping it enters whole-word
+// typing/backspacing mode; any other (mid-word) cell toggles just that one
+// letter, same as tapping it there only ever edits that single letter.
+// Returns { cells, isUnsure } listing every cell that changed (one cell for
+// a single-letter toggle, the whole word's cells otherwise), or null if the
 // cell isn't part of any word.
 export function toggleUnsure(state, row, col) {
+  const entry = getCellEntry(state.index, row, col);
+  if (!entry) return null;
   const word = resolveWordForToggle(state, row, col);
   if (!word) return null;
-  let isUnsure;
-  if (state.unsureWords.has(word.id)) {
-    state.unsureWords.delete(word.id);
-    isUnsure = false;
-  } else {
-    state.unsureWords.add(word.id);
-    isUnsure = true;
+
+  const isWholeWord = wholeWordCandidates(state, entry, row, col).includes(word.direction);
+  if (!isWholeWord) {
+    const isUnsure = !state.unsureCells[row][col];
+    state.unsureCells[row][col] = isUnsure;
+    return { cells: [[row, col]], isUnsure };
   }
-  return { wordId: word.id, isUnsure };
+
+  // Whole word: flip based on whether every one of its cells is ALREADY
+  // gray -- mirrors "a fully-filled word, tapped again, means start over"
+  // (see typeLetter/selectCell): "already all flagged" is the one state
+  // that reads as "toggle back off," anything else (none, or a mixed
+  // partial state) means "flag the rest too."
+  const isUnsure = !word.cells.every(([r, c]) => state.unsureCells[r][c]);
+  for (const [r, c] of word.cells) state.unsureCells[r][c] = isUnsure;
+  return { cells: word.cells, isUnsure };
 }
 
-// Sparse map ({wordId: true}, same shape as flattenAnswers/answerHues) for
-// pushing to a live room -- a map, not an array, so a single flag can be
-// added/removed as its own child path (see pushUnsureFlag in sync.js).
+// Sparse map ({ "r_c": true }, same shape as answers/answerHues) for pushing
+// to a live room -- so a single cell's flag can be added/removed as its own
+// child path (see pushUnsureFlag in sync.js).
 export function flattenUnsure(state) {
   const map = {};
-  for (const id of state.unsureWords) map[id] = true;
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (state.unsureCells[r][c]) map[`${r}_${c}`] = true;
+    }
+  }
   return map;
 }
 
-// Rebuilds state.unsureWords from a room's full snapshot map. Same
-// full-replace reasoning as applyRemoteAnswers.
+// Rebuilds state.unsureCells from a room's full snapshot map. Same
+// full-replace reasoning as applyRemoteAnswers/applyRemoteAnswerHues.
 export function applyRemoteUnsure(state, unsureMap) {
-  state.unsureWords = new Set(Object.keys(unsureMap || {}));
+  const { rows, cols } = state.index;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      state.unsureCells[r][c] = false;
+    }
+  }
+  for (const key of Object.keys(unsureMap || {})) {
+    const [r, c] = key.split("_").map(Number);
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      state.unsureCells[r][c] = true;
+    }
+  }
 }
 
-// Returns { row, col, letter } for the cell that was actually written, or
-// null if nothing was committed (e.g. stray punctuation from a mismapped
-// key) -- callers use this both to skip a wasted render/save when nothing
-// changed, and to know exactly which single cell to push to a live room
-// (see pushAnswerCell in sync.js).
+// Returns { row, col, letter, unsureCleared } for the cell that was actually
+// written, or null if nothing was committed (e.g. stray punctuation from a
+// mismapped key) -- callers use this both to skip a wasted render/save when
+// nothing changed, and to know exactly which single cell to push to a live
+// room (see pushAnswerCell in sync.js). Rewriting a cell always clears its
+// own unsure flag, regardless of the rest of its word -- retyping a letter
+// is a vote of confidence in it, and the flag is per-cell precisely so this
+// doesn't have to touch any OTHER cell in the word (see toggleUnsure).
+// `unsureCleared` says whether it actually was set, so callers only push a
+// sync write when something really changed.
 export function typeLetter(state, rawLetter) {
   if (!state.activeCell || isBlocked(state, state.activeCell.row, state.activeCell.col)) return null;
   const letter = normalizeLetter(rawLetter);
@@ -360,7 +399,9 @@ export function typeLetter(state, rawLetter) {
   const { row, col } = state.activeCell;
   const word = getActiveWord(state);
 
+  const unsureCleared = state.unsureCells[row][col];
   state.answers[row][col] = letter;
+  state.unsureCells[row][col] = false;
   if (word) {
     const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
     const nextIdx = idx >= 0 ? nextTypeIndex(word, idx) : -1;
@@ -369,17 +410,18 @@ export function typeLetter(state, rawLetter) {
       state.activeCell = { row: nr, col: nc };
     }
   }
-  return { row, col, letter };
+  return { row, col, letter, unsureCleared };
 }
 
 // Clears every filled answer cell -- the "start over" action. Also clears
 // every unsure flag, since "unsure about this answer" has no meaning once
-// the answer itself is gone. Returns which cells/words changed so each can
-// be synced to a live room individually, never as one whole-room overwrite
-// (see pushRoomState's warning in sync.js).
+// the answer itself is gone. Returns which cells changed so each can be
+// synced to a live room individually, never as one whole-room overwrite (see
+// pushRoomState's warning in sync.js).
 export function clearBoard(state) {
   const { rows, cols } = state.index;
   const clearedCells = [];
+  const clearedUnsureCells = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (state.answers[r][c]) {
@@ -387,31 +429,40 @@ export function clearBoard(state) {
         state.answers[r][c] = "";
         state.answerHues[r][c] = null;
       }
+      if (state.unsureCells[r][c]) {
+        clearedUnsureCells.push([r, c]);
+        state.unsureCells[r][c] = false;
+      }
     }
   }
-  const clearedWordIds = [...state.unsureWords];
-  state.unsureWords = new Set();
-  return { clearedCells, clearedWordIds };
+  return { clearedCells, clearedUnsureCells };
 }
 
-// Returns { row, col } for the cell that was actually cleared, or null if
-// nothing changed -- same reasoning as typeLetter's return value.
+// Returns { row, col, unsureCleared } for the cell that was actually
+// cleared, or null if nothing changed -- same reasoning as typeLetter's
+// return value, including clearing that cell's own unsure flag: an empty
+// cell has no answer left to be unsure about (same principle clearBoard
+// already applies board-wide, just for one cell here).
 export function backspace(state) {
   if (!state.activeCell) return null;
   const { row, col } = state.activeCell;
 
   if (state.answers[row][col]) {
+    const unsureCleared = state.unsureCells[row][col];
     state.answers[row][col] = "";
-    return { row, col };
+    state.unsureCells[row][col] = false;
+    return { row, col, unsureCleared };
   }
   const word = getActiveWord(state);
   if (!word) return null;
   const idx = word.cells.findIndex(([r, c]) => r === row && c === col);
   if (idx > 0) {
     const [pr, pc] = word.cells[idx - 1];
+    const unsureCleared = state.unsureCells[pr][pc];
     state.activeCell = { row: pr, col: pc };
     state.answers[pr][pc] = "";
-    return { row: pr, col: pc };
+    state.unsureCells[pr][pc] = false;
+    return { row: pr, col: pc, unsureCleared };
   }
   return null;
 }

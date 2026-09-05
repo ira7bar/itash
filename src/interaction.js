@@ -29,12 +29,15 @@ export function wireInteractions(
     clearBoard,
   }
 ) {
-  // Long-press (hold, don't drag) a cell. On a playable cell this flags its
-  // word "unsure" (see toggleUnsure); on a clue (blocked) cell it instead
-  // copies that clue's text to the clipboard -- reusing resolveClueTapWord's
-  // top-half/bottom-half resolution below, so a long-press on a split
-  // clue cell (two stacked clue boxes, one per direction) copies whichever
-  // half was actually pressed, not always the same one.
+  // Long-press (hold, don't drag) a cell. On a playable cell this flags it
+  // "unsure" -- the whole word, or just that one letter, exactly matching
+  // whether tapping that same cell would edit the whole word or just that
+  // letter (see toggleUnsure in model.js). On a clue (blocked) cell it
+  // instead copies that clue's text to the clipboard -- reusing
+  // resolveClueTapWord's top-half/bottom-half resolution below, so a
+  // long-press on a split clue cell (two stacked clue boxes, one per
+  // direction) copies whichever half was actually pressed, not always the
+  // same one.
   //
   // Either way, this is independent of the click handler further below,
   // which still fires normally afterward and selects/jumps to the cell as
@@ -79,7 +82,7 @@ export function wireInteractions(
       }
       const result = toggleUnsure(state, row, col);
       if (result) {
-        onUnsureToggle(result.wordId, result.isUnsure);
+        onUnsureToggle(result.cells, result.isUnsure);
         onChange();
       }
     }, LONG_PRESS_MS);
@@ -205,7 +208,7 @@ export function wireInteractions(
     hiddenInput.value = "";
     const result = candidate ? typeLetter(state, candidate) : null;
     if (result) {
-      onAnswerCellChange(result.row, result.col, result.letter);
+      onAnswerCellChange(result.row, result.col, result.letter, result.unsureCleared);
       // Advancing through a word can walk the active cell off the edge of
       // the screen (long words, or a pinch-zoomed-in view) -- nudge it back
       // into view, but only the minimum needed: no scroll at all while it's
@@ -222,7 +225,7 @@ export function wireInteractions(
       e.preventDefault();
       const result = backspace(state);
       if (result) {
-        onAnswerCellChange(result.row, result.col, "");
+        onAnswerCellChange(result.row, result.col, "", result.unsureCleared);
         scrollActiveCellIntoView("nearest");
       }
     } else if (e.key.startsWith("Arrow")) {

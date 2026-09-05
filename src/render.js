@@ -1,4 +1,4 @@
-import { isBlocked, getActiveWord, getWordsForClueCell, getWordCellsForPresence, getCellEntry } from "./model.js";
+import { isBlocked, getActiveWord, getWordsForClueCell, getWordCellsForPresence } from "./model.js";
 import { presenceWordTint, presenceLetterTint, answerAuthorTint } from "./presence.js";
 import { unreadCount } from "./chat.js";
 
@@ -90,18 +90,7 @@ export function updateGrid(state, overlayEl) {
     cellEl.classList.toggle("active", Boolean(isActive));
     cellEl.classList.toggle("in-word", !blocked && activeWordCellSet.has(`${r},${c}`));
 
-    // A cell can belong to an across word and a down word at once, only one
-    // of which might be flagged unsure -- the letter glyph is shared, so it
-    // can only show one color at a time. Either direction being unsure is
-    // enough to gray this cell's letter; genuinely ambiguous, but a rare
-    // edge case (a crossing intersection) rather than the common one.
-    const entry = getCellEntry(state.index, r, c);
-    const isUnsure =
-      !blocked &&
-      entry &&
-      ((entry.horizontal && state.unsureWords.has(entry.horizontal)) ||
-        (entry.vertical && state.unsureWords.has(entry.vertical)));
-    cellEl.classList.toggle("unsure", Boolean(isUnsure));
+    cellEl.classList.toggle("unsure", !blocked && state.unsureCells[r][c]);
 
     // A box-shadow tint rather than a background-color: .active/.in-word
     // already set `background` via CSS classes, and box-shadow layers on top

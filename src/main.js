@@ -197,12 +197,19 @@ async function main() {
   // correct the instant a room is later created from it -- see
   // ownAnswersForNewRoom), but only synced/rendered while actually in one;
   // solo solving has exactly one possible author, so it's never shown there.
-  const onAnswerCellChange = (row, col, letter) => {
+  // `unsureCleared` is set when typeLetter/backspace (model.js) just cleared
+  // this cell's own unsure flag as a side effect of writing to it (rewriting
+  // a gray letter is a vote of confidence in it) -- only push that extra
+  // write when something actually changed, not on every single keystroke.
+  const onAnswerCellChange = (row, col, letter, unsureCleared) => {
     setAnswerHue(state, row, col, letter ? userHue : null);
     onChange();
     if (state.roomId) {
       pushWithRetry(pushAnswerCell, state.roomId, row, col, letter);
       pushWithRetry(pushAnswerHue, state.roomId, row, col, letter ? userHue : null);
+      if (unsureCleared) {
+        pushWithRetry(pushUnsureFlag, state.roomId, row, col, false);
+      }
     }
   };
 
@@ -211,26 +218,29 @@ async function main() {
   // them one at a time would), never as a single whole-room overwrite, so it
   // can't clobber someone else's concurrent edit either.
   const onClearBoard = () => {
-    const { clearedCells, clearedWordIds } = clearBoard(state);
+    const { clearedCells, clearedUnsureCells } = clearBoard(state);
     onChange();
     if (state.roomId) {
       for (const [row, col] of clearedCells) {
         pushWithRetry(pushAnswerCell, state.roomId, row, col, "");
         pushWithRetry(pushAnswerHue, state.roomId, row, col, null);
       }
-      for (const wordId of clearedWordIds) {
-        pushWithRetry(pushUnsureFlag, state.roomId, wordId, false);
+      for (const [row, col] of clearedUnsureCells) {
+        pushWithRetry(pushUnsureFlag, state.roomId, row, col, false);
       }
     }
   };
 
-  // A long-press flips one word's unsure flag locally (toggleUnsure, called
-  // from interaction.js, already updated state.unsureWords by the time this
-  // runs); only the sync write is gated on actually being in a room, same as
-  // every other edit here.
-  const onUnsureToggle = (wordId, isUnsure) => {
+  // A long-press flips one or more cells' unsure flag locally (toggleUnsure,
+  // called from interaction.js, already updated state.unsureCells by the
+  // time this runs) -- one cell for a single-letter toggle, a whole word's
+  // cells otherwise (see toggleUnsure in model.js). Only the sync write is
+  // gated on actually being in a room, same as every other edit here.
+  const onUnsureToggle = (cells, isUnsure) => {
     if (state.roomId) {
-      pushWithRetry(pushUnsureFlag, state.roomId, wordId, isUnsure);
+      for (const [row, col] of cells) {
+        pushWithRetry(pushUnsureFlag, state.roomId, row, col, isUnsure);
+      }
     }
   };
 
