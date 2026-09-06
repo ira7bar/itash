@@ -3,8 +3,8 @@ import { setupImage, renderGridShell, updateGrid, renderRoster, renderChatMessag
 import { wireInteractions } from "./interaction.js";
 import { wireChat } from "./chat-interaction.js";
 import { saveProgress, loadProgress } from "./storage.js";
-import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel } from "./share.js";
-import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues } from "./sync.js";
+import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabel, RoomWeekMismatchError } from "./share.js";
+import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues, peekRoomWeek } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
@@ -275,6 +275,22 @@ async function main() {
   // this" action. Runs when joining someone else's room (from a URL or a
   // manually-entered code), and right after this device creates a brand new one.
   const joinRoom = async (roomId) => {
+    // A stale link to a room created for a PAST week's puzzle must never
+    // have its answers applied onto this week's differently-shaped grid --
+    // checked with a cheap one-time read (peekRoomWeek) BEFORE touching chat
+    // state or subscribing, so a rejected join never half-joins anything.
+    // Doing this check inside subscribeRoom's own onUpdate instead (checked
+    // and reverted) doesn't work: that callback's very first snapshot can
+    // fire synchronously as part of subscribeRoom's own setup, before the
+    // `unsubscribe` function it would need to call back with even exists
+    // yet. A room created before this check shipped has no `week` field at
+    // all -- treated as compatible (not rejected), since there's no way to
+    // tell whether it actually matches.
+    const remoteWeek = await peekRoomWeek(roomId);
+    if (remoteWeek && remoteWeek !== puzzle.meta.week) {
+      throw new RoomWeekMismatchError();
+    }
+
     // Bound before subscribing, not after -- the very first snapshot can
     // arrive as part of subscribeRoom's own setup, before the `await`
     // below even resolves, and applyRemoteMessages needs chatState.roomId
@@ -352,7 +368,9 @@ async function main() {
       // Unlike answers/answerHues, unsure flags carry no per-user authorship
       // to filter by -- they're seeded wholesale from whatever this device
       // currently has marked, same as the original design.
-      const roomState = { answers, answerHues, unsure: flattenUnsure(state) };
+      // `week` lets a future join (see peekRoomWeek/joinRoom) recognize a
+      // stale link to this room once next week's puzzle has replaced it.
+      const roomState = { week: puzzle.meta.week, answers, answerHues, unsure: flattenUnsure(state) };
       await pushRoomState(roomId, roomState);
       await joinRoom(roomId);
     }
@@ -379,6 +397,9 @@ async function main() {
       // reload doesn't just keep retrying the same failing join forever.
       console.warn("Failed to join room from URL, continuing solo:", err);
       history.replaceState(null, "", location.pathname + location.search);
+      if (err instanceof RoomWeekMismatchError) {
+        alert("הקישור הזה שייך לחדר של תשחץ משבוע קודם, אז נפתח לך את התשחץ הנוכחי במשחק אישי.");
+      }
     }
   }
   refreshRoomUi();

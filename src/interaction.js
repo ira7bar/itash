@@ -1,5 +1,5 @@
 import { selectCell, typeLetter, backspace, isBlocked, getWordsForClueCell, toggleUnsure } from "./model.js";
-import { shareRoomUrl, shareButtonRestingLabel } from "./share.js";
+import { shareRoomUrl, shareButtonRestingLabel, RoomWeekMismatchError } from "./share.js";
 
 // Includes the punctuation keys that map to ת/ץ/ף on the standard Hebrew
 // keyboard layout (, . ; and their shifted forms < > :) -- see hebrew.js.
@@ -298,7 +298,7 @@ export function wireInteractions(
       }
     } catch (err) {
       console.warn("Failed to join room by code:", err);
-      joinBtn.textContent = "קוד לא תקין";
+      joinBtn.textContent = err instanceof RoomWeekMismatchError ? "החדר משבוע קודם" : "קוד לא תקין";
       setTimeout(() => {
         joinBtn.textContent = originalJoinText;
       }, 2000);

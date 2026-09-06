@@ -62,6 +62,21 @@ export async function peekRoomPresenceHues(roomId) {
     .filter((hue) => typeof hue === "number");
 }
 
+// One-time read of a room's `week` field (the dated puzzle_YYYY-MM-DD.json
+// filename it was created for -- see pushRoomState/main.js), used only to
+// check compatibility BEFORE actually joining -- see joinRoom in main.js. A
+// stale link to a room created for a past week's puzzle must never have its
+// answers applied onto this week's differently-shaped grid; checking with a
+// plain get() first (rather than inside subscribeRoom's own onUpdate, whose
+// very first snapshot can already fire synchronously during subscription
+// setup -- see the comment in main.js's joinRoom) keeps the reject path a
+// clean "never actually joined," with nothing to unwind.
+export async function peekRoomWeek(roomId) {
+  const { database, ref, get } = await loadModules();
+  const snapshot = await get(ref(database, `rooms/${roomId}/week`));
+  return snapshot.val() ?? null;
+}
+
 // Overwrites the room's whole state. ONLY safe to use when seeding a brand
 // new room at creation time, when nobody else could possibly be connected to
 // it yet. Never use this for an ongoing edit -- see pushAnswerCell below for

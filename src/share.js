@@ -6,6 +6,18 @@
 const RADIX = 36;
 const ROOM_ID_LENGTH = 6;
 
+// Thrown by main.js's joinRoom when a room turns out to have been created
+// for a past week's puzzle (see peekRoomWeek in sync.js) -- callers catch
+// this specifically to show a "wrong week" message instead of a generic
+// invalid-code/join-failure one. Lives here (not main.js) since it's the one
+// module both main.js and interaction.js already import from.
+export class RoomWeekMismatchError extends Error {
+  constructor() {
+    super("Room was created for a different week's puzzle");
+    this.name = "RoomWeekMismatchError";
+  }
+}
+
 export function createRoomId() {
   let id = "";
   for (let i = 0; i < ROOM_ID_LENGTH; i++) {
