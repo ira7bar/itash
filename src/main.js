@@ -8,7 +8,7 @@ import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsure
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
 import { isNotifyEnabled, showChatNotification } from "./notifications.js";
-import { hideWhileZoomedIn } from "./zoom-hide.js";
+import { hideWhileZoomedIn, pinWhileZoomedIn } from "./zoom-hide.js";
 
 const RETRY_DELAY_MS = 1500;
 
@@ -248,14 +248,17 @@ async function main() {
 
   let unsubscribeRoom = null;
 
-  // Hides the footer and floating chrome once pinch-zoom gets heavy enough
-  // that they'd otherwise balloon up to the same zoom level as the grid --
-  // see zoom-hide.js. No resync needed on room-state changes (unlike an
-  // earlier counter-scaling attempt): this only reacts to zoom level, not to
-  // anything about these elements' own size or content.
+  // Hides the footer and chat panel once pinch-zoom gets heavy enough that
+  // they'd otherwise balloon up to the same zoom level as the grid -- see
+  // zoom-hide.js. The chat FAB is exempted from disappearing (someone mid-
+  // zoom might still want to glance at or send a chat message) -- instead it
+  // gets pinned to a fixed screen position/size via the same threshold, see
+  // pinWhileZoomedIn's own comment for why that's a different, cheaper
+  // technique than the counter-scaling attempt already reverted for the
+  // other two elements.
   hideWhileZoomedIn(footerEl);
-  hideWhileZoomedIn(chatToggleBtn);
   hideWhileZoomedIn(chatPanelEl);
+  pinWhileZoomedIn(chatToggleBtn);
 
   // Single source of truth for every piece of UI that depends on "are we
   // currently in a room": the join button (only makes sense when NOT already

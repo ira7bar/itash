@@ -272,11 +272,22 @@ footer {
   text-align: center;
 }
 
-/* Set by zoom-hide.js once pinch-zoom passes a "heavy zoom" threshold --
-   visibility (not display) so hiding/showing it doesn't reflow the grid
-   underneath. Applies to footer, #chat-toggle, and #chat-panel alike. */
+/* Set by zoom-hide.js's hideWhileZoomedIn once pinch-zoom passes a "heavy
+   zoom" threshold -- visibility (not display) so hiding/showing it doesn't
+   reflow the grid underneath. Applies to the footer and #chat-panel; the
+   chat FAB is exempted (see pinWhileZoomedIn/.zoom-pinned below) since
+   someone mid-zoom might still want to reach the chat. */
 .zoom-hidden {
   visibility: hidden;
+}
+
+/* Set by zoom-hide.js's pinWhileZoomedIn past that same threshold, in place
+   of hiding: position/left/top/transform are all written inline by that
+   function (the actual pinning math), this class only needs to guarantee
+   the FAB still stacks above everything else once it's escaped #grid-wrap's
+   own layout via position:fixed. */
+.zoom-pinned {
+  z-index: 30;
 }
 
 /* Flex + gap (rather than the old text-align:center + per-button
