@@ -497,6 +497,12 @@ footer {
 
 .chat-title { font-weight: 700; font-size: 0.95rem; }
 
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 #chat-close-btn {
   padding: 0.2rem 0.4rem;
   border: none;
@@ -507,6 +513,21 @@ footer {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Off by default (dimmed outline bell, 🔕); switches to a solid, accent-
+   colored 🔔 once notifications are actually on -- same dimmed/accent
+   language #chat-close-btn already uses for its own resting/active states. */
+#chat-notify-toggle {
+  padding: 0.2rem 0.35rem;
+  border: none;
+  background: none;
+  opacity: 0.6;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+#chat-notify-toggle[hidden] { display: none; }
+#chat-notify-toggle[aria-pressed="true"] { opacity: 1; }
 
 .roster {
   display: flex;

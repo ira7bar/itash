@@ -7,6 +7,7 @@ import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabe
 import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues, peekRoomWeek } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
+import { isNotifyEnabled, showChatNotification } from "./notifications.js";
 import { hideWhileZoomedIn } from "./zoom-hide.js";
 
 const RETRY_DELAY_MS = 1500;
@@ -61,6 +62,7 @@ async function main() {
   const chatBadgeEl = document.getElementById("chat-badge");
   const chatPanelEl = document.getElementById("chat-panel");
   const chatCloseBtn = document.getElementById("chat-close-btn");
+  const chatNotifyToggle = document.getElementById("chat-notify-toggle");
   const chatForm = document.getElementById("chat-form");
   const chatInput = document.getElementById("chat-input");
   const chatMessagesEl = document.getElementById("chat-messages");
@@ -305,7 +307,23 @@ async function main() {
       applyRemoteAnswerHues(state, roomState.answerHues || {});
       applyRemoteUnsure(state, roomState.unsure || {});
       applyRemotePresence(state, roomState.presence || {}, userId);
+      // Captured BEFORE applyRemoteMessages replaces the list, so it's the
+      // cutoff for "already seen before this snapshot" -- and BEFORE it also
+      // flips seenCountReady to true (see chat.js), so this snapshot's own
+      // very first call (right after (re)binding to a room) is recognized as
+      // "just caught up on this room's history," not a burst of new arrivals
+      // to notify about individually.
+      const wasFirstSnapshotForRoom = !chatState.seenCountReady;
+      const lastSeenTs = chatState.messages.at(-1)?.ts ?? 0;
       applyRemoteMessages(chatState, roomState.messages || {});
+      if (!wasFirstSnapshotForRoom && document.hidden && isNotifyEnabled()) {
+        const newOnes = chatState.messages.filter((m) => (m.ts ?? 0) > lastSeenTs && m.userId !== userId);
+        // Only the latest -- showChatNotification's own fixed `tag` would
+        // collapse several down to one anyway, so firing just the last one
+        // skips the redundant intermediate OS notification calls entirely.
+        const latest = newOnes.at(-1);
+        if (latest) showChatNotification({ name: latest.name, text: latest.text });
+      }
       onChange();
     });
     if (unsubscribeRoom) unsubscribeRoom();
@@ -437,6 +455,7 @@ async function main() {
     chatToggleBtn,
     chatPanelEl,
     chatCloseBtn,
+    chatNotifyToggle,
     chatForm,
     chatInput,
     nameModal,

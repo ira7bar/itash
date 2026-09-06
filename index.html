@@ -32,7 +32,10 @@
       <div class="chat-handle"></div>
       <div class="chat-header">
         <span class="chat-title">צ'אט החדר</span>
-        <button id="chat-close-btn" type="button" aria-label="סגירת הצ'אט">︿</button>
+        <div class="chat-header-actions">
+          <button id="chat-notify-toggle" type="button" hidden aria-pressed="false" aria-label="הפעלת התראות על הודעות חדשות">🔕</button>
+          <button id="chat-close-btn" type="button" aria-label="סגירת הצ'אט">︿</button>
+        </div>
       </div>
       <div id="roster" class="roster"></div>
       <div id="chat-messages" class="chat-messages"></div>

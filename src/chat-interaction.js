@@ -6,6 +6,7 @@
 
 import { getUserName, setUserName } from "./presence.js";
 import { openChat, closeChat } from "./chat.js";
+import { notificationsSupported, isNotifyEnabled, setNotifyEnabled } from "./notifications.js";
 
 const NAME_MAX_LENGTH = 20;
 
@@ -15,6 +16,7 @@ export function wireChat(
     chatToggleBtn,
     chatPanelEl,
     chatCloseBtn,
+    chatNotifyToggle,
     chatForm,
     chatInput,
     nameModal,
@@ -26,6 +28,36 @@ export function wireChat(
     onRenameSelf,
   }
 ) {
+  // Hidden entirely wherever the Notification API doesn't exist at all (iOS
+  // Safari outside an installed home-screen PWA) -- a toggle that could never
+  // do anything is worse than no toggle. Reflects whatever's already
+  // persisted (isNotifyEnabled also reconciles a since-revoked browser
+  // permission back to "off" -- see notifications.js), so a returning device
+  // shows its real state on load, not always starting from "off."
+  const renderNotifyToggle = (on) => {
+    chatNotifyToggle.setAttribute("aria-pressed", on ? "true" : "false");
+    chatNotifyToggle.textContent = on ? "🔔" : "🔕";
+    chatNotifyToggle.setAttribute(
+      "aria-label",
+      on ? "כיבוי התראות על הודעות חדשות" : "הפעלת התראות על הודעות חדשות"
+    );
+  };
+  if (notificationsSupported()) {
+    chatNotifyToggle.hidden = false;
+    renderNotifyToggle(isNotifyEnabled());
+  }
+
+  chatNotifyToggle.addEventListener("click", async () => {
+    const turningOn = chatNotifyToggle.getAttribute("aria-pressed") !== "true";
+    const result = await setNotifyEnabled(turningOn);
+    if (result === "denied") {
+      renderNotifyToggle(false);
+      alert("אין הרשאה להתראות בדפדפן הזה. אפשר לשנות את זה בהגדרות האתר של הדפדפן.");
+      return;
+    }
+    renderNotifyToggle(result === "on");
+  });
+
   const openPanel = () => {
     openChat(chatState);
     onChatChange();
