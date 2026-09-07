@@ -7,7 +7,7 @@ import { getRoomIdFromUrl, getRoomShareUrl, createRoomId, shareButtonRestingLabe
 import { subscribeRoom, pushRoomState, pushAnswerCell, pushAnswerHue, pushUnsureFlag, pushPresence, pushMessage, clearPresence, peekRoomPresenceHues, peekRoomWeek } from "./sync.js";
 import { getUserId, getUserHue, hasUserHue, getUserName, ownInWordTint, ownActiveTint } from "./presence.js";
 import { createChatState, applyRemoteMessages, resetChat, bindChatRoom } from "./chat.js";
-import { isNotifyEnabled, showChatNotification } from "./notifications.js";
+import { isNotifyEnabled, showChatNotification, notificationsSupported } from "./notifications.js";
 import { hideWhileZoomedIn, pinWhileZoomedIn } from "./zoom-hide.js";
 
 const RETRY_DELAY_MS = 1500;
@@ -26,6 +26,23 @@ function hasSeenUnsureHint() {
 
 function markUnsureHintSeen() {
   localStorage.setItem(UNSURE_HINT_SEEN_KEY, "1");
+}
+
+// Same one-time, device-scoped pattern as the unsure hint above, for a
+// second, unrelated hint: on iOS, the Notification API only exists for a
+// site added to the Home Screen (see notifications.js's notificationsSupported),
+// so the bell toggle in the chat panel simply never appears there for an
+// ordinary Safari/Chrome tab -- without this, there's nothing on screen to
+// explain why. Shown once per device, not once per puzzle, for the same
+// "have you seen this before" reasoning as the unsure hint.
+const IOS_NOTIFY_HINT_SEEN_KEY = "tashbetz:seen-ios-notify-hint";
+
+function hasSeenIosNotifyHint() {
+  return localStorage.getItem(IOS_NOTIFY_HINT_SEEN_KEY) != null;
+}
+
+function markIosNotifyHintSeen() {
+  localStorage.setItem(IOS_NOTIFY_HINT_SEEN_KEY, "1");
 }
 
 // A transient mobile-network blip can silently drop a single write, and
@@ -56,6 +73,8 @@ async function main() {
   const clueToastEl = document.getElementById("clue-toast");
   const unsureHintBanner = document.getElementById("unsure-hint-banner");
   const unsureHintCloseBtn = document.getElementById("unsure-hint-close");
+  const iosNotifyHintBanner = document.getElementById("ios-notify-hint-banner");
+  const iosNotifyHintCloseBtn = document.getElementById("ios-notify-hint-close");
   const celebrationEl = document.getElementById("celebration-overlay");
   const celebrationTextEl = document.getElementById("celebration-text");
   const chatToggleBtn = document.getElementById("chat-toggle");
@@ -433,6 +452,18 @@ async function main() {
   unsureHintCloseBtn.addEventListener("click", () => {
     unsureHintBanner.hidden = true;
     markUnsureHintSeen();
+  });
+
+  // Only shown where it's actually true -- notificationsSupported() is false
+  // precisely on iOS outside an installed Home Screen app (see
+  // notifications.js), which is also exactly when the chat panel's bell
+  // toggle stays hidden with no explanation otherwise.
+  if (!hasSeenIosNotifyHint() && !notificationsSupported()) {
+    iosNotifyHintBanner.hidden = false;
+  }
+  iosNotifyHintCloseBtn.addEventListener("click", () => {
+    iosNotifyHintBanner.hidden = true;
+    markIosNotifyHintSeen();
   });
 
   wireInteractions(state, {

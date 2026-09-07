@@ -12,7 +12,7 @@
 <body>
   <div id="app-row">
     <main id="grid-wrap">
-      <div id="unsure-hint-banner" class="unsure-hint-banner" hidden>
+      <div id="unsure-hint-banner" class="hint-banner" hidden>
         <span>✏️ נסו לחיצה ארוכה על תשובות לא ודאיות</span>
         <button id="unsure-hint-close" type="button" aria-label="סגירה">✕</button>
       </div>
@@ -36,6 +36,10 @@
           <button id="chat-notify-toggle" type="button" hidden aria-pressed="false" aria-label="הפעלת התראות על הודעות חדשות">🔕</button>
           <button id="chat-close-btn" type="button" aria-label="סגירת הצ'אט">︿</button>
         </div>
+      </div>
+      <div id="ios-notify-hint-banner" class="hint-banner" hidden>
+        <span>🔔 באייפון, כדי לקבל התראות יש להוסיף את האתר למסך הבית מ-Safari</span>
+        <button id="ios-notify-hint-close" type="button" aria-label="סגירה">✕</button>
       </div>
       <div id="roster" class="roster"></div>
       <div id="chat-messages" class="chat-messages"></div>

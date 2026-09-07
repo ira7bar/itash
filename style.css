@@ -71,12 +71,14 @@ body {
   background: var(--bg);
 }
 
-/* One-time hint pointing at the unsure-marking long-press -- shown once per
-   device (see main.js), dismissed with the close button and never shown
-   again. Sits in normal flow above the grid (not an overlay on top of it),
-   so it never covers actual puzzle cells, and its space is fully reclaimed
-   -- not just hidden -- the moment it's dismissed. */
-.unsure-hint-banner {
+/* Generic one-time dismissible hint -- shown once per device, dismissed with
+   the close button and never shown again (see main.js's hasSeen*/mark*Seen
+   pairs). Used for the unsure-marking long-press hint above the grid, and
+   the iOS-notifications hint inside the chat panel. Sits in normal flow
+   (not an overlay on top of other content), so it never covers anything
+   underneath, and its space is fully reclaimed -- not just hidden -- the
+   moment it's dismissed. */
+.hint-banner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -89,13 +91,13 @@ body {
   font-size: 0.85rem;
   line-height: 1.4;
 }
-.unsure-hint-banner[hidden] {
+.hint-banner[hidden] {
   display: none;
 }
-.unsure-hint-banner span {
+.hint-banner span {
   flex: 1;
 }
-.unsure-hint-banner button {
+.hint-banner button {
   flex-shrink: 0;
   width: 1.6rem;
   height: 1.6rem;
