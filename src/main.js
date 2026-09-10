@@ -92,7 +92,7 @@ async function main() {
 
   // Bumped each week alongside the dated puzzle_YYYY-MM-DD.json/.png pair --
   // see CLAUDE.md's "Deploying a new week" section.
-  const puzzleFile = "puzzle_2026-09-04.json";
+  const puzzleFile = "puzzle_2026-09-11.json";
   const res = await fetch(puzzleFile, { cache: "no-cache" });
   const puzzle = await res.json();
   // Solo progress (storage.js) is scoped by this, not by puzzle.meta's own
