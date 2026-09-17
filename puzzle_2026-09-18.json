@@ -4,19 +4,19 @@
     "cols": 16,
     "source": "tashbetz.pdf",
     "page": 3,
-    "image": "puzzle_2026-09-11.png",
+    "image": "puzzle_2026-09-18.png",
     "imageWidth": 1999,
     "imageHeight": 2611,
-    "originX": 205.19908905029297,
-    "originY": 295.7662353515625,
-    "cellWidth": 98.98575639724731,
+    "originX": 208.5582046508789,
+    "originY": 298.30718994140625,
+    "cellWidth": 98.98575353622437,
     "cellHeight": 98.98585728236607
   },
   "grid": [
     [
       {
         "type": "blocked",
-        "clue": "נדב, ולא כשם פרטי"
+        "clue": "שיטה בחשבונאות ניהולית"
       },
       {
         "type": "blank",
@@ -26,10 +26,10 @@
       },
       {
         "type": "blocked",
-        "clue": "זה לא עניין של דקות... | מקורבנות הגיליוטינה",
+        "clue": "כוכבת עבר אמריקאית | מכרסם ב־ 2 אותיות",
         "clueParts": [
-          "זה לא עניין של דקות...",
-          "מקורבנות הגיליוטינה"
+          "כוכבת עבר אמריקאית",
+          "מכרסם ב־ 2 אותיות"
         ]
       },
       {
@@ -40,10 +40,10 @@
       },
       {
         "type": "blocked",
-        "clue": "שיר של גלי עטרי | ,_ ג ' יימס _",
+        "clue": "_ סופרן | תפקיד בחברת ביטוח",
         "clueParts": [
-          "שיר של גלי עטרי",
-          ",_ ג ' יימס _"
+          "_ סופרן",
+          "תפקיד בחברת ביטוח"
         ]
       },
       {
@@ -54,59 +54,51 @@
       },
       {
         "type": "blocked",
-        "clue": "אולם שאינו בנוי | רכב על פגסוס",
+        "clue": "פחות מורכב מלגו, תרתי משמע"
+      },
+      {
+        "type": "blocked",
+        "clue": "אפשר לומר שזה כמו אפשר"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "יוצר בולט בסוגת המחזמר"
+      },
+      {
+        "type": "blocked",
+        "clue": "מפעל חיים..."
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "חוסם, כמנגנון של תרופה | ל \" ג _",
         "clueParts": [
-          "אולם שאינו בנוי",
-          "רכב על פגסוס"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
+          "חוסם, כמנגנון של תרופה",
+          "ל \" ג _"
         ]
       },
       {
         "type": "blocked",
-        "clue": "מאירועי 2011 בישראל"
+        "clue": "אזור נופש \" חד־ממדי \""
       },
       {
         "type": "blocked",
-        "clue": "היא יכולה לעזור בהתבוננות עצמית..."
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
+        "clue": "תואר ספרותי לאחד XXXXL"
       },
       {
         "type": "blocked",
-        "clue": "אחותם של הכידון והרומח?"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "פסלונים | אחת היא לו? שתיים!",
-        "clueParts": [
-          "פסלונים",
-          "אחת היא לו? שתיים!"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "גרסה חד־פעמית של אחד מחגי ישראל"
+        "clue": "לשולחני ראש אחד, לידני – שניים"
       }
     ],
     [
@@ -135,7 +127,18 @@
         ]
       },
       {
-        "type": "blank"
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "חלופה לכפתור בבגד | אשתי ש _",
+        "clueParts": [
+          "חלופה לכפתור בבגד",
+          "אשתי ש _"
+        ]
       },
       {
         "type": "blank",
@@ -148,6 +151,27 @@
       },
       {
         "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank",
@@ -159,37 +183,6 @@
         "type": "blank",
         "startsDirections": [
           "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "כתב: יעקב שבתאי | הוא מססמי סטריט",
-        "clueParts": [
-          "כתב: יעקב שבתאי",
-          "הוא מססמי סטריט"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "ייסורים | יעקב, יוסי, או האב \" א?...",
-        "clueParts": [
-          "ייסורים",
-          "יעקב, יוסי, או האב \" א?..."
         ]
       }
     ],
@@ -213,190 +206,6 @@
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "מסרטיו: דבר אליה | חרבונה, לדוגמה",
-        "clueParts": [
-          "מסרטיו: דבר אליה",
-          "חרבונה, לדוגמה"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      }
-    ],
-    [
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "לאדם יש 4 כאלה | היא הגברת בן־צבי",
-        "clueParts": [
-          "לאדם יש 4 כאלה",
-          "היא הגברת בן־צבי"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "ספר בתנ \" ך שאלוהים לא מוזכר בו"
-      }
-    ],
-    [
-      {
-        "type": "blocked",
-        "clue": "עושים עצמם כאילו אינם יודעים"
-      },
-      {
-        "type": "blocked",
-        "clue": "בימינו זה מתפרש כחיובי יותר מ ' עלול '"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "הרודיון | אולי נעשה באוריגמי קטנטן",
-        "clueParts": [
-          "הרודיון",
-          "אולי נעשה באוריגמי קטנטן"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "מילה קומפקטית יותר מ ' קומפקטי '"
-      }
-    ],
-    [
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "vertical"
@@ -413,40 +222,10 @@
       },
       {
         "type": "blocked",
-        "clue": "דפיברילטור | מה שרב רושם...",
-        "clueParts": [
-          "דפיברילטור",
-          "מה שרב רושם..."
-        ]
+        "clue": "מוסד שחוסך את הצורך במאמצים…"
       },
       {
         "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "יפלה לרעה | זה הפתרון, מה ההיסוס?...",
-        "clueParts": [
-          "יפלה לרעה",
-          "זה הפתרון, מה ההיסוס?..."
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
       },
       {
         "type": "blank"
@@ -465,10 +244,10 @@
       },
       {
         "type": "blocked",
-        "clue": "עונש קל ממחבוש בצבא | הגרלה",
+        "clue": "קם או טלטול? | סוג לווייתן",
         "clueParts": [
-          "עונש קל ממחבוש בצבא",
-          "הגרלה"
+          "קם או טלטול?",
+          "סוג לווייתן"
         ]
       }
     ],
@@ -487,16 +266,10 @@
       },
       {
         "type": "blocked",
-        "clue": "אבי אבינדב וסב יונדב | מוצר חלב או עץ?",
+        "clue": "עמידה צבאית | הכדור כבר לא בידיהם",
         "clueParts": [
-          "אבי אבינדב וסב יונדב",
-          "מוצר חלב או עץ?"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
+          "עמידה צבאית",
+          "הכדור כבר לא בידיהם"
         ]
       },
       {
@@ -510,12 +283,6 @@
       },
       {
         "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
       },
       {
         "type": "blank",
@@ -525,15 +292,20 @@
       },
       {
         "type": "blocked",
-        "clue": "מהזוכים בו: זובין מהטה | מושב, ועם עין: קיבוץ",
+        "clue": "ככניסה ויציאה | הפגין מין לקות דיבור",
         "clueParts": [
-          "מהזוכים בו: זובין מהטה",
-          "מושב, ועם עין: קיבוץ"
+          "ככניסה ויציאה",
+          "הפגין מין לקות דיבור"
         ]
       },
       {
-        "type": "blocked",
-        "clue": "הארמון בו שוכן הפרלמנט הבריטי"
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -561,31 +333,23 @@
       {
         "type": "blank",
         "startsDirections": [
+          "horizontal",
           "vertical"
         ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
         "type": "blocked",
-        "clue": "קורט וגראף, למשל | כך דיבבתי דוב",
+        "clue": "מספקים שירותי דרך | שם שנגזר ממגדלנה",
         "clueParts": [
-          "קורט וגראף, למשל",
-          "כך דיבבתי דוב"
+          "מספקים שירותי דרך",
+          "שם שנגזר ממגדלנה"
         ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -600,10 +364,13 @@
         ]
       },
       {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -616,7 +383,7 @@
       },
       {
         "type": "blocked",
-        "clue": "בנימין _"
+        "clue": "כינוי לנטילת ידיים לפני סעודה"
       }
     ],
     [
@@ -633,26 +400,6 @@
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "מתקרבים רגשית | מפרים את הסדר",
-        "clueParts": [
-          "מתקרבים רגשית",
-          "מפרים את הסדר"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "vertical"
@@ -662,6 +409,20 @@
         "type": "blank"
       },
       {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "רשת עשה זאת בעצמך | ממש לפני זמן קצר!",
+        "clueParts": [
+          "רשת עשה זאת בעצמך",
+          "ממש לפני זמן קצר!"
+        ]
+      },
+      {
         "type": "blank"
       },
       {
@@ -675,19 +436,31 @@
       },
       {
         "type": "blocked",
-        "clue": "מין משפחה של ריקודים | האן _",
+        "clue": "מתחבר למחסנית | אילנית: _ _ _",
         "clueParts": [
-          "מין משפחה של ריקודים",
-          "האן _"
+          "מתחבר למחסנית",
+          "אילנית: _ _ _"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
         ]
       },
       {
         "type": "blocked",
-        "clue": "ביטוי לסיום ששאול מישעיהו"
-      },
-      {
-        "type": "blocked",
-        "clue": "המדינה שיצאה למלחמת האמו"
+        "clue": "ביים את ' המופע של טרומן ' | _ על הגג",
+        "clueParts": [
+          "ביים את ' המופע של טרומן '",
+          "_ על הגג"
+        ]
       }
     ],
     [
@@ -696,11 +469,37 @@
       },
       {
         "type": "blocked",
-        "clue": "פעולה למניעת חיכוך"
+        "clue": "\" כולל הפרוורים ויישובי הלוויין \""
       },
       {
         "type": "blocked",
-        "clue": "יוצאים אליה מהעבודה..."
+        "clue": "פיזיקאי גרמני, על שמו חוק ויח ' מידה"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "מני או אחיינו סתיו | מקטרת",
+        "clueParts": [
+          "מני או אחיינו סתיו",
+          "מקטרת"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
       },
       {
         "type": "blank"
@@ -720,10 +519,10 @@
       },
       {
         "type": "blocked",
-        "clue": "למחנאות ולמחאות | רק בטור _ תצעד!",
+        "clue": "אידשון | בודדים, לחיוב",
         "clueParts": [
-          "למחנאות ולמחאות",
-          "רק בטור _ תצעד!"
+          "אידשון",
+          "בודדים, לחיוב"
         ]
       },
       {
@@ -731,27 +530,6 @@
       },
       {
         "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
       },
       {
         "type": "blank",
@@ -769,6 +547,103 @@
         "startsDirections": [
           "vertical"
         ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "עט סרטוט | שלוש אחיות מיתולוגיות",
+        "clueParts": [
+          "עט סרטוט",
+          "שלוש אחיות מיתולוגיות"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "כירורגים פלסטיים אולי יעדיפו ' הרמת אף '"
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "הגדרה זו יש בה אתגר... | כלב מעצבים",
+        "clueParts": [
+          "הגדרה זו יש בה אתגר...",
+          "כלב מעצבים"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank",
@@ -779,47 +654,11 @@
       },
       {
         "type": "blocked",
-        "clue": "גוגנהיים ידועה | שתהיו לי בריאים...",
+        "clue": "כרות | ח \" כ וסבא רבא של שירה גפן",
         "clueParts": [
-          "גוגנהיים ידועה",
-          "שתהיו לי בריאים..."
+          "כרות",
+          "ח \" כ וסבא רבא של שירה גפן"
         ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "קיבוץ בעמק חפר | ההבדל בין איל ואייל",
-        "clueParts": [
-          "קיבוץ בעמק חפר",
-          "ההבדל בין איל ואייל"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "לפי כלל זה דיני חז \" ל תקפים תמיד"
       },
       {
         "type": "blank"
@@ -835,7 +674,19 @@
       },
       {
         "type": "blocked",
-        "clue": "הקשר בין באפ ופם"
+        "clue": "לא בית ספר אלא ספר בית... | אם ננעלו...",
+        "clueParts": [
+          "לא בית ספר אלא ספר בית...",
+          "אם ננעלו..."
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "קיבל השראה"
+      },
+      {
+        "type": "blocked",
+        "clue": "_ נוצה ממעל והשלף לרגליי"
       }
     ],
     [
@@ -851,95 +702,21 @@
       {
         "type": "blank",
         "startsDirections": [
+          "horizontal",
           "vertical"
         ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
         "type": "blocked",
-        "clue": "כינוי לספר ויקרא | פול _",
+        "clue": "מושג מרכזי בשיווק ופרסום | מערבולי",
         "clueParts": [
-          "כינוי לספר ויקרא",
-          "פול _"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
+          "מושג מרכזי בשיווק ופרסום",
+          "מערבולי"
         ]
       },
       {
         "type": "blocked",
-        "clue": "פגני | זה של פריז – המפורסם מכולם",
-        "clueParts": [
-          "פגני",
-          "זה של פריז – המפורסם מכולם"
-        ]
-      }
-    ],
-    [
-      {
-        "type": "blocked",
-        "clue": "האור בקצה המנהרה? כמעט כל המנהרה!..."
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "השלם את _ | משיריה: שלווה",
-        "clueParts": [
-          "השלם את _",
-          "משיריה: שלווה"
-        ]
+        "clue": "שורו, הביטו ו _"
       },
       {
         "type": "blank"
@@ -957,41 +734,6 @@
         ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      }
-    ],
-    [
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "horizontal"
@@ -999,10 +741,19 @@
       },
       {
         "type": "blocked",
-        "clue": "בה נפגשים הרון והסון | לב, אוזן או שפתיים",
+        "clue": "כומר עשוי להיות כזה | תכונת הטוקסינים",
         "clueParts": [
-          "בה נפגשים הרון והסון",
-          "לב, אוזן או שפתיים"
+          "כומר עשוי להיות כזה",
+          "תכונת הטוקסינים"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
         ]
       },
       {
@@ -1012,51 +763,10 @@
         ]
       },
       {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "horizontal"
         ]
-      },
-      {
-        "type": "blocked",
-        "clue": "קל, בהקשר מסוים | אזור פיתוח...",
-        "clueParts": [
-          "קל, בהקשר מסוים",
-          "אזור פיתוח..."
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "נשאו קינה | בניגוד לעץ פרי",
-        "clueParts": [
-          "נשאו קינה",
-          "בניגוד לעץ פרי"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blocked",
-        "clue": "\" עיר האזמרגד \", ולא זו שבארץ עוץ"
       }
     ],
     [
@@ -1079,15 +789,6 @@
         ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "vertical"
@@ -1101,79 +802,10 @@
       },
       {
         "type": "blocked",
-        "clue": "כתב: חיים חפר, הלחין: דובי זלצר | מצעד ה _",
+        "clue": "לא קייפטאון ולא בלומפונטיין | נָמַק",
         "clueParts": [
-          "כתב: חיים חפר, הלחין: דובי זלצר",
-          "מצעד ה _"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      }
-    ],
-    [
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blocked",
-        "clue": "שיש לו שני היבטים שונים"
-      },
-      {
-        "type": "blocked",
-        "clue": "ייקח מהזולת ללא רשות"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "בדרך או בכל | קנה לו שם...",
-        "clueParts": [
-          "בדרך או בכל",
-          "קנה לו שם..."
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
+          "לא קייפטאון ולא בלומפונטיין",
+          "נָמַק"
         ]
       },
       {
@@ -1184,31 +816,6 @@
       },
       {
         "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "נגיפון | אותו דבר כמו אותו דבר",
-        "clueParts": [
-          "נגיפון",
-          "אותו דבר כמו אותו דבר"
-        ]
-      }
-    ],
-    [
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
       },
       {
         "type": "blank",
@@ -1230,58 +837,20 @@
       },
       {
         "type": "blocked",
-        "clue": "מורה לה... | מי לי...?",
-        "clueParts": [
-          "מורה לה...",
-          "מי לי...?"
-        ]
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "כרות המואביה | חצי קטנוע...",
-        "clueParts": [
-          "כרות המואביה",
-          "חצי קטנוע..."
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
+        "clue": "נושא לציור שגיבוריו קימון ופרו"
       }
     ],
     [
       {
         "type": "blocked",
-        "clue": "עיר באוסטרליה ע \" ש עיר בסקוטלנד"
+        "clue": "תנאי לטיפול רפואי אתי, בשגרה"
+      },
+      {
+        "type": "blocked",
+        "clue": "אלבום של אתני:X _ תן"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -1297,54 +866,45 @@
       },
       {
         "type": "blocked",
-        "clue": "העלו במחשבתם"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "vertical"
-        ]
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "מסגרת חינוכית | בדגלה – המפה שלה",
+        "clue": "סיפורי בדים רבים לו... | נאמרת גם בשבת",
         "clueParts": [
-          "מסגרת חינוכית",
-          "בדגלה – המפה שלה"
+          "סיפורי בדים רבים לו...",
+          "נאמרת גם בשבת"
         ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "עכשיו היא!"
       }
     ],
     [
@@ -1355,20 +915,13 @@
         ]
       },
       {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
-          "horizontal"
+          "vertical"
         ]
       },
       {
-        "type": "blocked",
-        "clue": "לא ישמור אמונים"
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -1382,15 +935,98 @@
       {
         "type": "blank",
         "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
           "horizontal"
         ]
       },
       {
         "type": "blocked",
-        "clue": "קשה לתארו כקשה עורף"
+        "clue": "אובססיה לא בריאה למזון בריא"
       },
       {
         "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "לנמנמנים בין העצים | שכנו מהצד של גז אציל",
+        "clueParts": [
+          "לנמנמנים בין העצים",
+          "שכנו מהצד של גז אציל"
+        ]
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "סימון בהתעמלות | מושלם: ללא _",
+        "clueParts": [
+          "סימון בהתעמלות",
+          "מושלם: ללא _"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "מה לעשות בכרטיס נסיעה? | אקראי",
+        "clueParts": [
+          "מה לעשות בכרטיס נסיעה?",
+          "אקראי"
+        ]
       },
       {
         "type": "blank"
@@ -1419,9 +1055,6 @@
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
           "horizontal"
@@ -1429,51 +1062,286 @@
       },
       {
         "type": "blocked",
-        "clue": "צריכים לחכות? הטכנולוגיה קיימת!..."
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "ריסייך עצובים וצווארך _ כגבעול"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank"
-      },
-      {
-        "type": "blank",
-        "startsDirections": [
-          "horizontal"
-        ]
-      },
-      {
-        "type": "blocked",
-        "clue": "אלופת אנגליה המכהנת | חומר בערה",
+        "clue": "מין אגוז | יכול לתת עצה בנוגע לעץ",
         "clueParts": [
-          "אלופת אנגליה המכהנת",
-          "חומר בערה"
+          "מין אגוז",
+          "יכול לתת עצה בנוגע לעץ"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "איזו סיבה יש לנשק? הם כבר ידגימו..."
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "שותף בכיר באופיס | שגב",
+        "clueParts": [
+          "שותף בכיר באופיס",
+          "שגב"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blocked",
+        "clue": "אפיון של מוסר"
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "מה הטעם?... | משקה שלא מכיל תולעת",
+        "clueParts": [
+          "מה הטעם?...",
+          "משקה שלא מכיל תולעת"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blocked",
+        "clue": "הם בוודאי לא יקדימו, אדרבה..."
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "משפט בחשמל | עיר בנחלת שבט דן",
+        "clueParts": [
+          "משפט בחשמל",
+          "עיר בנחלת שבט דן"
+        ]
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "_ ודוט | מקבילתה הרומית של הרה",
+        "clueParts": [
+          "_ ודוט",
+          "מקבילתה הרומית של הרה"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "שלום או נכון | בע \" ח בעל דבשת",
+        "clueParts": [
+          "שלום או נכון",
+          "בע \" ח בעל דבשת"
+        ]
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "שמיכת _ | תחילית בהוראת שלילה",
+        "clueParts": [
+          "שמיכת _",
+          "תחילית בהוראת שלילה"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "אנחנו ושכמותנו | צ ' רלס – גלגול שלו",
+        "clueParts": [
+          "אנחנו ושכמותנו",
+          "צ ' רלס – גלגול שלו"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
         ]
       }
     ],
@@ -1494,20 +1362,10 @@
         "type": "blank"
       },
       {
-        "type": "blank"
-      },
-      {
         "type": "blank",
         "startsDirections": [
-          "horizontal"
+          "vertical"
         ]
-      },
-      {
-        "type": "blocked",
-        "clue": "לא משתמע מהשם, אך זו מנה של מסעדה"
-      },
-      {
-        "type": "blank"
       },
       {
         "type": "blank"
@@ -1523,7 +1381,147 @@
       },
       {
         "type": "blocked",
-        "clue": "שלא כפיוז, לשרפתו אין משמעות מושאלת"
+        "clue": "כינוי לצמח נוי פופולרי"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "vertical"
+        ]
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "כשיש בשוק ביקוש אך לא היצע"
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "קבוצת האותיות המקבלות חטף"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "שלד קדם־אנושי ידוע ע \" ש דמות משיר"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "מגזין | ערסל או הדפס? ובכן...",
+        "clueParts": [
+          "מגזין",
+          "ערסל או הדפס? ובכן..."
+        ]
+      }
+    ],
+    [
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "הקשר בין חול והמשיח"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank",
+        "startsDirections": [
+          "horizontal"
+        ]
+      },
+      {
+        "type": "blocked",
+        "clue": "לא הציור המקורי"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
+      },
+      {
+        "type": "blank"
       },
       {
         "type": "blank"
@@ -1546,26 +1544,6 @@
       "cells": [
         [
           1,
-          10
-        ],
-        [
-          1,
-          9
-        ],
-        [
-          1,
-          8
-        ],
-        [
-          1,
-          7
-        ],
-        [
-          1,
-          6
-        ],
-        [
-          1,
           5
         ],
         [
@@ -1589,16 +1567,20 @@
           0
         ]
       ],
-      "clue": "כתב: יעקב שבתאי",
+      "clue": "חלופה לכפתור בבגד",
       "clueCell": [
         1,
-        11
+        6
       ]
     },
     {
-      "id": "h-1-12",
+      "id": "h-1-7",
       "direction": "horizontal",
       "cells": [
+        [
+          1,
+          15
+        ],
         [
           1,
           14
@@ -1610,13 +1592,30 @@
         [
           1,
           12
+        ],
+        [
+          1,
+          11
+        ],
+        [
+          1,
+          10
+        ],
+        [
+          1,
+          9
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          7
         ]
       ],
-      "clue": "ייסורים | יעקב, יוסי, או האב \" א?...",
-      "clueCell": [
-        1,
-        15
-      ]
+      "clue": null,
+      "clueCell": null
     },
     {
       "id": "h-2-0",
@@ -1624,6 +1623,10 @@
       "cells": [
         [
           2,
+          8
+        ],
+        [
+          2,
           7
         ],
         [
@@ -1655,20 +1658,16 @@
           0
         ]
       ],
-      "clue": "מסרטיו: דבר אליה",
+      "clue": "מוסד שחוסך את הצורך במאמצים…",
       "clueCell": [
         2,
-        8
+        9
       ]
     },
     {
-      "id": "h-2-9",
+      "id": "h-2-10",
       "direction": "horizontal",
       "cells": [
-        [
-          2,
-          15
-        ],
         [
           2,
           14
@@ -1688,14 +1687,13 @@
         [
           2,
           10
-        ],
-        [
-          2,
-          9
         ]
       ],
-      "clue": null,
-      "clueCell": null
+      "clue": "קם או טלטול? | סוג לווייתן",
+      "clueCell": [
+        2,
+        15
+      ]
     },
     {
       "id": "h-3-0",
@@ -1703,14 +1701,6 @@
       "cells": [
         [
           3,
-          4
-        ],
-        [
-          3,
-          3
-        ],
-        [
-          3,
           2
         ],
         [
@@ -1722,16 +1712,51 @@
           0
         ]
       ],
-      "clue": "לאדם יש 4 כאלה",
+      "clue": "עמידה צבאית",
       "clueCell": [
         3,
-        5
+        3
       ]
     },
     {
-      "id": "h-3-6",
+      "id": "h-3-4",
       "direction": "horizontal",
       "cells": [
+        [
+          3,
+          8
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "clue": "ככניסה ויציאה",
+      "clueCell": [
+        3,
+        9
+      ]
+    },
+    {
+      "id": "h-3-10",
+      "direction": "horizontal",
+      "cells": [
+        [
+          3,
+          15
+        ],
         [
           3,
           14
@@ -1751,34 +1776,62 @@
         [
           3,
           10
-        ],
-        [
-          3,
-          9
-        ],
-        [
-          3,
-          8
-        ],
-        [
-          3,
-          7
-        ],
-        [
-          3,
-          6
         ]
       ],
-      "clue": "ספר בתנ \" ך שאלוהים לא מוזכר בו",
+      "clue": null,
+      "clueCell": null
+    },
+    {
+      "id": "h-4-0",
+      "direction": "horizontal",
+      "cells": [
+        [
+          4,
+          3
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "clue": "מספקים שירותי דרך",
       "clueCell": [
-        3,
-        15
+        4,
+        4
       ]
     },
     {
-      "id": "h-4-2",
+      "id": "h-4-5",
       "direction": "horizontal",
       "cells": [
+        [
+          4,
+          14
+        ],
+        [
+          4,
+          13
+        ],
+        [
+          4,
+          12
+        ],
+        [
+          4,
+          11
+        ],
+        [
+          4,
+          10
+        ],
         [
           4,
           9
@@ -1798,48 +1851,9 @@
         [
           4,
           5
-        ],
-        [
-          4,
-          4
-        ],
-        [
-          4,
-          3
-        ],
-        [
-          4,
-          2
         ]
       ],
-      "clue": "הרודיון",
-      "clueCell": [
-        4,
-        10
-      ]
-    },
-    {
-      "id": "h-4-11",
-      "direction": "horizontal",
-      "cells": [
-        [
-          4,
-          14
-        ],
-        [
-          4,
-          13
-        ],
-        [
-          4,
-          12
-        ],
-        [
-          4,
-          11
-        ]
-      ],
-      "clue": "מילה קומפקטית יותר מ ' קומפקטי '",
+      "clue": "כינוי לנטילת ידיים לפני סעודה",
       "clueCell": [
         4,
         15
@@ -1851,6 +1865,18 @@
       "cells": [
         [
           5,
+          6
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
           3
         ],
         [
@@ -1866,41 +1892,37 @@
           0
         ]
       ],
-      "clue": "דפיברילטור",
+      "clue": "רשת עשה זאת בעצמך",
       "clueCell": [
         5,
-        4
+        7
       ]
     },
     {
-      "id": "h-5-5",
+      "id": "h-5-8",
       "direction": "horizontal",
       "cells": [
         [
           5,
+          10
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          5,
           8
-        ],
-        [
-          5,
-          7
-        ],
-        [
-          5,
-          6
-        ],
-        [
-          5,
-          5
         ]
       ],
-      "clue": "יפלה לרעה",
+      "clue": "מתחבר למחסנית",
       "clueCell": [
         5,
-        9
+        11
       ]
     },
     {
-      "id": "h-5-10",
+      "id": "h-5-12",
       "direction": "horizontal",
       "cells": [
         [
@@ -1914,49 +1936,45 @@
         [
           5,
           12
-        ],
-        [
-          5,
-          11
-        ],
-        [
-          5,
-          10
         ]
       ],
-      "clue": "עונש קל ממחבוש בצבא | הגרלה",
+      "clue": "ביים את ' המופע של טרומן ' | _ על הגג",
       "clueCell": [
         5,
         15
       ]
     },
     {
-      "id": "h-6-0",
+      "id": "h-6-3",
       "direction": "horizontal",
       "cells": [
         [
           6,
-          2
+          5
         ],
         [
           6,
-          1
+          4
         ],
         [
           6,
-          0
+          3
         ]
       ],
-      "clue": "אבי אבינדב וסב יונדב",
+      "clue": "מני או אחיינו סתיו",
       "clueCell": [
         6,
-        3
+        6
       ]
     },
     {
-      "id": "h-6-4",
+      "id": "h-6-7",
       "direction": "horizontal",
       "cells": [
+        [
+          6,
+          11
+        ],
         [
           6,
           10
@@ -1972,24 +1990,12 @@
         [
           6,
           7
-        ],
-        [
-          6,
-          6
-        ],
-        [
-          6,
-          5
-        ],
-        [
-          6,
-          4
         ]
       ],
-      "clue": "מהזוכים בו: זובין מהטה",
+      "clue": "אידשון",
       "clueCell": [
         6,
-        11
+        12
       ]
     },
     {
@@ -2049,7 +2055,7 @@
           0
         ]
       ],
-      "clue": "קורט וגראף, למשל",
+      "clue": "עט סרטוט",
       "clueCell": [
         7,
         8
@@ -2084,7 +2090,7 @@
           9
         ]
       ],
-      "clue": "בנימין _",
+      "clue": "כירורגים פלסטיים אולי יעדיפו ' הרמת אף '",
       "clueCell": [
         7,
         15
@@ -2096,18 +2102,6 @@
       "cells": [
         [
           8,
-          5
-        ],
-        [
-          8,
-          4
-        ],
-        [
-          8,
-          3
-        ],
-        [
-          8,
           2
         ],
         [
@@ -2119,14 +2113,45 @@
           0
         ]
       ],
-      "clue": "מתקרבים רגשית",
+      "clue": "הגדרה זו יש בה אתגר...",
       "clueCell": [
         8,
-        6
+        3
       ]
     },
     {
-      "id": "h-8-7",
+      "id": "h-8-4",
+      "direction": "horizontal",
+      "cells": [
+        [
+          8,
+          8
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          4
+        ]
+      ],
+      "clue": "כרות",
+      "clueCell": [
+        8,
+        9
+      ]
+    },
+    {
+      "id": "h-8-10",
       "direction": "horizontal",
       "cells": [
         [
@@ -2140,55 +2165,74 @@
         [
           8,
           10
-        ],
-        [
-          8,
-          9
-        ],
-        [
-          8,
-          8
-        ],
-        [
-          8,
-          7
         ]
       ],
-      "clue": "מין משפחה של ריקודים",
+      "clue": "לא בית ספר אלא ספר בית...",
       "clueCell": [
         8,
         13
       ]
     },
     {
-      "id": "h-9-3",
+      "id": "h-9-0",
       "direction": "horizontal",
       "cells": [
         [
           9,
-          6
-        ],
-        [
-          9,
-          5
-        ],
-        [
-          9,
-          4
-        ],
-        [
-          9,
           3
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          9,
+          0
         ]
       ],
-      "clue": "למחנאות ולמחאות",
+      "clue": "מושג מרכזי בשיווק ופרסום",
       "clueCell": [
         9,
-        7
+        4
       ]
     },
     {
-      "id": "h-9-8",
+      "id": "h-9-6",
+      "direction": "horizontal",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          9,
+          6
+        ]
+      ],
+      "clue": "כומר עשוי להיות כזה",
+      "clueCell": [
+        9,
+        11
+      ]
+    },
+    {
+      "id": "h-9-12",
       "direction": "horizontal",
       "cells": [
         [
@@ -2206,22 +2250,6 @@
         [
           9,
           12
-        ],
-        [
-          9,
-          11
-        ],
-        [
-          9,
-          10
-        ],
-        [
-          9,
-          9
-        ],
-        [
-          9,
-          8
         ]
       ],
       "clue": null,
@@ -2233,6 +2261,22 @@
       "cells": [
         [
           10,
+          6
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          10,
           2
         ],
         [
@@ -2244,16 +2288,36 @@
           0
         ]
       ],
-      "clue": "גוגנהיים ידועה",
+      "clue": "לא קייפטאון ולא בלומפונטיין",
       "clueCell": [
         10,
-        3
+        7
       ]
     },
     {
-      "id": "h-10-4",
+      "id": "h-10-8",
       "direction": "horizontal",
       "cells": [
+        [
+          10,
+          14
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          10,
+          10
+        ],
         [
           10,
           9
@@ -2261,205 +2325,161 @@
         [
           10,
           8
-        ],
+        ]
+      ],
+      "clue": "נושא לציור שגיבוריו קימון ופרו",
+      "clueCell": [
+        10,
+        15
+      ]
+    },
+    {
+      "id": "h-11-2",
+      "direction": "horizontal",
+      "cells": [
         [
-          10,
-          7
-        ],
-        [
-          10,
-          6
-        ],
-        [
-          10,
+          11,
           5
         ],
         [
-          10,
+          11,
           4
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          11,
+          2
         ]
       ],
-      "clue": "קיבוץ בעמק חפר",
+      "clue": "סיפורי בדים רבים לו...",
       "clueCell": [
-        10,
+        11,
+        6
+      ]
+    },
+    {
+      "id": "h-11-7",
+      "direction": "horizontal",
+      "cells": [
+        [
+          11,
+          14
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          11,
+          11
+        ],
+        [
+          11,
+          10
+        ],
+        [
+          11,
+          9
+        ],
+        [
+          11,
+          8
+        ],
+        [
+          11,
+          7
+        ]
+      ],
+      "clue": "עכשיו היא!",
+      "clueCell": [
+        11,
+        15
+      ]
+    },
+    {
+      "id": "h-12-0",
+      "direction": "horizontal",
+      "cells": [
+        [
+          12,
+          9
+        ],
+        [
+          12,
+          8
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          2
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12,
+          0
+        ]
+      ],
+      "clue": "אובססיה לא בריאה למזון בריא",
+      "clueCell": [
+        12,
         10
       ]
     },
     {
-      "id": "h-10-12",
+      "id": "h-12-11",
       "direction": "horizontal",
       "cells": [
         [
-          10,
+          12,
           14
         ],
         [
-          10,
+          12,
           13
         ],
         [
-          10,
-          12
-        ]
-      ],
-      "clue": "הקשר בין באפ ופם",
-      "clueCell": [
-        10,
-        15
-      ]
-    },
-    {
-      "id": "h-11-0",
-      "direction": "horizontal",
-      "cells": [
-        [
-          11,
-          8
-        ],
-        [
-          11,
-          7
-        ],
-        [
-          11,
-          6
-        ],
-        [
-          11,
-          5
-        ],
-        [
-          11,
-          4
-        ],
-        [
-          11,
-          3
-        ],
-        [
-          11,
-          2
-        ],
-        [
-          11,
-          1
-        ],
-        [
-          11,
-          0
-        ]
-      ],
-      "clue": "כינוי לספר ויקרא",
-      "clueCell": [
-        11,
-        9
-      ]
-    },
-    {
-      "id": "h-11-10",
-      "direction": "horizontal",
-      "cells": [
-        [
-          11,
-          14
-        ],
-        [
-          11,
-          13
-        ],
-        [
-          11,
+          12,
           12
         ],
         [
-          11,
+          12,
           11
-        ],
-        [
-          11,
-          10
         ]
       ],
-      "clue": "פגני | זה של פריז – המפורסם מכולם",
-      "clueCell": [
-        11,
-        15
-      ]
-    },
-    {
-      "id": "h-12-1",
-      "direction": "horizontal",
-      "cells": [
-        [
-          12,
-          4
-        ],
-        [
-          12,
-          3
-        ],
-        [
-          12,
-          2
-        ],
-        [
-          12,
-          1
-        ]
-      ],
-      "clue": "השלם את _",
+      "clue": "לנמנמנים בין העצים | שכנו מהצד של גז אציל",
       "clueCell": [
         12,
-        5
+        15
       ]
-    },
-    {
-      "id": "h-12-6",
-      "direction": "horizontal",
-      "cells": [
-        [
-          12,
-          15
-        ],
-        [
-          12,
-          14
-        ],
-        [
-          12,
-          13
-        ],
-        [
-          12,
-          12
-        ],
-        [
-          12,
-          11
-        ],
-        [
-          12,
-          10
-        ],
-        [
-          12,
-          9
-        ],
-        [
-          12,
-          8
-        ],
-        [
-          12,
-          7
-        ],
-        [
-          12,
-          6
-        ]
-      ],
-      "clue": null,
-      "clueCell": null
     },
     {
       "id": "h-13-0",
@@ -2467,6 +2487,10 @@
       "cells": [
         [
           13,
+          4
+        ],
+        [
+          13,
           3
         ],
         [
@@ -2482,16 +2506,24 @@
           0
         ]
       ],
-      "clue": "בה נפגשים הרון והסון",
+      "clue": "סימון בהתעמלות",
       "clueCell": [
         13,
-        4
+        5
       ]
     },
     {
-      "id": "h-13-5",
+      "id": "h-13-6",
       "direction": "horizontal",
       "cells": [
+        [
+          13,
+          9
+        ],
+        [
+          13,
+          8
+        ],
         [
           13,
           7
@@ -2499,22 +2531,30 @@
         [
           13,
           6
-        ],
-        [
-          13,
-          5
         ]
       ],
-      "clue": "קל, בהקשר מסוים",
+      "clue": "מה לעשות בכרטיס נסיעה?",
       "clueCell": [
         13,
-        8
+        10
       ]
     },
     {
-      "id": "h-13-9",
+      "id": "h-13-11",
       "direction": "horizontal",
       "cells": [
+        [
+          13,
+          15
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          13,
+          13
+        ],
         [
           13,
           12
@@ -2522,21 +2562,10 @@
         [
           13,
           11
-        ],
-        [
-          13,
-          10
-        ],
-        [
-          13,
-          9
         ]
       ],
-      "clue": "נשאו קינה",
-      "clueCell": [
-        13,
-        13
-      ]
+      "clue": null,
+      "clueCell": null
     },
     {
       "id": "h-14-0",
@@ -2544,12 +2573,27 @@
       "cells": [
         [
           14,
-          9
+          2
         ],
         [
           14,
-          8
+          1
         ],
+        [
+          14,
+          0
+        ]
+      ],
+      "clue": "מין אגוז",
+      "clueCell": [
+        14,
+        3
+      ]
+    },
+    {
+      "id": "h-14-4",
+      "direction": "horizontal",
+      "cells": [
         [
           14,
           7
@@ -2565,46 +2609,18 @@
         [
           14,
           4
-        ],
-        [
-          14,
-          3
-        ],
-        [
-          14,
-          2
-        ],
-        [
-          14,
-          1
-        ],
-        [
-          14,
-          0
         ]
       ],
-      "clue": "כתב: חיים חפר, הלחין: דובי זלצר",
+      "clue": "איזו סיבה יש לנשק? הם כבר ידגימו...",
       "clueCell": [
         14,
-        10
+        8
       ]
     },
     {
-      "id": "h-14-11",
+      "id": "h-14-9",
       "direction": "horizontal",
       "cells": [
-        [
-          14,
-          15
-        ],
-        [
-          14,
-          14
-        ],
-        [
-          14,
-          13
-        ],
         [
           14,
           12
@@ -2612,15 +2628,30 @@
         [
           14,
           11
+        ],
+        [
+          14,
+          10
+        ],
+        [
+          14,
+          9
         ]
       ],
-      "clue": null,
-      "clueCell": null
+      "clue": "שותף בכיר באופיס",
+      "clueCell": [
+        14,
+        13
+      ]
     },
     {
-      "id": "h-15-3",
+      "id": "h-15-0",
       "direction": "horizontal",
       "cells": [
+        [
+          15,
+          7
+        ],
         [
           15,
           6
@@ -2636,178 +2667,174 @@
         [
           15,
           3
+        ],
+        [
+          15,
+          2
+        ],
+        [
+          15,
+          1
+        ],
+        [
+          15,
+          0
         ]
       ],
-      "clue": "בדרך או בכל",
+      "clue": "מה הטעם?...",
       "clueCell": [
         15,
+        8
+      ]
+    },
+    {
+      "id": "h-15-9",
+      "direction": "horizontal",
+      "cells": [
+        [
+          15,
+          15
+        ],
+        [
+          15,
+          14
+        ],
+        [
+          15,
+          13
+        ],
+        [
+          15,
+          12
+        ],
+        [
+          15,
+          11
+        ],
+        [
+          15,
+          10
+        ],
+        [
+          15,
+          9
+        ]
+      ],
+      "clue": null,
+      "clueCell": null
+    },
+    {
+      "id": "h-16-2",
+      "direction": "horizontal",
+      "cells": [
+        [
+          16,
+          6
+        ],
+        [
+          16,
+          5
+        ],
+        [
+          16,
+          4
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          16,
+          2
+        ]
+      ],
+      "clue": "משפט בחשמל",
+      "clueCell": [
+        16,
         7
       ]
     },
     {
-      "id": "h-15-8",
+      "id": "h-16-8",
       "direction": "horizontal",
       "cells": [
         [
-          15,
-          14
-        ],
-        [
-          15,
-          13
-        ],
-        [
-          15,
-          12
-        ],
-        [
-          15,
-          11
-        ],
-        [
-          15,
+          16,
           10
         ],
         [
-          15,
+          16,
           9
         ],
         [
-          15,
+          16,
           8
         ]
       ],
-      "clue": "נגיפון | אותו דבר כמו אותו דבר",
+      "clue": "_ ודוט",
       "clueCell": [
-        15,
+        16,
+        11
+      ]
+    },
+    {
+      "id": "h-16-12",
+      "direction": "horizontal",
+      "cells": [
+        [
+          16,
+          14
+        ],
+        [
+          16,
+          13
+        ],
+        [
+          16,
+          12
+        ]
+      ],
+      "clue": "שלום או נכון | בע \" ח בעל דבשת",
+      "clueCell": [
+        16,
         15
       ]
     },
     {
-      "id": "h-16-0",
+      "id": "h-17-0",
       "direction": "horizontal",
       "cells": [
         [
-          16,
-          5
-        ],
-        [
-          16,
+          17,
           4
         ],
         [
-          16,
+          17,
           3
         ],
         [
-          16,
+          17,
           2
         ],
         [
-          16,
+          17,
           1
         ],
         [
-          16,
+          17,
           0
         ]
       ],
-      "clue": "מורה לה...",
-      "clueCell": [
-        16,
-        6
-      ]
-    },
-    {
-      "id": "h-16-7",
-      "direction": "horizontal",
-      "cells": [
-        [
-          16,
-          11
-        ],
-        [
-          16,
-          10
-        ],
-        [
-          16,
-          9
-        ],
-        [
-          16,
-          8
-        ],
-        [
-          16,
-          7
-        ]
-      ],
-      "clue": "כרות המואביה",
-      "clueCell": [
-        16,
-        12
-      ]
-    },
-    {
-      "id": "h-16-13",
-      "direction": "horizontal",
-      "cells": [
-        [
-          16,
-          15
-        ],
-        [
-          16,
-          14
-        ],
-        [
-          16,
-          13
-        ]
-      ],
-      "clue": null,
-      "clueCell": null
-    },
-    {
-      "id": "h-17-1",
-      "direction": "horizontal",
-      "cells": [
-        [
-          17,
-          3
-        ],
-        [
-          17,
-          2
-        ],
-        [
-          17,
-          1
-        ]
-      ],
-      "clue": "העלו במחשבתם",
+      "clue": "שמיכת _",
       "clueCell": [
         17,
-        4
+        5
       ]
     },
     {
-      "id": "h-17-5",
+      "id": "h-17-6",
       "direction": "horizontal",
       "cells": [
-        [
-          17,
-          14
-        ],
-        [
-          17,
-          13
-        ],
-        [
-          17,
-          12
-        ],
         [
           17,
           11
@@ -2831,17 +2858,33 @@
         [
           17,
           6
+        ]
+      ],
+      "clue": "אנחנו ושכמותנו",
+      "clueCell": [
+        17,
+        12
+      ]
+    },
+    {
+      "id": "h-17-13",
+      "direction": "horizontal",
+      "cells": [
+        [
+          17,
+          15
         ],
         [
           17,
-          5
+          14
+        ],
+        [
+          17,
+          13
         ]
       ],
-      "clue": "מסגרת חינוכית | בדגלה – המפה שלה",
-      "clueCell": [
-        17,
-        15
-      ]
+      "clue": null,
+      "clueCell": null
     },
     {
       "id": "h-18-0",
@@ -2849,6 +2892,26 @@
       "cells": [
         [
           18,
+          8
+        ],
+        [
+          18,
+          7
+        ],
+        [
+          18,
+          6
+        ],
+        [
+          18,
+          5
+        ],
+        [
+          18,
+          4
+        ],
+        [
+          18,
           3
         ],
         [
@@ -2864,34 +2927,7 @@
           0
         ]
       ],
-      "clue": "לא ישמור אמונים",
-      "clueCell": [
-        18,
-        4
-      ]
-    },
-    {
-      "id": "h-18-5",
-      "direction": "horizontal",
-      "cells": [
-        [
-          18,
-          8
-        ],
-        [
-          18,
-          7
-        ],
-        [
-          18,
-          6
-        ],
-        [
-          18,
-          5
-        ]
-      ],
-      "clue": "קשה לתארו כקשה עורף",
+      "clue": "כינוי לצמח נוי פופולרי",
       "clueCell": [
         18,
         9
@@ -2903,10 +2939,6 @@
       "cells": [
         [
           18,
-          15
-        ],
-        [
-          18,
           14
         ],
         [
@@ -2926,8 +2958,11 @@
           10
         ]
       ],
-      "clue": null,
-      "clueCell": null
+      "clue": "כשיש בשוק ביקוש אך לא היצע",
+      "clueCell": [
+        18,
+        15
+      ]
     },
     {
       "id": "h-19-0",
@@ -2950,7 +2985,7 @@
           0
         ]
       ],
-      "clue": "צריכים לחכות? הטכנולוגיה קיימת!...",
+      "clue": "קבוצת האותיות המקבלות חטף",
       "clueCell": [
         19,
         4
@@ -2977,7 +3012,7 @@
           5
         ]
       ],
-      "clue": "ריסייך עצובים וצווארך _ כגבעול",
+      "clue": "שלד קדם־אנושי ידוע ע \" ש דמות משיר",
       "clueCell": [
         19,
         9
@@ -3008,7 +3043,7 @@
           10
         ]
       ],
-      "clue": "אלופת אנגליה המכהנת | חומר בערה",
+      "clue": "מגזין | ערסל או הדפס? ובכן...",
       "clueCell": [
         19,
         15
@@ -3018,18 +3053,6 @@
       "id": "h-20-0",
       "direction": "horizontal",
       "cells": [
-        [
-          20,
-          6
-        ],
-        [
-          20,
-          5
-        ],
-        [
-          20,
-          4
-        ],
         [
           20,
           3
@@ -3047,41 +3070,41 @@
           0
         ]
       ],
-      "clue": "לא משתמע מהשם, אך זו מנה של מסעדה",
+      "clue": "הקשר בין חול והמשיח",
       "clueCell": [
         20,
-        7
+        4
       ]
     },
     {
-      "id": "h-20-8",
+      "id": "h-20-5",
       "direction": "horizontal",
       "cells": [
         [
           20,
-          11
-        ],
-        [
-          20,
-          10
-        ],
-        [
-          20,
-          9
-        ],
-        [
-          20,
           8
+        ],
+        [
+          20,
+          7
+        ],
+        [
+          20,
+          6
+        ],
+        [
+          20,
+          5
         ]
       ],
-      "clue": "שלא כפיוז, לשרפתו אין משמעות מושאלת",
+      "clue": "לא הציור המקורי",
       "clueCell": [
         20,
-        12
+        9
       ]
     },
     {
-      "id": "h-20-13",
+      "id": "h-20-10",
       "direction": "horizontal",
       "cells": [
         [
@@ -3095,6 +3118,18 @@
         [
           20,
           13
+        ],
+        [
+          20,
+          12
+        ],
+        [
+          20,
+          11
+        ],
+        [
+          20,
+          10
         ]
       ],
       "clue": null,
@@ -3115,18 +3150,11 @@
         [
           3,
           0
-        ]
-      ],
-      "clue": "נדב, ולא כשם פרטי",
-      "clueCell": [
-        0,
-        0
-      ]
-    },
-    {
-      "id": "v-5-0",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          4,
+          0
+        ],
         [
           5,
           0
@@ -3150,22 +3178,22 @@
         [
           10,
           0
-        ],
-        [
-          11,
-          0
         ]
       ],
-      "clue": "עושים עצמם כאילו אינם יודעים",
+      "clue": "שיטה בחשבונאות ניהולית",
       "clueCell": [
-        4,
+        0,
         0
       ]
     },
     {
-      "id": "v-13-0",
+      "id": "v-12-0",
       "direction": "vertical",
       "cells": [
+        [
+          12,
+          0
+        ],
         [
           13,
           0
@@ -3181,18 +3209,11 @@
         [
           16,
           0
-        ]
-      ],
-      "clue": "האור בקצה המנהרה? כמעט כל המנהרה!...",
-      "clueCell": [
-        12,
-        0
-      ]
-    },
-    {
-      "id": "v-18-0",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          17,
+          0
+        ],
         [
           18,
           0
@@ -3206,9 +3227,9 @@
           0
         ]
       ],
-      "clue": "עיר באוסטרליה ע \" ש עיר בסקוטלנד",
+      "clue": "תנאי לטיפול רפואי אתי, בשגרה",
       "clueCell": [
-        17,
+        11,
         0
       ]
     },
@@ -3231,23 +3252,23 @@
         [
           3,
           1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
         ]
       ],
       "clue": null,
       "clueCell": null
     },
     {
-      "id": "v-5-1",
+      "id": "v-7-1",
       "direction": "vertical",
       "cells": [
-        [
-          5,
-          1
-        ],
-        [
-          6,
-          1
-        ],
         [
           7,
           1
@@ -3255,26 +3276,26 @@
         [
           8,
           1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
         ]
       ],
-      "clue": "בימינו זה מתפרש כחיובי יותר מ ' עלול '",
+      "clue": "\" כולל הפרוורים ויישובי הלוויין \"",
       "clueCell": [
-        4,
+        6,
         1
       ]
     },
     {
-      "id": "v-10-1",
+      "id": "v-12-1",
       "direction": "vertical",
       "cells": [
-        [
-          10,
-          1
-        ],
-        [
-          11,
-          1
-        ],
         [
           12,
           1
@@ -3286,22 +3307,22 @@
         [
           14,
           1
+        ],
+        [
+          15,
+          1
         ]
       ],
-      "clue": "פעולה למניעת חיכוך",
+      "clue": "אלבום של אתני:X _ תן",
       "clueCell": [
-        9,
+        11,
         1
       ]
     },
     {
-      "id": "v-16-1",
+      "id": "v-17-1",
       "direction": "vertical",
       "cells": [
-        [
-          16,
-          1
-        ],
         [
           17,
           1
@@ -3319,9 +3340,9 @@
           1
         ]
       ],
-      "clue": "שיש לו שני היבטים שונים",
+      "clue": "הם בוודאי לא יקדימו, אדרבה...",
       "clueCell": [
-        15,
+        16,
         1
       ]
     },
@@ -3348,11 +3369,18 @@
         [
           5,
           2
-        ],
-        [
-          6,
-          2
-        ],
+        ]
+      ],
+      "clue": "כוכבת עבר אמריקאית | מכרסם ב־ 2 אותיות",
+      "clueCell": [
+        0,
+        2
+      ]
+    },
+    {
+      "id": "v-7-2",
+      "direction": "vertical",
+      "cells": [
         [
           7,
           2
@@ -3360,18 +3388,11 @@
         [
           8,
           2
-        ]
-      ],
-      "clue": "זה לא עניין של דקות... | מקורבנות הגיליוטינה",
-      "clueCell": [
-        0,
-        2
-      ]
-    },
-    {
-      "id": "v-10-2",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          9,
+          2
+        ],
         [
           10,
           2
@@ -3391,18 +3412,11 @@
         [
           14,
           2
-        ]
-      ],
-      "clue": "יוצאים אליה מהעבודה...",
-      "clueCell": [
-        9,
-        2
-      ]
-    },
-    {
-      "id": "v-16-2",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          15,
+          2
+        ],
         [
           16,
           2
@@ -3424,9 +3438,9 @@
           2
         ]
       ],
-      "clue": "ייקח מהזולת ללא רשות",
+      "clue": "פיזיקאי גרמני, על שמו חוק ויח ' מידה",
       "clueCell": [
-        15,
+        6,
         2
       ]
     },
@@ -3445,11 +3459,15 @@
         [
           2,
           3
-        ],
-        [
-          3,
-          3
-        ],
+        ]
+      ],
+      "clue": null,
+      "clueCell": null
+    },
+    {
+      "id": "v-4-3",
+      "direction": "vertical",
+      "cells": [
         [
           4,
           3
@@ -3457,38 +3475,34 @@
         [
           5,
           3
-        ]
-      ],
-      "clue": null,
-      "clueCell": null
-    },
-    {
-      "id": "v-7-3",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          6,
+          3
+        ],
         [
           7,
           3
-        ],
-        [
-          8,
-          3
-        ],
-        [
-          9,
-          3
         ]
       ],
-      "clue": "מוצר חלב או עץ?",
+      "clue": "הכדור כבר לא בידיהם",
       "clueCell": [
-        6,
+        3,
         3
       ]
     },
     {
-      "id": "v-11-3",
+      "id": "v-9-3",
       "direction": "vertical",
       "cells": [
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
         [
           11,
           3
@@ -3500,11 +3514,18 @@
         [
           13,
           3
-        ],
-        [
-          14,
-          3
-        ],
+        ]
+      ],
+      "clue": "כלב מעצבים",
+      "clueCell": [
+        8,
+        3
+      ]
+    },
+    {
+      "id": "v-15-3",
+      "direction": "vertical",
+      "cells": [
         [
           15,
           3
@@ -3530,9 +3551,9 @@
           3
         ]
       ],
-      "clue": "שתהיו לי בריאים...",
+      "clue": "יכול לתת עצה בנוגע לעץ",
       "clueCell": [
-        10,
+        14,
         3
       ]
     },
@@ -3551,22 +3572,22 @@
         [
           3,
           4
-        ],
-        [
-          4,
-          4
         ]
       ],
-      "clue": "שיר של גלי עטרי | ,_ ג ' יימס _",
+      "clue": "_ סופרן | תפקיד בחברת ביטוח",
       "clueCell": [
         0,
         4
       ]
     },
     {
-      "id": "v-6-4",
+      "id": "v-5-4",
       "direction": "vertical",
       "cells": [
+        [
+          5,
+          4
+        ],
         [
           6,
           4
@@ -3578,11 +3599,18 @@
         [
           8,
           4
-        ],
-        [
-          9,
-          4
-        ],
+        ]
+      ],
+      "clue": "שם שנגזר ממגדלנה",
+      "clueCell": [
+        4,
+        4
+      ]
+    },
+    {
+      "id": "v-10-4",
+      "direction": "vertical",
+      "cells": [
         [
           10,
           4
@@ -3594,18 +3622,11 @@
         [
           12,
           4
-        ]
-      ],
-      "clue": "מה שרב רושם...",
-      "clueCell": [
-        5,
-        4
-      ]
-    },
-    {
-      "id": "v-14-4",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          13,
+          4
+        ],
         [
           14,
           4
@@ -3617,11 +3638,19 @@
         [
           16,
           4
+        ],
+        [
+          17,
+          4
+        ],
+        [
+          18,
+          4
         ]
       ],
-      "clue": "לב, אוזן או שפתיים",
+      "clue": "מערבולי",
       "clueCell": [
-        13,
+        9,
         4
       ]
     },
@@ -3640,15 +3669,11 @@
         [
           2,
           5
-        ]
-      ],
-      "clue": null,
-      "clueCell": null
-    },
-    {
-      "id": "v-4-5",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          3,
+          5
+        ],
         [
           4,
           5
@@ -3668,11 +3693,15 @@
         [
           8,
           5
-        ],
-        [
-          9,
-          5
-        ],
+        ]
+      ],
+      "clue": null,
+      "clueCell": null
+    },
+    {
+      "id": "v-10-5",
+      "direction": "vertical",
+      "cells": [
         [
           10,
           5
@@ -3680,22 +3709,22 @@
         [
           11,
           5
+        ],
+        [
+          12,
+          5
         ]
       ],
-      "clue": "היא הגברת בן־צבי",
+      "clue": "שורו, הביטו ו _",
       "clueCell": [
-        3,
+        9,
         5
       ]
     },
     {
-      "id": "v-13-5",
+      "id": "v-14-5",
       "direction": "vertical",
       "cells": [
-        [
-          13,
-          5
-        ],
         [
           14,
           5
@@ -3707,11 +3736,18 @@
         [
           16,
           5
-        ],
-        [
-          17,
-          5
-        ],
+        ]
+      ],
+      "clue": "מושלם: ללא _",
+      "clueCell": [
+        13,
+        5
+      ]
+    },
+    {
+      "id": "v-18-5",
+      "direction": "vertical",
+      "cells": [
         [
           18,
           5
@@ -3725,20 +3761,16 @@
           5
         ]
       ],
-      "clue": "משיריה: שלווה",
+      "clue": "תחילית בהוראת שלילה",
       "clueCell": [
-        12,
+        17,
         5
       ]
     },
     {
-      "id": "v-1-6",
+      "id": "v-2-6",
       "direction": "vertical",
       "cells": [
-        [
-          1,
-          6
-        ],
         [
           2,
           6
@@ -3754,26 +3786,26 @@
         [
           5,
           6
-        ],
-        [
-          6,
-          6
-        ],
-        [
-          7,
-          6
         ]
       ],
-      "clue": "אולם שאינו בנוי | רכב על פגסוס",
+      "clue": "אשתי ש _",
       "clueCell": [
-        0,
+        1,
         6
       ]
     },
     {
-      "id": "v-9-6",
+      "id": "v-7-6",
       "direction": "vertical",
       "cells": [
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
         [
           9,
           6
@@ -3781,11 +3813,18 @@
         [
           10,
           6
-        ],
-        [
-          11,
-          6
-        ],
+        ]
+      ],
+      "clue": "מקטרת",
+      "clueCell": [
+        6,
+        6
+      ]
+    },
+    {
+      "id": "v-12-6",
+      "direction": "vertical",
+      "cells": [
         [
           12,
           6
@@ -3801,18 +3840,11 @@
         [
           15,
           6
-        ]
-      ],
-      "clue": "מפרים את הסדר",
-      "clueCell": [
-        8,
-        6
-      ]
-    },
-    {
-      "id": "v-17-6",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          16,
+          6
+        ],
         [
           17,
           6
@@ -3830,140 +3862,159 @@
           6
         ]
       ],
-      "clue": "מי לי...?",
+      "clue": "נאמרת גם בשבת",
       "clueCell": [
-        16,
+        11,
         6
       ]
     },
     {
-      "id": "v-0-7",
+      "id": "v-1-7",
+      "direction": "vertical",
+      "cells": [
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      "clue": "אפשר לומר שזה כמו אפשר",
+      "clueCell": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "v-6-7",
+      "direction": "vertical",
+      "cells": [
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          7
+        ]
+      ],
+      "clue": "ממש לפני זמן קצר!",
+      "clueCell": [
+        5,
+        7
+      ]
+    },
+    {
+      "id": "v-11-7",
+      "direction": "vertical",
+      "cells": [
+        [
+          11,
+          7
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          13,
+          7
+        ],
+        [
+          14,
+          7
+        ],
+        [
+          15,
+          7
+        ]
+      ],
+      "clue": "נָמַק",
+      "clueCell": [
+        10,
+        7
+      ]
+    },
+    {
+      "id": "v-17-7",
+      "direction": "vertical",
+      "cells": [
+        [
+          17,
+          7
+        ],
+        [
+          18,
+          7
+        ],
+        [
+          19,
+          7
+        ],
+        [
+          20,
+          7
+        ]
+      ],
+      "clue": "עיר בנחלת שבט דן",
+      "clueCell": [
+        16,
+        7
+      ]
+    },
+    {
+      "id": "v-0-8",
       "direction": "vertical",
       "cells": [
         [
           0,
-          7
+          8
         ],
         [
           1,
-          7
+          8
         ],
         [
           2,
-          7
+          8
         ],
         [
           3,
-          7
+          8
         ],
         [
           4,
-          7
+          8
         ],
         [
           5,
-          7
+          8
         ],
         [
           6,
-          7
-        ],
-        [
-          7,
-          7
-        ],
-        [
-          8,
-          7
+          8
         ]
       ],
       "clue": null,
       "clueCell": null
-    },
-    {
-      "id": "v-10-7",
-      "direction": "vertical",
-      "cells": [
-        [
-          10,
-          7
-        ],
-        [
-          11,
-          7
-        ],
-        [
-          12,
-          7
-        ],
-        [
-          13,
-          7
-        ],
-        [
-          14,
-          7
-        ]
-      ],
-      "clue": "רק בטור _ תצעד!",
-      "clueCell": [
-        9,
-        7
-      ]
-    },
-    {
-      "id": "v-16-7",
-      "direction": "vertical",
-      "cells": [
-        [
-          16,
-          7
-        ],
-        [
-          17,
-          7
-        ],
-        [
-          18,
-          7
-        ],
-        [
-          19,
-          7
-        ]
-      ],
-      "clue": "קנה לו שם...",
-      "clueCell": [
-        15,
-        7
-      ]
-    },
-    {
-      "id": "v-3-8",
-      "direction": "vertical",
-      "cells": [
-        [
-          3,
-          8
-        ],
-        [
-          4,
-          8
-        ],
-        [
-          5,
-          8
-        ],
-        [
-          6,
-          8
-        ]
-      ],
-      "clue": "חרבונה, לדוגמה",
-      "clueCell": [
-        2,
-        8
-      ]
     },
     {
       "id": "v-8-8",
@@ -3988,26 +4039,22 @@
         [
           12,
           8
+        ],
+        [
+          13,
+          8
         ]
       ],
-      "clue": "כך דיבבתי דוב",
+      "clue": "שלוש אחיות מיתולוגיות",
       "clueCell": [
         7,
         8
       ]
     },
     {
-      "id": "v-14-8",
+      "id": "v-16-8",
       "direction": "vertical",
       "cells": [
-        [
-          14,
-          8
-        ],
-        [
-          15,
-          8
-        ],
         [
           16,
           8
@@ -4029,43 +4076,24 @@
           8
         ]
       ],
-      "clue": "אזור פיתוח...",
+      "clue": "משקה שלא מכיל תולעת",
       "clueCell": [
-        13,
+        15,
         8
       ]
     },
     {
-      "id": "v-1-9",
+      "id": "v-4-9",
       "direction": "vertical",
       "cells": [
-        [
-          1,
-          9
-        ],
-        [
-          2,
-          9
-        ],
-        [
-          3,
-          9
-        ],
         [
           4,
           9
-        ]
-      ],
-      "clue": "היא יכולה לעזור בהתבוננות עצמית...",
-      "clueCell": [
-        0,
-        9
-      ]
-    },
-    {
-      "id": "v-6-9",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          5,
+          9
+        ],
         [
           6,
           9
@@ -4073,11 +4101,18 @@
         [
           7,
           9
-        ],
-        [
-          8,
-          9
-        ],
+        ]
+      ],
+      "clue": "הפגין מין לקות דיבור",
+      "clueCell": [
+        3,
+        9
+      ]
+    },
+    {
+      "id": "v-9-9",
+      "direction": "vertical",
+      "cells": [
         [
           9,
           9
@@ -4085,18 +4120,11 @@
         [
           10,
           9
-        ]
-      ],
-      "clue": "זה הפתרון, מה ההיסוס?...",
-      "clueCell": [
-        5,
-        9
-      ]
-    },
-    {
-      "id": "v-12-9",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          11,
+          9
+        ],
         [
           12,
           9
@@ -4122,20 +4150,16 @@
           9
         ]
       ],
-      "clue": "פול _",
+      "clue": "ח \" כ וסבא רבא של שירה גפן",
       "clueCell": [
-        11,
+        8,
         9
       ]
     },
     {
-      "id": "v-0-10",
+      "id": "v-1-10",
       "direction": "vertical",
       "cells": [
-        [
-          0,
-          10
-        ],
         [
           1,
           10
@@ -4147,15 +4171,11 @@
         [
           3,
           10
-        ]
-      ],
-      "clue": null,
-      "clueCell": null
-    },
-    {
-      "id": "v-5-10",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          4,
+          10
+        ],
         [
           5,
           10
@@ -4175,41 +4195,30 @@
         [
           9,
           10
-        ]
-      ],
-      "clue": "אולי נעשה באוריגמי קטנטן",
-      "clueCell": [
-        4,
-        10
-      ]
-    },
-    {
-      "id": "v-11-10",
-      "direction": "vertical",
-      "cells": [
+        ],
+        [
+          10,
+          10
+        ],
         [
           11,
           10
-        ],
-        [
-          12,
-          10
-        ],
-        [
-          13,
-          10
         ]
       ],
-      "clue": "ההבדל בין איל ואייל",
+      "clue": "מפעל חיים...",
       "clueCell": [
-        10,
+        0,
         10
       ]
     },
     {
-      "id": "v-15-10",
+      "id": "v-14-10",
       "direction": "vertical",
       "cells": [
+        [
+          14,
+          10
+        ],
         [
           15,
           10
@@ -4235,16 +4244,24 @@
           10
         ]
       ],
-      "clue": "מצעד ה _",
+      "clue": "אקראי",
       "clueCell": [
-        14,
+        13,
         10
       ]
     },
     {
-      "id": "v-2-11",
+      "id": "v-0-11",
       "direction": "vertical",
       "cells": [
+        [
+          0,
+          11
+        ],
+        [
+          1,
+          11
+        ],
         [
           2,
           11
@@ -4256,22 +4273,19 @@
         [
           4,
           11
-        ],
-        [
-          5,
-          11
         ]
       ],
-      "clue": "הוא מססמי סטריט",
-      "clueCell": [
-        1,
-        11
-      ]
+      "clue": null,
+      "clueCell": null
     },
     {
-      "id": "v-7-11",
+      "id": "v-6-11",
       "direction": "vertical",
       "cells": [
+        [
+          6,
+          11
+        ],
         [
           7,
           11
@@ -4279,22 +4293,22 @@
         [
           8,
           11
-        ],
-        [
-          9,
-          11
         ]
       ],
-      "clue": "מושב, ועם עין: קיבוץ",
+      "clue": "אילנית: _ _ _",
       "clueCell": [
-        6,
+        5,
         11
       ]
     },
     {
-      "id": "v-11-11",
+      "id": "v-10-11",
       "direction": "vertical",
       "cells": [
+        [
+          10,
+          11
+        ],
         [
           11,
           11
@@ -4314,11 +4328,18 @@
         [
           15,
           11
-        ],
-        [
-          16,
-          11
-        ],
+        ]
+      ],
+      "clue": "תכונת הטוקסינים",
+      "clueCell": [
+        9,
+        11
+      ]
+    },
+    {
+      "id": "v-17-11",
+      "direction": "vertical",
+      "cells": [
         [
           17,
           11
@@ -4336,20 +4357,16 @@
           11
         ]
       ],
-      "clue": "לפי כלל זה דיני חז \" ל תקפים תמיד",
+      "clue": "מקבילתה הרומית של הרה",
       "clueCell": [
-        10,
+        16,
         11
       ]
     },
     {
-      "id": "v-0-12",
+      "id": "v-1-12",
       "direction": "vertical",
       "cells": [
-        [
-          0,
-          12
-        ],
         [
           1,
           12
@@ -4371,8 +4388,11 @@
           12
         ]
       ],
-      "clue": null,
-      "clueCell": null
+      "clue": "חוסם, כמנגנון של תרופה | ל \" ג _",
+      "clueCell": [
+        0,
+        12
+      ]
     },
     {
       "id": "v-7-12",
@@ -4413,22 +4433,22 @@
         [
           15,
           12
+        ],
+        [
+          16,
+          12
         ]
       ],
-      "clue": "הארמון בו שוכן הפרלמנט הבריטי",
+      "clue": "בודדים, לחיוב",
       "clueCell": [
         6,
         12
       ]
     },
     {
-      "id": "v-17-12",
+      "id": "v-18-12",
       "direction": "vertical",
       "cells": [
-        [
-          17,
-          12
-        ],
         [
           18,
           12
@@ -4436,11 +4456,15 @@
         [
           19,
           12
+        ],
+        [
+          20,
+          12
         ]
       ],
-      "clue": "חצי קטנוע...",
+      "clue": "צ ' רלס – גלגול שלו",
       "clueCell": [
-        16,
+        17,
         12
       ]
     },
@@ -4477,7 +4501,7 @@
           13
         ]
       ],
-      "clue": "פסלונים | אחת היא לו? שתיים!",
+      "clue": "אזור נופש \" חד־ממדי \"",
       "clueCell": [
         0,
         13
@@ -4502,22 +4526,22 @@
         [
           12,
           13
+        ],
+        [
+          13,
+          13
         ]
       ],
-      "clue": "האן _",
+      "clue": "אם ננעלו...",
       "clueCell": [
         8,
         13
       ]
     },
     {
-      "id": "v-14-13",
+      "id": "v-15-13",
       "direction": "vertical",
       "cells": [
-        [
-          14,
-          13
-        ],
         [
           15,
           13
@@ -4543,20 +4567,16 @@
           13
         ]
       ],
-      "clue": "בניגוד לעץ פרי",
+      "clue": "שגב",
       "clueCell": [
-        13,
+        14,
         13
       ]
     },
     {
-      "id": "v-0-14",
+      "id": "v-1-14",
       "direction": "vertical",
       "cells": [
-        [
-          0,
-          14
-        ],
         [
           1,
           14
@@ -4586,8 +4606,11 @@
           14
         ]
       ],
-      "clue": null,
-      "clueCell": null
+      "clue": "תואר ספרותי לאחד XXXXL",
+      "clueCell": [
+        0,
+        14
+      ]
     },
     {
       "id": "v-9-14",
@@ -4642,7 +4665,7 @@
           14
         ]
       ],
-      "clue": "ביטוי לסיום ששאול מישעיהו",
+      "clue": "קיבל השראה",
       "clueCell": [
         8,
         14
@@ -4650,23 +4673,21 @@
     }
   ],
   "warnings": {
-    "runs_without_clue": 15,
+    "runs_without_clue": 13,
     "run_ids_without_clue": [
-      "h-2-9",
+      "h-1-7",
+      "h-3-10",
       "h-6-13",
-      "h-9-8",
-      "h-12-6",
-      "h-14-11",
-      "h-16-13",
-      "h-18-10",
-      "h-20-13",
+      "h-9-12",
+      "h-13-11",
+      "h-15-9",
+      "h-17-13",
+      "h-20-10",
       "v-0-1",
       "v-0-3",
       "v-0-5",
-      "v-0-7",
-      "v-0-10",
-      "v-0-12",
-      "v-0-14"
+      "v-0-8",
+      "v-0-11"
     ]
   }
 }
